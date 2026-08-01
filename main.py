@@ -113,12 +113,18 @@ class AboodHandler(BaseHTTPRequestHandler):
         if stats["ratings"]:
             avg_rating = sum(stats["ratings"]) / len(stats["ratings"])
         
+        # بناء نجوم التقييم
+        full_stars = int(round(avg_rating))
+        empty_stars = 5 - full_stars
+        stars_display = "⭐" * full_stars + "☆" * empty_stars
+        
         return f"""<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>عبود | تعليم الأمن السيبراني والاختراقات</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
         body {{
@@ -183,7 +189,6 @@ class AboodHandler(BaseHTTPRequestHandler):
         }}
         .btn-rating:hover {{ transform: scale(1.04); box-shadow: 0 8px 30px rgba(255,215,0,0.3); }}
         
-        /* ===== قسم الإحصائيات ===== */
         .stats-section {{
             background: linear-gradient(135deg, rgba(0,255,136,0.05), rgba(0,204,255,0.05));
             border: 1px solid rgba(0,255,136,0.1);
@@ -235,7 +240,6 @@ class AboodHandler(BaseHTTPRequestHandler):
             color: #8d99b6; font-size: 18px; max-width: 700px; margin: 15px auto 30px;
         }}
         
-        /* ===== النوافذ المنبثقة (Modal) ===== */
         .modal-overlay {{
             display: none;
             position: fixed;
@@ -296,7 +300,6 @@ class AboodHandler(BaseHTTPRequestHandler):
         .modal-title.support-title i {{ color: #ff6b6b; }}
         .modal-title.rating-title i {{ color: #ffd700; }}
         
-        /* ===== قسم الدعم داخل المودال ===== */
         .support-grid {{
             display: grid; grid-template-columns: 1fr 1fr;
             gap: 20px; margin-top: 15px;
@@ -349,7 +352,6 @@ class AboodHandler(BaseHTTPRequestHandler):
         }}
         .support-info-item i {{ color: #ff6b6b; }}
         
-        /* ===== نموذج التقييم داخل المودال ===== */
         .rating-form-modal {{
             display: flex;
             flex-direction: column;
@@ -386,7 +388,6 @@ class AboodHandler(BaseHTTPRequestHandler):
             letter-spacing: 4px;
         }}
         
-        /* ===== قسم الأدوات المحرمة ===== */
         .blackhat-section {{
             background: linear-gradient(135deg, rgba(255,0,0,0.08), rgba(200,0,0,0.05));
             border: 2px solid rgba(255,0,0,0.2);
@@ -515,7 +516,6 @@ class AboodHandler(BaseHTTPRequestHandler):
         </div>
     </header>
 
-    <!-- ===== قسم الإحصائيات ===== -->
     <div class="stats-section">
         <div class="stats-item">
             <i class="fas fa-users"></i>
@@ -529,7 +529,7 @@ class AboodHandler(BaseHTTPRequestHandler):
             <div>
                 <span class="number">{avg_rating:.1f}</span>
                 <span class="label">/ 5</span>
-                <div class="stars">{'⭐' * int(round(avg_rating))}{'☆' * (5 - int(round(avg_rating)))}</div>
+                <div class="stars">{stars_display}</div>
             </div>
         </div>
         <div class="stats-actions">
@@ -546,7 +546,6 @@ class AboodHandler(BaseHTTPRequestHandler):
         </a>
     </section>
 
-    <!-- ===== بقية الأقسام (مختصرة) ===== -->
     <h2 class="category-title" id="courses"><i class="fas fa-graduation-cap"></i> منصات تعليمية - دورات مجانية</h2>
     <div class="links-grid">
         <div class="link-card"><a href="https://www.coursera.org/courses?query=cybersecurity" target="_blank"><i class="fas fa-school"></i> Coursera <span class="badge">مجاني</span></a></div>
@@ -561,7 +560,6 @@ class AboodHandler(BaseHTTPRequestHandler):
         <div class="link-card"><a href="https://www.eccouncil.org/training-courses/" target="_blank"><i class="fas fa-certificate"></i> EC-Council <span class="badge">مدفوع</span></a></div>
     </div>
 
-    <!-- ===== قسم 2: أدوات الاختراق ===== -->
     <h2 class="category-title" id="tools"><i class="fas fa-tools"></i> أدوات الاختراق والتحليل</h2>
     <div class="links-grid">
         <div class="link-card"><a href="https://www.kali.org/tools/" target="_blank"><i class="fas fa-skull-crossbones"></i> Kali Tools</a></div>
@@ -582,7 +580,6 @@ class AboodHandler(BaseHTTPRequestHandler):
         <div class="link-card"><a href="https://www.coresecurity.com/core-impact" target="_blank"><i class="fas fa-crosshairs"></i> Core Impact</a></div>
     </div>
 
-    <!-- ===== قسم 3: قنوات يوتيوب ===== -->
     <h2 class="category-title"><i class="fab fa-youtube"></i> قنوات يوتيوب - اختراقات وأمن سيبراني</h2>
     <div class="links-grid">
         <div class="link-card"><a href="https://www.youtube.com/@NetworkChuck" target="_blank"><i class="fab fa-youtube"></i> NetworkChuck</a></div>
@@ -602,7 +599,6 @@ class AboodHandler(BaseHTTPRequestHandler):
         <div class="link-card"><a href="https://www.youtube.com/@Computerphile" target="_blank"><i class="fab fa-youtube"></i> Computerphile</a></div>
     </div>
 
-    <!-- ===== قسم 4: كتب ومكتبات ===== -->
     <h2 class="category-title" id="resources"><i class="fas fa-book"></i> كتب ومراجع مجانية</h2>
     <div class="links-grid">
         <div class="link-card"><a href="https://www.oreilly.com/online-learning/" target="_blank"><i class="fas fa-book-open"></i> O'Reilly</a></div>
@@ -619,7 +615,6 @@ class AboodHandler(BaseHTTPRequestHandler):
         <div class="link-card"><a href="https://www.enisa.europa.eu/topics/cybersecurity" target="_blank"><i class="fas fa-europe"></i> ENISA</a></div>
     </div>
 
-    <!-- ===== قسم 5: منتديات ومجتمعات ===== -->
     <h2 class="category-title"><i class="fas fa-users"></i> منتديات ومجتمعات اختراق</h2>
     <div class="links-grid">
         <div class="link-card"><a href="https://www.reddit.com/r/cybersecurity/" target="_blank"><i class="fab fa-reddit"></i> r/cybersecurity</a></div>
@@ -639,7 +634,6 @@ class AboodHandler(BaseHTTPRequestHandler):
         <div class="link-card"><a href="https://www.leetcode.com/" target="_blank"><i class="fas fa-code"></i> LeetCode</a></div>
     </div>
 
-    <!-- ===== قسم 6: شهادات مهنية ===== -->
     <h2 class="category-title"><i class="fas fa-certificate"></i> شهادات احترافية في الأمن السيبراني</h2>
     <div class="links-grid">
         <div class="link-card"><a href="https://www.eccouncil.org/ceh/" target="_blank"><i class="fas fa-certificate"></i> CEH</a></div>
@@ -656,7 +650,6 @@ class AboodHandler(BaseHTTPRequestHandler):
         <div class="link-card"><a href="https://www.eccouncil.org/chfi/" target="_blank"><i class="fas fa-certificate"></i> CHFI</a></div>
     </div>
 
-    <!-- ===== قسم 7: هجمات وحماية ===== -->
     <h2 class="category-title"><i class="fas fa-bug"></i> تقنيات الهجوم والدفاع</h2>
     <div class="links-grid">
         <div class="link-card"><a href="https://www.owasp.org/index.php/OWASP_Top_Ten_Cheat_Sheet" target="_blank"><i class="fas fa-list"></i> OWASP Top 10</a></div>
@@ -673,7 +666,6 @@ class AboodHandler(BaseHTTPRequestHandler):
         <div class="link-card"><a href="https://www.cert.org/" target="_blank"><i class="fas fa-certificate"></i> CERT</a></div>
     </div>
 
-    <!-- ===== قسم 8: برمجيات خبيثة ===== -->
     <h2 class="category-title"><i class="fas fa-virus"></i> تحليل البرمجيات الخبيثة</h2>
     <div class="links-grid">
         <div class="link-card"><a href="https://www.virustotal.com/" target="_blank"><i class="fas fa-shield-virus"></i> VirusTotal</a></div>
@@ -690,7 +682,6 @@ class AboodHandler(BaseHTTPRequestHandler):
         <div class="link-card"><a href="https://www.mandiant.com/" target="_blank"><i class="fas fa-eye"></i> Mandiant</a></div>
     </div>
 
-    <!-- ===== قسم 9: بلوكشين ===== -->
     <h2 class="category-title"><i class="fas fa-link"></i> أمن البلوكشين والعملات الرقمية</h2>
     <div class="links-grid">
         <div class="link-card"><a href="https://ethereum.org/en/security/" target="_blank"><i class="fab fa-ethereum"></i> Ethereum Security</a></div>
@@ -707,7 +698,6 @@ class AboodHandler(BaseHTTPRequestHandler):
         <div class="link-card"><a href="https://www.gemini.com/learn" target="_blank"><i class="fas fa-graduation-cap"></i> Gemini Learn</a></div>
     </div>
 
-    <!-- ===== قسم 10: إنترنت الأشياء ===== -->
     <h2 class="category-title"><i class="fas fa-microchip"></i> أمن إنترنت الأشياء (IoT)</h2>
     <div class="links-grid">
         <div class="link-card"><a href="https://www.iotsecurityfoundation.org/" target="_blank"><i class="fas fa-shield"></i> IoT Security Foundation</a></div>
@@ -722,7 +712,6 @@ class AboodHandler(BaseHTTPRequestHandler):
         <div class="link-card"><a href="https://www.fortinet.com/resources/cyberglossary/iot-security" target="_blank"><i class="fas fa-shield"></i> Fortinet IoT</a></div>
     </div>
 
-    <!-- ===== قسم 11: أمن السحابة ===== -->
     <h2 class="category-title"><i class="fas fa-cloud"></i> أمن الحوسبة السحابية</h2>
     <div class="links-grid">
         <div class="link-card"><a href="https://aws.amazon.com/security/" target="_blank"><i class="fab fa-aws"></i> AWS Security</a></div>
@@ -737,7 +726,6 @@ class AboodHandler(BaseHTTPRequestHandler):
         <div class="link-card"><a href="https://www.netlify.com/security/" target="_blank"><i class="fas fa-cloud"></i> Netlify Security</a></div>
     </div>
 
-    <!-- ===== قسم الأدوات المحرمة ===== -->
     <section class="blackhat-section" id="blackhat">
         <div class="blackhat-header">
             <i class="fas fa-skull-crossbones"></i>
@@ -830,7 +818,6 @@ class AboodHandler(BaseHTTPRequestHandler):
     </footer>
 </div>
 
-<!-- ===== مودال الدعم الفني ===== -->
 <div class="modal-overlay" id="supportModal">
     <div class="modal-box">
         <button class="modal-close" onclick="closeSupport()">✕</button>
@@ -885,7 +872,6 @@ class AboodHandler(BaseHTTPRequestHandler):
     </div>
 </div>
 
-<!-- ===== مودال التقييم ===== -->
 <div class="modal-overlay" id="ratingModal">
     <div class="modal-box">
         <button class="modal-close" onclick="closeRating()">✕</button>
@@ -893,7 +879,7 @@ class AboodHandler(BaseHTTPRequestHandler):
             <i class="fas fa-star"></i> تقييم الموقع
         </div>
         <div class="rating-current">
-            <div>التقييم الحالي: <span class="big-stars">{'⭐' * int(round(avg_rating))}{'☆' * (5 - int(round(avg_rating)))}</span></div>
+            <div>التقييم الحالي: <span class="big-stars">{stars_display}</span></div>
             <div style="font-size:16px; color:#8d99b6; margin-top:4px;">{avg_rating:.1f} / 5 من {len(stats["ratings"])} تقييم</div>
         </div>
         
@@ -918,31 +904,30 @@ class AboodHandler(BaseHTTPRequestHandler):
 </div>
 
 <script>
-    function openSupport() {
+    function openSupport() {{
         document.getElementById('supportModal').classList.add('active');
         document.body.style.overflow = 'hidden';
-    }
-    function closeSupport() {
+    }}
+    function closeSupport() {{
         document.getElementById('supportModal').classList.remove('active');
         document.body.style.overflow = '';
-    }
-    function openRating() {
+    }}
+    function openRating() {{
         document.getElementById('ratingModal').classList.add('active');
         document.body.style.overflow = 'hidden';
-    }
-    function closeRating() {
+    }}
+    function closeRating() {{
         document.getElementById('ratingModal').classList.remove('active');
         document.body.style.overflow = '';
-    }
-    // إغلاق المودال عند الضغط خارج المحتوى
-    document.querySelectorAll('.modal-overlay').forEach(overlay => {
-        overlay.addEventListener('click', function(e) {
-            if (e.target === this) {
+    }}
+    document.querySelectorAll('.modal-overlay').forEach(function(overlay) {{
+        overlay.addEventListener('click', function(e) {{
+            if (e.target === this) {{
                 this.classList.remove('active');
                 document.body.style.overflow = '';
-            }
-        });
-    });
+            }}
+        }});
+    }});
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
 </body>
