@@ -256,6 +256,11 @@ class AboodHandler(BaseHTTPRequestHandler):
         }}
         .modal-box {{
             background: #1a1a2e;
+            background-image: url('https://i.imgur.com/3rJh8qP.png');
+            background-size: cover;
+            background-position: center;
+            background-blend-mode: overlay;
+            background-color: rgba(26, 26, 46, 0.85);
             border-radius: 24px;
             padding: 35px 40px;
             max-width: 600px;
