@@ -177,8 +177,13 @@ class AboodHandler(BaseHTTPRequestHandler):
             color: #fff;
         }}
         .btn-danger:hover {{ transform: scale(1.04); box-shadow: 0 8px 30px rgba(255,0,0,0.3); }}
+        .btn-rating {{
+            background: linear-gradient(135deg, #ffd700, #f0a500);
+            color: #0a0a12;
+        }}
+        .btn-rating:hover {{ transform: scale(1.04); box-shadow: 0 8px 30px rgba(255,215,0,0.3); }}
         
-        /* ===== قسم الإحصائيات والتقييم ===== */
+        /* ===== قسم الإحصائيات ===== */
         .stats-section {{
             background: linear-gradient(135deg, rgba(0,255,136,0.05), rgba(0,204,255,0.05));
             border: 1px solid rgba(0,255,136,0.1);
@@ -209,32 +214,12 @@ class AboodHandler(BaseHTTPRequestHandler):
             font-size: 20px;
             letter-spacing: 2px;
         }}
-        
-        .rating-form {{
+        .stats-actions {{
             display: flex;
-            align-items: center;
             gap: 10px;
             flex-wrap: wrap;
         }}
-        .rating-form select, .rating-form input {{
-            padding: 8px 14px;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 12px;
-            color: #fff;
-            font-size: 14px;
-        }}
-        .rating-form select:focus, .rating-form input:focus {{
-            outline: none;
-            border-color: #00ff88;
-        }}
-        .rating-form input {{
-            min-width: 150px;
-        }}
-        .rating-form .btn {{
-            padding: 8px 20px;
-            font-size: 13px;
-        }}
+        .stats-actions .btn {{ font-size: 13px; padding: 8px 18px; }}
         
         .hero {{
             text-align: center; padding: 40px 0 30px;
@@ -248,6 +233,157 @@ class AboodHandler(BaseHTTPRequestHandler):
         }}
         .hero p {{
             color: #8d99b6; font-size: 18px; max-width: 700px; margin: 15px auto 30px;
+        }}
+        
+        /* ===== النوافذ المنبثقة (Modal) ===== */
+        .modal-overlay {{
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }}
+        .modal-overlay.active {{
+            display: flex;
+        }}
+        .modal-box {{
+            background: #1a1a2e;
+            border-radius: 24px;
+            padding: 35px 40px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid rgba(255,255,255,0.08);
+            position: relative;
+            animation: fadeIn 0.3s ease;
+        }}
+        @keyframes fadeIn {{
+            from {{ opacity: 0; transform: scale(0.95); }}
+            to {{ opacity: 1; transform: scale(1); }}
+        }}
+        .modal-close {{
+            position: absolute;
+            top: 15px; left: 20px;
+            background: rgba(255,255,255,0.06);
+            border: none;
+            color: #b0baca;
+            font-size: 24px;
+            cursor: pointer;
+            transition: 0.3s;
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }}
+        .modal-close:hover {{
+            background: rgba(255,107,107,0.2);
+            color: #ff6b6b;
+        }}
+        .modal-title {{
+            color: #fff;
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-align: center;
+        }}
+        .modal-title i {{ margin-left: 10px; }}
+        .modal-title.support-title i {{ color: #ff6b6b; }}
+        .modal-title.rating-title i {{ color: #ffd700; }}
+        
+        /* ===== قسم الدعم داخل المودال ===== */
+        .support-grid {{
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 20px; margin-top: 15px;
+        }}
+        .support-card {{
+            background: rgba(255,255,255,0.04);
+            border-radius: 18px; padding: 20px;
+            border: 1px solid rgba(255,255,255,0.06);
+            transition: 0.3s;
+        }}
+        .support-card:hover {{
+            border-color: rgba(255,107,107,0.2);
+            transform: translateY(-4px);
+        }}
+        .support-card h3 {{
+            color: #fff; font-size: 18px; margin-bottom: 10px;
+        }}
+        .support-card h3 i {{ color: #ff6b6b; margin-left: 8px; }}
+        .support-card p {{
+            color: #b0baca; font-size: 14px; line-height: 1.6; margin-bottom: 15px;
+        }}
+        .support-card .btn {{ width: 100%; justify-content: center; padding: 12px; }}
+        
+        .support-form {{
+            background: rgba(255,255,255,0.03);
+            border-radius: 18px; padding: 20px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }}
+        .support-form input, .support-form textarea {{
+            width: 100%; padding: 12px 14px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px; color: #fff; font-size: 14px;
+            margin-bottom: 12px; font-family: inherit;
+        }}
+        .support-form input:focus, .support-form textarea:focus {{
+            outline: none; border-color: #ff6b6b;
+        }}
+        .support-form textarea {{ min-height: 80px; resize: vertical; }}
+        .support-form .btn {{ width: 100%; justify-content: center; padding: 12px; }}
+        
+        .support-info {{
+            display: flex; flex-wrap: wrap; gap: 15px;
+            margin-top: 20px; padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }}
+        .support-info-item {{
+            display: flex; align-items: center; gap: 8px;
+            color: #b0baca; font-size: 14px;
+        }}
+        .support-info-item i {{ color: #ff6b6b; }}
+        
+        /* ===== نموذج التقييم داخل المودال ===== */
+        .rating-form-modal {{
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }}
+        .rating-form-modal select, .rating-form-modal input {{
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 15px;
+            width: 100%;
+        }}
+        .rating-form-modal select:focus, .rating-form-modal input:focus {{
+            outline: none;
+            border-color: #ffd700;
+        }}
+        .rating-form-modal .btn {{
+            width: 100%;
+            justify-content: center;
+            padding: 14px;
+            font-size: 16px;
+        }}
+        .rating-current {{
+            text-align: center;
+            color: #b0baca;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }}
+        .rating-current .big-stars {{
+            font-size: 32px;
+            color: #ffd700;
+            letter-spacing: 4px;
         }}
         
         /* ===== قسم الأدوات المحرمة ===== */
@@ -286,70 +422,6 @@ class AboodHandler(BaseHTTPRequestHandler):
             color: #ff3333; padding: 4px 16px; border-radius: 40px;
             font-size: 13px; font-weight: 700;
         }}
-        
-        .support-section {{
-            background: linear-gradient(135deg, rgba(255,107,107,0.08), rgba(238,90,36,0.05));
-            border: 1px solid rgba(255,107,107,0.15);
-            border-radius: 24px;
-            padding: 35px 40px;
-            margin: 30px 0 40px;
-            backdrop-filter: blur(8px);
-        }}
-        .support-header {{
-            display: flex; align-items: center; gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }}
-        .support-header h2 {{
-            color: #ff6b6b; font-size: 28px; font-weight: 800;
-        }}
-        .support-header i {{ color: #ff6b6b; font-size: 32px; }}
-        .support-header .badge-support {{
-            background: rgba(255,107,107,0.2);
-            color: #ff6b6b; padding: 4px 16px; border-radius: 40px;
-            font-size: 13px; font-weight: 700;
-        }}
-        .support-grid {{
-            display: grid; grid-template-columns: 1fr 1fr;
-            gap: 30px; margin-top: 15px;
-        }}
-        .support-card {{
-            background: rgba(255,255,255,0.04);
-            border-radius: 18px; padding: 25px;
-            border: 1px solid rgba(255,255,255,0.06);
-            transition: 0.3s;
-        }}
-        .support-card:hover {{
-            border-color: rgba(255,107,107,0.2);
-            transform: translateY(-4px);
-        }}
-        .support-card h3 {{
-            color: #fff; font-size: 20px; margin-bottom: 12px;
-        }}
-        .support-card h3 i {{ color: #ff6b6b; margin-left: 10px; }}
-        .support-card p {{
-            color: #b0baca; font-size: 15px; line-height: 1.6; margin-bottom: 18px;
-        }}
-        .support-card .btn {{ width: 100%; justify-content: center; padding: 14px; }}
-        .support-card .btn i {{ font-size: 18px; }}
-        
-        .support-form {{
-            background: rgba(255,255,255,0.03);
-            border-radius: 18px; padding: 25px;
-            border: 1px solid rgba(255,255,255,0.06);
-        }}
-        .support-form input, .support-form textarea {{
-            width: 100%; padding: 14px 16px;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 12px; color: #fff; font-size: 15px;
-            margin-bottom: 14px; font-family: inherit;
-        }}
-        .support-form input:focus, .support-form textarea:focus {{
-            outline: none; border-color: #ff6b6b;
-        }}
-        .support-form textarea {{ min-height: 100px; resize: vertical; }}
-        .support-form .btn {{ width: 100%; justify-content: center; padding: 14px; }}
         
         .category-title {{
             color: #fff; font-size: 26px; font-weight: 800;
@@ -417,11 +489,11 @@ class AboodHandler(BaseHTTPRequestHandler):
             .nav-links {{ justify-content: center; gap: 12px; font-size: 14px; }}
             .hero h1 {{ font-size: 28px; }}
             .support-grid {{ grid-template-columns: 1fr; }}
-            .support-section {{ padding: 20px; }}
             .blackhat-section {{ padding: 20px; }}
             .links-grid {{ grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }}
             .stats-section {{ flex-direction: column; align-items: stretch; text-align: center; }}
-            .rating-form {{ justify-content: center; }}
+            .stats-actions {{ justify-content: center; }}
+            .modal-box {{ padding: 25px 20px; }}
         }}
     </style>
 </head>
@@ -434,16 +506,16 @@ class AboodHandler(BaseHTTPRequestHandler):
             <li><a href="#courses">الدورات</a></li>
             <li><a href="#tools">أدوات</a></li>
             <li><a href="#blackhat">أدوات محرمة</a></li>
-            <li><a href="#support">الدعم</a></li>
             <li><a href="#resources">مصادر</a></li>
         </ul>
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <a href="#support" class="btn btn-support"><i class="fas fa-headset"></i> الدعم الفني</a>
+            <a href="#" class="btn btn-support" onclick="openSupport()"><i class="fas fa-headset"></i> الدعم الفني</a>
+            <a href="#" class="btn btn-rating" onclick="openRating()"><i class="fas fa-star"></i> تقييم</a>
             <a href="#blackhat" class="btn btn-danger"><i class="fas fa-skull"></i> أدوات محرمة</a>
         </div>
     </header>
 
-    <!-- ===== قسم الإحصائيات والتقييم ===== -->
+    <!-- ===== قسم الإحصائيات ===== -->
     <div class="stats-section">
         <div class="stats-item">
             <i class="fas fa-users"></i>
@@ -460,18 +532,10 @@ class AboodHandler(BaseHTTPRequestHandler):
                 <div class="stars">{'⭐' * int(round(avg_rating))}{'☆' * (5 - int(round(avg_rating)))}</div>
             </div>
         </div>
-        <form action="/submit-rating" method="POST" class="rating-form">
-            <select name="rating" required>
-                <option value="">تقييمك</option>
-                <option value="1">⭐ 1</option>
-                <option value="2">⭐⭐ 2</option>
-                <option value="3">⭐⭐⭐ 3</option>
-                <option value="4">⭐⭐⭐⭐ 4</option>
-                <option value="5">⭐⭐⭐⭐⭐ 5</option>
-            </select>
-            <input type="text" name="comment" placeholder="تعليقك (اختياري)">
-            <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> تقييم</button>
-        </form>
+        <div class="stats-actions">
+            <button class="btn btn-support" onclick="openSupport()"><i class="fas fa-headset"></i> الدعم</button>
+            <button class="btn btn-rating" onclick="openRating()"><i class="fas fa-star"></i> تقييم</button>
+        </div>
     </div>
 
     <section class="hero">
@@ -482,141 +546,7 @@ class AboodHandler(BaseHTTPRequestHandler):
         </a>
     </section>
 
-    <!-- ===== قسم الأدوات المحرمة ===== -->
-    <section class="blackhat-section" id="blackhat">
-        <div class="blackhat-header">
-            <i class="fas fa-skull-crossbones"></i>
-            <h2>أدوات اختراق محرمة وخطيرة</h2>
-            <span class="badge-danger">للأغراض التعليمية فقط</span>
-        </div>
-        <p style="color:#ff6666; font-size:15px; margin-bottom:15px;">
-            <i class="fas fa-exclamation-triangle"></i> 
-            هذه الأدوات تستخدم في الاختراقات المتقدمة. استخدامها بدون إذن يعتبر جريمة. التعليم فقط!
-        </p>
-        
-        <div class="links-grid">
-            <div class="link-card danger-card"><a href="https://github.com/gentilkiwi/mimikatz" target="_blank"><i class="fas fa-key"></i> Mimikatz <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/beefproject/beef" target="_blank"><i class="fas fa-bug"></i> BeEF <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/sqlmapproject/sqlmap" target="_blank"><i class="fas fa-database"></i> SQLMap <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/rapid7/metasploit-framework" target="_blank"><i class="fas fa-bolt"></i> Metasploit <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/trustedsec/social-engineer-toolkit" target="_blank"><i class="fas fa-users"></i> SEToolkit <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/offensive-security/exploitdb" target="_blank"><i class="fas fa-database"></i> Exploit-DB <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/danielmiessler/SecLists" target="_blank"><i class="fas fa-list"></i> SecLists <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/vanhauser-thc/thc-hydra" target="_blank"><i class="fas fa-key"></i> THC-Hydra <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/openwall/john" target="_blank"><i class="fas fa-lock"></i> John the Ripper <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/aircrack-ng/aircrack-ng" target="_blank"><i class="fas fa-wifi"></i> Aircrack-ng <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/ReFirmLabs/binwalk" target="_blank"><i class="fas fa-microchip"></i> Binwalk <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/volatilityfoundation/volatility" target="_blank"><i class="fas fa-memory"></i> Volatility <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/radareorg/radare2" target="_blank"><i class="fas fa-microchip"></i> Radare2 <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/NationalSecurityAgency/ghidra" target="_blank"><i class="fas fa-cogs"></i> Ghidra <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/xorrior/Random-C2" target="_blank"><i class="fas fa-robot"></i> Random C2 <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/EmpireProject/Empire" target="_blank"><i class="fas fa-crown"></i> Empire <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/byt3bl33d3r/CrackMapExec" target="_blank"><i class="fas fa-network-wired"></i> CrackMapExec <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/BloodHoundAD/BloodHound" target="_blank"><i class="fas fa-dog"></i> BloodHound <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/kerberoasting/kerberoast" target="_blank"><i class="fas fa-user-secret"></i> Kerberoast <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/gentilkiwi/kekeo" target="_blank"><i class="fas fa-key"></i> Kekeo <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/Ne0nd0g/merlin" target="_blank"><i class="fas fa-magic"></i> Merlin <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/mwrlabs/Sharp-Suite" target="_blank"><i class="fas fa-code"></i> Sharp-Suite <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/GhostPack/Seatbelt" target="_blank"><i class="fas fa-seatbelt"></i> Seatbelt <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/GhostPack/SharpUp" target="_blank"><i class="fas fa-arrow-up"></i> SharpUp <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/cobbr/Covenant" target="_blank"><i class="fas fa-handshake"></i> Covenant <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/PowerShellMafia/PowerSploit" target="_blank"><i class="fas fa-bolt"></i> PowerSploit <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/SamRothCA/evil-winrm" target="_blank"><i class="fas fa-terminal"></i> Evil-WinRM <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/rasta-mouse/Sherlock" target="_blank"><i class="fas fa-search"></i> Sherlock <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/matterpreter/OffensiveCSharp" target="_blank"><i class="fas fa-csharp"></i> OffensiveCSharp <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/Arno0x/DNSExfiltrator" target="_blank"><i class="fas fa-dns"></i> DNSExfiltrator <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/zer0yu/RedTeam" target="_blank"><i class="fas fa-shield"></i> RedTeam Tools <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/CiscoCXSecurity/linux_enum" target="_blank"><i class="fab fa-linux"></i> Linux Enum <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/rebootuser/LinEnum" target="_blank"><i class="fab fa-linux"></i> LinEnum <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/AlessandroZ/LaZagne" target="_blank"><i class="fas fa-key"></i> LaZagne <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/behindthefirewalls/Mimikatz" target="_blank"><i class="fas fa-key"></i> Mimikatz Extras <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/Mr-Un1k0d3r/ADHunt" target="_blank"><i class="fas fa-search"></i> ADHunt <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/Mr-Un1k0d3r/RedTeam-Cookbook" target="_blank"><i class="fas fa-book"></i> RedTeam Cookbook <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/TechNowTools/Shellcode" target="_blank"><i class="fas fa-code"></i> Shellcode <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/ParrotSec/parrot-tools" target="_blank"><i class="fas fa-parrot"></i> Parrot Tools <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/0x4D31/fatt" target="_blank"><i class="fas fa-fingerprint"></i> FATT <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/SpiderLabs/Responder" target="_blank"><i class="fas fa-respond"></i> Responder <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/infosec-au/altdns" target="_blank"><i class="fas fa-dns"></i> Altdns <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/aboul3la/Sublist3r" target="_blank"><i class="fas fa-search"></i> Sublist3r <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/OWASP/Amass" target="_blank"><i class="fas fa-search"></i> Amass <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/blechschmidt/massdns" target="_blank"><i class="fas fa-dns"></i> MassDNS <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/projectdiscovery/nuclei" target="_blank"><i class="fas fa-biohazard"></i> Nuclei <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/projectdiscovery/httpx" target="_blank"><i class="fas fa-http"></i> HTTPX <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/projectdiscovery/subfinder" target="_blank"><i class="fas fa-search"></i> Subfinder <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/ffuf/ffuf" target="_blank"><i class="fas fa-sitemap"></i> FFUF <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/OJ/gobuster" target="_blank"><i class="fas fa-sitemap"></i> Gobuster <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/digininja/DNSChef" target="_blank"><i class="fas fa-chef"></i> DNSChef <span class="badge-danger">خطير</span></a></div>
-            <div class="link-card danger-card"><a href="https://github.com/DavidBuchanan314/dns-dumpster" target="_blank"><i class="fas fa-dumpster"></i> DNS Dumpster <span class="badge-danger">خطير</span></a></div>
-        </div>
-        
-        <div style="margin-top:20px; padding:15px; background:rgba(255,0,0,0.05); border-radius:12px; border:1px solid rgba(255,0,0,0.1);">
-            <p style="color:#ff6666; font-size:14px; text-align:center;">
-                <i class="fas fa-gavel"></i> 
-                <strong>تنبيه قانوني:</strong> استخدام هذه الأدوات بدون إذن صريح يعتبر جريمة يعاقب عليها القانون. 
-                هذه الروابط للأغراض التعليمية والبحثية فقط.
-            </p>
-        </div>
-    </section>
-
-    <!-- ===== قسم الدعم ===== -->
-    <section class="support-section" id="support">
-        <div class="support-header">
-            <i class="fas fa-headset"></i>
-            <h2>مركز الدعم الفني</h2>
-            <span class="badge-support">تحت إشراف المبرمج عبود</span>
-        </div>
-        <p style="color:#b0baca; font-size:16px; margin-bottom:10px;">
-            <i class="fas fa-info-circle" style="color:#ff6b6b;"></i> 
-            فريق الدعم متاح 24/7 للإجابة على استفساراتك وحل مشاكلك التقنية
-        </p>
-        
-        <div class="support-grid">
-            <div class="support-card">
-                <h3><i class="fab fa-telegram"></i> تواصل عبر تيليجرام</h3>
-                <p>احصل على دعم فوري عبر تيليجرام من فريق الدعم المختص. أرسل رسالتك وسنرد عليك في أقرب وقت.</p>
-                <a href="https://t.me/SSSTlF" target="_blank" class="btn btn-telegram">
-                    <i class="fab fa-telegram"></i> @SSSTlF - تواصل الآن
-                </a>
-            </div>
-            
-            <div class="support-form">
-                <h3 style="color:#fff; font-size:18px; margin-bottom:12px;">
-                    <i class="fas fa-envelope" style="color:#ff6b6b;"></i> أرسل رسالتك
-                </h3>
-                <form action="https://formsubmit.co/your-email@example.com" method="POST">
-                    <input type="text" name="name" placeholder="الاسم الكامل" required>
-                    <input type="email" name="email" placeholder="البريد الإلكتروني" required>
-                    <input type="text" name="subject" placeholder="موضوع الرسالة" required>
-                    <textarea name="message" placeholder="اكتب رسالتك هنا..." required></textarea>
-                    <input type="hidden" name="_captcha" value="false">
-                    <input type="hidden" name="_next" value="/">
-                    <button type="submit" class="btn btn-support">
-                        <i class="fas fa-paper-plane"></i> إرسال الرسالة
-                    </button>
-                </form>
-                <p style="color:#6b7a98; font-size:12px; margin-top:10px; text-align:center;">
-                    <i class="fas fa-lock"></i> رسالتك مشفرة وآمنة
-                </p>
-            </div>
-        </div>
-        
-        <div style="display:flex; flex-wrap:wrap; gap:20px; margin-top:25px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.06);">
-            <div style="display:flex; align-items:center; gap:10px; color:#b0baca;">
-                <i class="fas fa-user-cog" style="color:#ff6b6b;"></i>
-                <span>المشرف: <strong style="color:#fff;">المبرمج عبود</strong></span>
-            </div>
-            <div style="display:flex; align-items:center; gap:10px; color:#b0baca;">
-                <i class="fas fa-clock" style="color:#ff6b6b;"></i>
-                <span>ساعات الدعم: 24/7</span>
-            </div>
-            <div style="display:flex; align-items:center; gap:10px; color:#b0baca;">
-                <i class="fas fa-shield-alt" style="color:#ff6b6b;"></i>
-                <span>جميع المحادثات خاصة ومشفرة</span>
-            </div>
-        </div>
-    </section>
-
-    <!-- ===== بقية الأقسام (مختصرة للاختصار) ===== -->
+    <!-- ===== بقية الأقسام (مختصرة) ===== -->
     <h2 class="category-title" id="courses"><i class="fas fa-graduation-cap"></i> منصات تعليمية - دورات مجانية</h2>
     <div class="links-grid">
         <div class="link-card"><a href="https://www.coursera.org/courses?query=cybersecurity" target="_blank"><i class="fas fa-school"></i> Coursera <span class="badge">مجاني</span></a></div>
@@ -807,6 +737,82 @@ class AboodHandler(BaseHTTPRequestHandler):
         <div class="link-card"><a href="https://www.netlify.com/security/" target="_blank"><i class="fas fa-cloud"></i> Netlify Security</a></div>
     </div>
 
+    <!-- ===== قسم الأدوات المحرمة ===== -->
+    <section class="blackhat-section" id="blackhat">
+        <div class="blackhat-header">
+            <i class="fas fa-skull-crossbones"></i>
+            <h2>أدوات اختراق محرمة وخطيرة</h2>
+            <span class="badge-danger">للأغراض التعليمية فقط</span>
+        </div>
+        <p style="color:#ff6666; font-size:15px; margin-bottom:15px;">
+            <i class="fas fa-exclamation-triangle"></i> 
+            هذه الأدوات تستخدم في الاختراقات المتقدمة. استخدامها بدون إذن يعتبر جريمة. التعليم فقط!
+        </p>
+        
+        <div class="links-grid">
+            <div class="link-card danger-card"><a href="https://github.com/gentilkiwi/mimikatz" target="_blank"><i class="fas fa-key"></i> Mimikatz <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/beefproject/beef" target="_blank"><i class="fas fa-bug"></i> BeEF <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/sqlmapproject/sqlmap" target="_blank"><i class="fas fa-database"></i> SQLMap <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/rapid7/metasploit-framework" target="_blank"><i class="fas fa-bolt"></i> Metasploit <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/trustedsec/social-engineer-toolkit" target="_blank"><i class="fas fa-users"></i> SEToolkit <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/offensive-security/exploitdb" target="_blank"><i class="fas fa-database"></i> Exploit-DB <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/danielmiessler/SecLists" target="_blank"><i class="fas fa-list"></i> SecLists <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/vanhauser-thc/thc-hydra" target="_blank"><i class="fas fa-key"></i> THC-Hydra <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/openwall/john" target="_blank"><i class="fas fa-lock"></i> John the Ripper <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/aircrack-ng/aircrack-ng" target="_blank"><i class="fas fa-wifi"></i> Aircrack-ng <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/ReFirmLabs/binwalk" target="_blank"><i class="fas fa-microchip"></i> Binwalk <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/volatilityfoundation/volatility" target="_blank"><i class="fas fa-memory"></i> Volatility <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/radareorg/radare2" target="_blank"><i class="fas fa-microchip"></i> Radare2 <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/NationalSecurityAgency/ghidra" target="_blank"><i class="fas fa-cogs"></i> Ghidra <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/xorrior/Random-C2" target="_blank"><i class="fas fa-robot"></i> Random C2 <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/EmpireProject/Empire" target="_blank"><i class="fas fa-crown"></i> Empire <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/byt3bl33d3r/CrackMapExec" target="_blank"><i class="fas fa-network-wired"></i> CrackMapExec <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/BloodHoundAD/BloodHound" target="_blank"><i class="fas fa-dog"></i> BloodHound <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/kerberoasting/kerberoast" target="_blank"><i class="fas fa-user-secret"></i> Kerberoast <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/gentilkiwi/kekeo" target="_blank"><i class="fas fa-key"></i> Kekeo <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/Ne0nd0g/merlin" target="_blank"><i class="fas fa-magic"></i> Merlin <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/mwrlabs/Sharp-Suite" target="_blank"><i class="fas fa-code"></i> Sharp-Suite <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/GhostPack/Seatbelt" target="_blank"><i class="fas fa-seatbelt"></i> Seatbelt <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/GhostPack/SharpUp" target="_blank"><i class="fas fa-arrow-up"></i> SharpUp <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/cobbr/Covenant" target="_blank"><i class="fas fa-handshake"></i> Covenant <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/PowerShellMafia/PowerSploit" target="_blank"><i class="fas fa-bolt"></i> PowerSploit <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/SamRothCA/evil-winrm" target="_blank"><i class="fas fa-terminal"></i> Evil-WinRM <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/rasta-mouse/Sherlock" target="_blank"><i class="fas fa-search"></i> Sherlock <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/matterpreter/OffensiveCSharp" target="_blank"><i class="fas fa-csharp"></i> OffensiveCSharp <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/Arno0x/DNSExfiltrator" target="_blank"><i class="fas fa-dns"></i> DNSExfiltrator <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/zer0yu/RedTeam" target="_blank"><i class="fas fa-shield"></i> RedTeam Tools <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/CiscoCXSecurity/linux_enum" target="_blank"><i class="fab fa-linux"></i> Linux Enum <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/rebootuser/LinEnum" target="_blank"><i class="fab fa-linux"></i> LinEnum <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/AlessandroZ/LaZagne" target="_blank"><i class="fas fa-key"></i> LaZagne <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/behindthefirewalls/Mimikatz" target="_blank"><i class="fas fa-key"></i> Mimikatz Extras <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/Mr-Un1k0d3r/ADHunt" target="_blank"><i class="fas fa-search"></i> ADHunt <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/Mr-Un1k0d3r/RedTeam-Cookbook" target="_blank"><i class="fas fa-book"></i> RedTeam Cookbook <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/TechNowTools/Shellcode" target="_blank"><i class="fas fa-code"></i> Shellcode <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/ParrotSec/parrot-tools" target="_blank"><i class="fas fa-parrot"></i> Parrot Tools <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/0x4D31/fatt" target="_blank"><i class="fas fa-fingerprint"></i> FATT <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/SpiderLabs/Responder" target="_blank"><i class="fas fa-respond"></i> Responder <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/infosec-au/altdns" target="_blank"><i class="fas fa-dns"></i> Altdns <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/aboul3la/Sublist3r" target="_blank"><i class="fas fa-search"></i> Sublist3r <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/OWASP/Amass" target="_blank"><i class="fas fa-search"></i> Amass <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/blechschmidt/massdns" target="_blank"><i class="fas fa-dns"></i> MassDNS <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/projectdiscovery/nuclei" target="_blank"><i class="fas fa-biohazard"></i> Nuclei <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/projectdiscovery/httpx" target="_blank"><i class="fas fa-http"></i> HTTPX <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/projectdiscovery/subfinder" target="_blank"><i class="fas fa-search"></i> Subfinder <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/ffuf/ffuf" target="_blank"><i class="fas fa-sitemap"></i> FFUF <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/OJ/gobuster" target="_blank"><i class="fas fa-sitemap"></i> Gobuster <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/digininja/DNSChef" target="_blank"><i class="fas fa-chef"></i> DNSChef <span class="badge-danger">خطير</span></a></div>
+            <div class="link-card danger-card"><a href="https://github.com/DavidBuchanan314/dns-dumpster" target="_blank"><i class="fas fa-dumpster"></i> DNS Dumpster <span class="badge-danger">خطير</span></a></div>
+        </div>
+        
+        <div style="margin-top:20px; padding:15px; background:rgba(255,0,0,0.05); border-radius:12px; border:1px solid rgba(255,0,0,0.1);">
+            <p style="color:#ff6666; font-size:14px; text-align:center;">
+                <i class="fas fa-gavel"></i> 
+                <strong>تنبيه قانوني:</strong> استخدام هذه الأدوات بدون إذن صريح يعتبر جريمة يعاقب عليها القانون. 
+                هذه الروابط للأغراض التعليمية والبحثية فقط.
+            </p>
+        </div>
+    </section>
+
     <footer class="footer">
         <div>
             <a href="#"><i class="fab fa-facebook-f"></i></a>
@@ -823,6 +829,121 @@ class AboodHandler(BaseHTTPRequestHandler):
         </p>
     </footer>
 </div>
+
+<!-- ===== مودال الدعم الفني ===== -->
+<div class="modal-overlay" id="supportModal">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeSupport()">✕</button>
+        <div class="modal-title support-title">
+            <i class="fas fa-headset"></i> مركز الدعم الفني
+        </div>
+        <div style="color:#ff6b6b; font-size:14px; text-align:center; margin-bottom:15px;">
+            <i class="fas fa-info-circle"></i> تحت إشراف المبرمج عبود - متاح 24/7
+        </div>
+        
+        <div class="support-grid">
+            <div class="support-card">
+                <h3><i class="fab fa-telegram"></i> تواصل عبر تيليجرام</h3>
+                <p>احصل على دعم فوري عبر تيليجرام من فريق الدعم المختص.</p>
+                <a href="https://t.me/SSSTlF" target="_blank" class="btn btn-telegram">
+                    <i class="fab fa-telegram"></i> @SSSTlF - تواصل الآن
+                </a>
+            </div>
+            
+            <div class="support-form">
+                <h3 style="color:#fff; font-size:16px; margin-bottom:10px;">
+                    <i class="fas fa-envelope" style="color:#ff6b6b;"></i> أرسل رسالتك
+                </h3>
+                <form action="https://formsubmit.co/your-email@example.com" method="POST">
+                    <input type="text" name="name" placeholder="الاسم الكامل" required>
+                    <input type="email" name="email" placeholder="البريد الإلكتروني" required>
+                    <input type="text" name="subject" placeholder="موضوع الرسالة" required>
+                    <textarea name="message" placeholder="اكتب رسالتك هنا..." required></textarea>
+                    <input type="hidden" name="_captcha" value="false">
+                    <input type="hidden" name="_next" value="/">
+                    <button type="submit" class="btn btn-support">
+                        <i class="fas fa-paper-plane"></i> إرسال الرسالة
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="support-info">
+            <div class="support-info-item">
+                <i class="fas fa-user-cog"></i>
+                <span>المشرف: <strong style="color:#fff;">المبرمج عبود</strong></span>
+            </div>
+            <div class="support-info-item">
+                <i class="fas fa-clock"></i>
+                <span>ساعات الدعم: 24/7</span>
+            </div>
+            <div class="support-info-item">
+                <i class="fas fa-shield-alt"></i>
+                <span>جميع المحادثات خاصة ومشفرة</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== مودال التقييم ===== -->
+<div class="modal-overlay" id="ratingModal">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeRating()">✕</button>
+        <div class="modal-title rating-title">
+            <i class="fas fa-star"></i> تقييم الموقع
+        </div>
+        <div class="rating-current">
+            <div>التقييم الحالي: <span class="big-stars">{'⭐' * int(round(avg_rating))}{'☆' * (5 - int(round(avg_rating)))}</span></div>
+            <div style="font-size:16px; color:#8d99b6; margin-top:4px;">{avg_rating:.1f} / 5 من {len(stats["ratings"])} تقييم</div>
+        </div>
+        
+        <form action="/submit-rating" method="POST" class="rating-form-modal">
+            <select name="rating" required>
+                <option value="">اختر تقييمك</option>
+                <option value="1">⭐ 1 - ضعيف</option>
+                <option value="2">⭐⭐ 2 - مقبول</option>
+                <option value="3">⭐⭐⭐ 3 - جيد</option>
+                <option value="4">⭐⭐⭐⭐ 4 - ممتاز</option>
+                <option value="5">⭐⭐⭐⭐⭐ 5 - رائع</option>
+            </select>
+            <input type="text" name="comment" placeholder="تعليقك (اختياري)">
+            <button type="submit" class="btn btn-rating">
+                <i class="fas fa-paper-plane"></i> إرسال التقييم
+            </button>
+        </form>
+        <p style="color:#6b7a98; font-size:12px; text-align:center; margin-top:12px;">
+            <i class="fas fa-lock"></i> سيتم إرسال تقييمك بشكل آمن
+        </p>
+    </div>
+</div>
+
+<script>
+    function openSupport() {
+        document.getElementById('supportModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeSupport() {
+        document.getElementById('supportModal').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    function openRating() {
+        document.getElementById('ratingModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeRating() {
+        document.getElementById('ratingModal').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    // إغلاق المودال عند الضغط خارج المحتوى
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+    });
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
 </body>
 </html>"""
