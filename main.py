@@ -94,23 +94,6 @@ class Example_{i} {{
         Console.WriteLine($"ID: {{i}}\\nValue: {{result}}\\nStatus: {{(result % 2 == 0 ? "success" : "pending")}}");
     }}
 }}'''
-        elif category == 'Go':
-            code = f'''package main
-import "fmt"
-func example_{i}() {{
-    result := {i * 7 + 3}
-    status := "pending"
-    if result%2 == 0 {{ status = "success" }}
-    fmt.Printf("ID: %d\\nValue: %d\\nStatus: %s\\n", {i}, result, status)
-}}
-func main() {{ example_{i}() }}'''
-        elif category == 'Rust':
-            code = f'''fn example_{i}() {{
-    let result = {i * 7 + 3};
-    let status = if result % 2 == 0 {{ "success" }} else {{ "pending" }};
-    println!("ID: {{}}\\nValue: {{}}\\nStatus: {{}}", {i}, result, status);
-}}
-fn main() {{ example_{i}(); }}'''
         else:
             code = f'# {category} Example {i}\nprint("ID: {i} | Value: {i * 7 + 3}")'
         codes.append(code)
