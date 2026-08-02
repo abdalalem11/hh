@@ -1,8 +1,29 @@
 from flask import Flask, render_template_string, request, jsonify
 import os
 import json
+import requests
+import threading
 
 app = Flask(__name__)
+
+# ===== إعدادات بوت تيليجرام =====
+TELEGRAM_TOKEN = "8875360747:AAHZH8ti8BTzA8_Gzo6QV6ex4OsaJyoBovI"
+TELEGRAM_CHAT_ID = "8875360747"  # يمكن تغييره إلى معرف المستخدم
+
+def send_telegram_notification(message):
+    """إرسال إشعار إلى تيليجرام"""
+    try:
+        url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
+        payload = {
+            "chat_id": TELEGRAM_CHAT_ID,
+            "text": message,
+            "parse_mode": "HTML"
+        }
+        response = requests.post(url, json=payload, timeout=5)
+        return response.json()
+    except Exception as e:
+        print(f"خطأ في إرسال الإشعار: {e}")
+        return None
 
 # ===== بيانات الدورس التعليمية =====
 COURSES_DATA = {}
@@ -1004,7 +1025,7 @@ for course in programming_courses + pentest_courses + tools_courses:
         "category": course["category"]
     })
 
-# ===== صفحة تفاصيل الدرس (فخمة) =====
+# ===== صفحة تفاصيل الدرس =====
 COURSE_PAGE_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="ar">
@@ -1246,17 +1267,37 @@ COURSE_PAGE_TEMPLATE = """
             background: rgba(0,0,0,0.5);
         }
         .footer-text { color: #444; font-size: 0.7rem; }
-        .footer-links { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; }
-        .footer-links a { color: #444; font-size: 0.7rem; transition: 0.3s; text-decoration: none; }
+        .footer-links { 
+            display: flex; 
+            gap: 20px; 
+            flex-wrap: wrap; 
+            align-items: center; 
+        }
+        .footer-links a { 
+            color: #444; 
+            font-size: 0.7rem; 
+            transition: 0.3s; 
+            text-decoration: none; 
+        }
         .footer-links a:hover { color: #00ff41; }
-        .hidden-support {
-            color: #0a0a0a !important;
-            background: #0a0a0a !important;
-            border: none !important;
+        
+        /* ===== زر الدعم الفني ===== */
+        .support-btn {
+            background: transparent;
+            border: 1px solid #ff00ff;
+            color: #ff00ff;
+            padding: 6px 18px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 0.6rem;
-            padding: 2px 8px;
-            user-select: none;
+            font-family: inherit;
+            font-size: 0.7rem;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+        .support-btn:hover {
+            background: #ff00ff;
+            color: #000;
+            box-shadow: 0 0 30px #ff00ff;
         }
         
         .support-modal {
@@ -1281,8 +1322,30 @@ COURSE_PAGE_TEMPLATE = """
             box-shadow: 0 0 80px rgba(255,0,255,0.2);
         }
         .support-modal-content h2 { color: #ff00ff; font-size: 2rem; text-shadow: 0 0 30px #ff00ff; }
-        .support-modal-content .contact { font-size: 1.5rem; color: #00ff41; padding: 15px; border: 1px solid #00ff41; border-radius: 8px; margin: 20px 0; }
-        .support-modal-content .close-btn { background: transparent; border: 1px solid #ff3333; color: #ff3333; padding: 10px 30px; border-radius: 4px; cursor: pointer; font-family: inherit; transition: 0.3s; }
+        .support-modal-content .contact {
+            font-size: 1.8rem;
+            color: #00ff41;
+            padding: 15px;
+            border: 1px solid #00ff41;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-shadow: 0 0 20px #00ff41;
+        }
+        .support-modal-content .contact-sub {
+            color: #888;
+            font-size: 0.9rem;
+            margin: 10px 0;
+        }
+        .support-modal-content .close-btn {
+            background: transparent;
+            border: 1px solid #ff3333;
+            color: #ff3333;
+            padding: 10px 30px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.3s;
+        }
         .support-modal-content .close-btn:hover { background: #ff3333; color: #000; }
         
         @media (max-width: 700px) {
@@ -1308,7 +1371,10 @@ COURSE_PAGE_TEMPLATE = """
                 <div class="brand-sub">// {{ course.category }} //</div>
             </div>
         </div>
-        <a href="/" class="back-btn">← العودة للقائمة</a>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <a href="/" class="back-btn">← العودة للقائمة</a>
+            <button class="support-btn" onclick="openSupport()">🛡️ الدعم الفني</button>
+        </div>
     </header>
 
     <div class="container">
@@ -1392,6 +1458,7 @@ COURSE_PAGE_TEMPLATE = """
                 <a href="/" class="action-btn primary">📚 جميع الدورس</a>
                 <button class="action-btn secondary" onclick="window.print()">🖨️ طباعة</button>
                 <button class="action-btn danger" onclick="shareCourse()">📤 مشاركة</button>
+                <button class="action-btn" style="border-color:#ff00ff;color:#ff00ff;" onclick="openSupport()">🛡️ الدعم الفني</button>
             </div>
         </div>
     </div>
@@ -1400,15 +1467,22 @@ COURSE_PAGE_TEMPLATE = """
         <span class="footer-text">© 2026 ABOOD_SECURE_ACADEMY - 100 مثال لكل درس</span>
         <div class="footer-links">
             <a href="/">الرئيسية</a>
-            <button class="hidden-support" id="supportTrigger">للاستفسارات الفورية</button>
+            <button class="support-btn" onclick="openSupport()">🛡️ الدعم الفني</button>
         </div>
     </footer>
 
+    <!-- ===== نافذة الدعم الفني ===== -->
     <div class="support-modal" id="supportModal">
         <div class="support-modal-content">
-            <h2>🔐 دعم فوري</h2>
-            <p style="color:#888;margin-bottom:15px;">للتواصل مع الدعم التقني</p>
+            <h2>🛡️ الدعم الفني</h2>
+            <p style="color:#888;margin-bottom:5px;">للتواصل مع الدعم الفني والاستفسارات</p>
             <div class="contact">@SSSTlF عبود</div>
+            <p class="contact-sub">📱 تواصل عبر تيليجرام للدعم الفوري</p>
+            <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+                <a href="https://t.me/SSSTlF" target="_blank" class="action-btn" style="border-color:#00ff41;color:#00ff41;padding:10px 30px;text-decoration:none;">
+                    📨 تواصل الآن
+                </a>
+            </div>
             <button class="close-btn" id="closeSupport">إغلاق</button>
         </div>
     </div>
@@ -1450,22 +1524,14 @@ COURSE_PAGE_TEMPLATE = """
             }
         }
 
-        // ===== زر الدعم المخفي =====
+        // ===== فتح نافذة الدعم =====
+        function openSupport() {
+            document.getElementById('supportModal').classList.add('show');
+        }
+
+        // ===== زر الدعم =====
         const supportModal = document.getElementById('supportModal');
-        const supportTrigger = document.getElementById('supportTrigger');
         const closeSupport = document.getElementById('closeSupport');
-
-        supportTrigger.addEventListener('click', function(e) {
-            e.preventDefault();
-            supportModal.classList.add('show');
-        });
-
-        document.addEventListener('keydown', function(e) {
-            if (e.ctrlKey && e.shiftKey && (e.key === 'S' || e.key === 's')) {
-                e.preventDefault();
-                supportModal.classList.add('show');
-            }
-        });
 
         closeSupport.addEventListener('click', function() {
             supportModal.classList.remove('show');
@@ -1474,6 +1540,14 @@ COURSE_PAGE_TEMPLATE = """
         supportModal.addEventListener('click', function(e) {
             if (e.target === supportModal) {
                 supportModal.classList.remove('show');
+            }
+        });
+
+        // اختصار Ctrl+Shift+S لفتح الدعم
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.shiftKey && (e.key === 'S' || e.key === 's')) {
+                e.preventDefault();
+                openSupport();
             }
         });
 
@@ -1491,6 +1565,7 @@ COURSE_PAGE_TEMPLATE = """
         console.log('%c◼ ABOOD_SECURE_ACADEMY ◼', 'color: #00ff41; font-size: 20px; font-weight: bold;');
         console.log(`%cالدرس الحالي: {{ course.name }} - 100 مثال`, 'color: #888; font-size: 14px;');
         console.log('%cاستخدم الأسهم → ← للتنقل بين الأمثلة', 'color: #ffaa00; font-size: 12px;');
+        console.log('%cالدعم الفني: @SSSTlF عبود', 'color: #ff00ff; font-size: 12px;');
         console.log('%cجميع الحقوق محفوظة © 2026', 'color: #444; font-size: 12px;');
     </script>
 </body>
@@ -1535,6 +1610,23 @@ HOME_PAGE_TEMPLATE = """
         .brand-sub { font-size: 0.7rem; color: #666; letter-spacing: 2px; }
         .header-badge { border: 1px solid #ff3333; padding: 5px 15px; border-radius: 20px; color: #ff3333; font-size: 0.7rem; }
         .header-count { color: #888; font-size: 0.8rem; }
+        
+        .support-header-btn {
+            background: transparent;
+            border: 1px solid #ff00ff;
+            color: #ff00ff;
+            padding: 6px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.7rem;
+            transition: 0.3s;
+        }
+        .support-header-btn:hover {
+            background: #ff00ff;
+            color: #000;
+            box-shadow: 0 0 30px #ff00ff;
+        }
 
         .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
 
@@ -1648,16 +1740,23 @@ HOME_PAGE_TEMPLATE = """
         .footer-links a { color: #444; font-size: 0.7rem; transition: 0.3s; text-decoration: none; }
         .footer-links a:hover { color: #00ff41; }
 
-        .hidden-support {
-            color: #0a0a0a !important;
-            background: #0a0a0a !important;
-            border: none !important;
+        .support-footer-btn {
+            background: transparent;
+            border: 1px solid #ff00ff;
+            color: #ff00ff;
+            padding: 4px 14px;
+            border-radius: 4px;
             cursor: pointer;
+            font-family: inherit;
             font-size: 0.6rem;
-            padding: 2px 8px;
-            user-select: none;
+            transition: 0.3s;
+        }
+        .support-footer-btn:hover {
+            background: #ff00ff;
+            color: #000;
         }
 
+        /* ===== نافذة الدعم ===== */
         .support-modal {
             display: none;
             position: fixed;
@@ -1680,9 +1779,48 @@ HOME_PAGE_TEMPLATE = """
             box-shadow: 0 0 80px rgba(255,0,255,0.2);
         }
         .support-modal-content h2 { color: #ff00ff; font-size: 2rem; text-shadow: 0 0 30px #ff00ff; }
-        .support-modal-content .contact { font-size: 1.5rem; color: #00ff41; padding: 15px; border: 1px solid #00ff41; border-radius: 8px; margin: 20px 0; }
-        .support-modal-content .close-btn { background: transparent; border: 1px solid #ff3333; color: #ff3333; padding: 10px 30px; border-radius: 4px; cursor: pointer; font-family: inherit; transition: 0.3s; }
+        .support-modal-content .contact {
+            font-size: 1.8rem;
+            color: #00ff41;
+            padding: 15px;
+            border: 1px solid #00ff41;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-shadow: 0 0 20px #00ff41;
+        }
+        .support-modal-content .contact-sub {
+            color: #888;
+            font-size: 0.9rem;
+            margin: 10px 0;
+        }
+        .support-modal-content .close-btn {
+            background: transparent;
+            border: 1px solid #ff3333;
+            color: #ff3333;
+            padding: 10px 30px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.3s;
+        }
         .support-modal-content .close-btn:hover { background: #ff3333; color: #000; }
+        .support-modal-content .action-btn {
+            padding: 10px 30px;
+            border-radius: 8px;
+            border: 1px solid;
+            background: transparent;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .support-modal-content .action-btn:hover {
+            background: #00ff41;
+            color: #000;
+            box-shadow: 0 0 30px #00ff41;
+        }
 
         .search-box {
             width: 100%;
@@ -1723,6 +1861,7 @@ HOME_PAGE_TEMPLATE = """
             <span class="header-count">📚 {{ course_list|length }} درس</span>
             <span class="header-count">💻 100 كود لكل درس</span>
             <span class="header-badge">● ROOT ACCESS</span>
+            <button class="support-header-btn" onclick="openSupport()">🛡️ الدعم الفني</button>
         </div>
     </header>
 
@@ -1734,6 +1873,7 @@ HOME_PAGE_TEMPLATE = """
                 <span>📚 {{ course_list|length }} درس</span>
                 <span>💻 100 كود لكل درس</span>
                 <span>🛡️ تعليم حقيقي</span>
+                <span>📱 دعم @SSSTlF</span>
             </div>
         </div>
 
@@ -1779,15 +1919,22 @@ HOME_PAGE_TEMPLATE = """
         <span class="footer-text">© 2026 ABOOD_SECURE_ACADEMY - 100 كود لكل درس</span>
         <div class="footer-links">
             <a href="/">الرئيسية</a>
-            <button class="hidden-support" id="supportTrigger">للاستفسارات الفورية</button>
+            <button class="support-footer-btn" onclick="openSupport()">🛡️ الدعم الفني @SSSTlF</button>
         </div>
     </footer>
 
+    <!-- ===== نافذة الدعم ===== -->
     <div class="support-modal" id="supportModal">
         <div class="support-modal-content">
-            <h2>🔐 دعم فوري</h2>
-            <p style="color:#888;margin-bottom:15px;">للتواصل مع الدعم التقني</p>
+            <h2>🛡️ الدعم الفني</h2>
+            <p style="color:#888;margin-bottom:5px;">للتواصل مع الدعم الفني والاستفسارات</p>
             <div class="contact">@SSSTlF عبود</div>
+            <p class="contact-sub">📱 تواصل عبر تيليجرام للدعم الفوري</p>
+            <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:15px 0;">
+                <a href="https://t.me/SSSTlF" target="_blank" class="action-btn" style="border-color:#00ff41;color:#00ff41;padding:10px 30px;text-decoration:none;">
+                    📨 تواصل الآن
+                </a>
+            </div>
             <button class="close-btn" id="closeSupport">إغلاق</button>
         </div>
     </div>
@@ -1801,21 +1948,13 @@ HOME_PAGE_TEMPLATE = """
             });
         }
 
+        // ===== فتح نافذة الدعم =====
+        function openSupport() {
+            document.getElementById('supportModal').classList.add('show');
+        }
+
         const supportModal = document.getElementById('supportModal');
-        const supportTrigger = document.getElementById('supportTrigger');
         const closeSupport = document.getElementById('closeSupport');
-
-        supportTrigger.addEventListener('click', function(e) {
-            e.preventDefault();
-            supportModal.classList.add('show');
-        });
-
-        document.addEventListener('keydown', function(e) {
-            if (e.ctrlKey && e.shiftKey && (e.key === 'S' || e.key === 's')) {
-                e.preventDefault();
-                supportModal.classList.add('show');
-            }
-        });
 
         closeSupport.addEventListener('click', function() {
             supportModal.classList.remove('show');
@@ -1827,8 +1966,17 @@ HOME_PAGE_TEMPLATE = """
             }
         });
 
+        // اختصار Ctrl+Shift+S
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.shiftKey && (e.key === 'S' || e.key === 's')) {
+                e.preventDefault();
+                openSupport();
+            }
+        });
+
         console.log('%c◼ ABOOD_SECURE_ACADEMY ◼', 'color: #00ff41; font-size: 20px; font-weight: bold;');
         console.log('%cمنصة تعليمية شاملة - 100 كود لكل درس', 'color: #888; font-size: 14px;');
+        console.log('%cالدعم الفني: @SSSTlF عبود', 'color: #ff00ff; font-size: 12px;');
         console.log('%cجميع الحقوق محفوظة © 2026', 'color: #444; font-size: 12px;');
     </script>
 </body>
@@ -1837,6 +1985,25 @@ HOME_PAGE_TEMPLATE = """
 
 @app.route('/')
 def index():
+    # إرسال إشعار عند زيارة الموقع
+    try:
+        visitor_ip = request.remote_addr
+        user_agent = request.headers.get('User-Agent', 'غير معروف')
+        message = f"""🟢 <b>تم زيارة الموقع!</b>
+
+📱 <b>المستخدم:</b> @SSSTlF
+🌐 <b>IP:</b> {visitor_ip}
+💻 <b>المتصفح:</b> {user_agent[:100]}
+📚 <b>الدورس:</b> {len(COURSE_LIST)} درس
+⏰ <b>الوقت:</b> {__import__('datetime').datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+
+<b>ABOOD_SECURE_ACADEMY</b>"""
+        
+        # إرسال الإشعار في خلفية
+        threading.Thread(target=send_telegram_notification, args=(message,)).start()
+    except Exception as e:
+        print(f"خطأ في إرسال الإشعار: {e}")
+    
     return render_template_string(
         HOME_PAGE_TEMPLATE,
         courses_data=COURSES_DATA,
@@ -1849,6 +2016,25 @@ def course_page(course_id):
         return "الدرس غير موجود", 404
     
     course = COURSES_DATA[course_id]
+    
+    # إرسال إشعار عند مشاهدة درس
+    try:
+        visitor_ip = request.remote_addr
+        message = f"""📘 <b>تم مشاهدة درس!</b>
+
+📚 <b>الدرس:</b> {course['name']}
+📂 <b>القسم:</b> {course['category']}
+📊 <b>المستوى:</b> {course['level']}
+💻 <b>الأكواد:</b> 100 مثال
+🌐 <b>IP:</b> {visitor_ip}
+⏰ <b>الوقت:</b> {__import__('datetime').datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+
+<b>ABOOD_SECURE_ACADEMY</b>"""
+        
+        threading.Thread(target=send_telegram_notification, args=(message,)).start()
+    except Exception as e:
+        print(f"خطأ في إرسال الإشعار: {e}")
+    
     return render_template_string(
         COURSE_PAGE_TEMPLATE,
         course=course,
@@ -1861,6 +2047,29 @@ def get_course(course_id):
         return jsonify(COURSES_DATA[course_id])
     return jsonify({"error": "الدرس غير موجود"}), 404
 
+@app.route('/api/notify')
+def notify():
+    """端点 لاختبار الإشعارات"""
+    message = "🔔 <b>اختبار الإشعار</b>\n\nتم إرسال هذا الإشعار من API"
+    result = send_telegram_notification(message)
+    return jsonify({"status": "sent", "result": result})
+
 if __name__ == '__main__':
+    # إرسال إشعار عند تشغيل الخادم
+    try:
+        message = f"""🚀 <b>تم تشغيل الخادم!</b>
+
+📚 <b>ABOOD_SECURE_ACADEMY</b>
+📖 <b>عدد الدورس:</b> {len(COURSE_LIST)} درس
+💻 <b>الأكواد:</b> 100 كود لكل درس
+🛡️ <b>الدعم:</b> @SSSTlF
+⏰ <b>الوقت:</b> {__import__('datetime').datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+
+✅ النظام جاهز للعمل"""
+        
+        send_telegram_notification(message)
+    except Exception as e:
+        print(f"خطأ في إرسال إشعار التشغيل: {e}")
+    
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
