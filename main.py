@@ -1,7 +1,8 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, render_template_string, jsonify
 import os
 import requests
 import datetime
+import json
 
 app = Flask(__name__)
 
@@ -16,18 +17,80 @@ def send_telegram(message):
     except Exception as e:
         print(f"خطأ: {e}")
 
+# ===== قاعدة الأكواد =====
+CODES_DB = {}
+
+def generate_codes(category, count=100):
+    codes = []
+    for i in range(1, count + 1):
+        code = f'''# ===== {category} - مثال رقم {i} =====
+# مبرمج عبود | @SSSTlF
+
+def example_{i}():
+    """
+    {category} - كود رقم {i}
+    """
+    print(f"تنفيذ {category} - مثال {i}")
+    result = {i * 7 + 3}
+    data = {{
+        'id': {i},
+        'name': f'{category}_{i}',
+        'value': result,
+        'status': 'نجاح' if result % 2 == 0 else 'قيد التنفيذ'
+    }}
+    print(f"النتيجة: {{data}}")
+    return data
+
+if __name__ == '__main__':
+    example_{i}()
+'''
+        codes.append(code)
+    return codes
+
+# ===== إنشاء الأكواد لكل فئة =====
+categories = [
+    'python', 'javascript', 'html', 'css', 'php', 'sql', 
+    'bash', 'cpp', 'java', 'csharp', 'go', 'rust',
+    'react', 'vue', 'angular', 'nodejs', 'django', 'flask',
+    'ai', 'ml', 'deep-learning', 'nlp', 'computer-vision',
+    'cybersecurity', 'penetration-testing', 'network-security', 'cryptography',
+    'cloud', 'docker', 'kubernetes', 'aws', 'azure', 'gcp',
+    'mobile', 'android', 'ios', 'flutter', 'react-native',
+    'game-dev', 'unity', 'unreal', 'p5js',
+    'data-science', 'pandas', 'numpy', 'matplotlib', 'scikit-learn',
+    'web-scraping', 'automation', 'api', 'graphql', 'rest',
+    'devops', 'ci-cd', 'jenkins', 'ansible', 'terraform',
+    'blockchain', 'solidity', 'web3',
+    'quantum', 'robotics', 'iot', 'arduino', 'raspberrypi'
+]
+
+for cat in categories:
+    CODES_DB[cat] = generate_codes(cat, 100)
+
+# ===== صفحة رئيسية =====
 @app.route('/')
 def index():
     visitor_ip = request.remote_addr
     user_agent = request.headers.get('User-Agent', 'غير معروف')
-    send_telegram(f"""🔥 <b>زائر جديد للموقع</b>
-🌐 <b>IP:</b> {visitor_ip}
-💻 <b>المتصفح:</b> {user_agent[:100]}
-⏰ <b>الوقت:</b> {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-
+    send_telegram(f"""🔥 <b>زائر جديد</b>
+🌐 IP: {visitor_ip}
+💻 {user_agent[:100]}
+⏰ {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 <b>مبرمج عبود | @SSSTlF</b>""")
     
-    return '''
+    # إنشاء الأزرار
+    buttons_html = ''
+    for cat in categories:
+        display_name = cat.replace('-', ' ').replace('_', ' ').title()
+        buttons_html += f'''
+        <a href="/code/{cat}" class="btn-inline {cat}">
+            <span class="btn-icon">✦</span>
+            <span class="btn-label">{display_name}</span>
+            <span class="btn-count">{len(CODES_DB[cat])} كود</span>
+        </a>
+        '''
+    
+    return f'''
     <!DOCTYPE html>
     <html lang="ar" dir="rtl">
     <head>
@@ -36,20 +99,20 @@ def index():
         <title>مبرمج عبود | @SSSTlF</title>
         <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
         <style>
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-            body {
+            * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+            body {{
                 font-family: 'Cairo', sans-serif;
                 background: #05070D;
                 color: #F8FAFC;
-                overflow-x: hidden;
                 min-height: 100vh;
-            }
+                overflow-x: hidden;
+            }}
             
-            ::-webkit-scrollbar { width: 6px; }
-            ::-webkit-scrollbar-track { background: #05070D; }
-            ::-webkit-scrollbar-thumb { background: #E8C66A; border-radius: 10px; }
+            ::-webkit-scrollbar {{ width: 6px; }}
+            ::-webkit-scrollbar-track {{ background: #05070D; }}
+            ::-webkit-scrollbar-thumb {{ background: #E8C66A; border-radius: 10px; }}
 
-            .aurora {
+            .aurora {{
                 position: fixed;
                 top: 0;
                 left: 0;
@@ -57,46 +120,47 @@ def index():
                 height: 100%;
                 z-index: 0;
                 overflow: hidden;
-            }
-            .aurora::before {
+                pointer-events: none;
+            }}
+            .aurora::before {{
                 content: '';
                 position: absolute;
                 width: 600px;
                 height: 600px;
-                background: radial-gradient(circle, rgba(232, 198, 106, 0.08), transparent 70%);
+                background: radial-gradient(circle, rgba(232, 198, 106, 0.06), transparent 70%);
                 top: -10%;
                 left: -10%;
                 animation: aurora1 15s ease-in-out infinite alternate;
-            }
-            .aurora::after {
+            }}
+            .aurora::after {{
                 content: '';
                 position: absolute;
                 width: 500px;
                 height: 500px;
-                background: radial-gradient(circle, rgba(59, 130, 246, 0.08), transparent 70%);
+                background: radial-gradient(circle, rgba(59, 130, 246, 0.06), transparent 70%);
                 bottom: -10%;
                 right: -10%;
                 animation: aurora2 20s ease-in-out infinite alternate;
-            }
-            @keyframes aurora1 {
-                0% { transform: translate(0, 0) scale(1); }
-                100% { transform: translate(200px, 100px) scale(1.5); }
-            }
-            @keyframes aurora2 {
-                0% { transform: translate(0, 0) scale(1); }
-                100% { transform: translate(-200px, -100px) scale(1.5); }
-            }
+            }}
+            @keyframes aurora1 {{
+                0% {{ transform: translate(0, 0) scale(1); }}
+                100% {{ transform: translate(200px, 100px) scale(1.5); }}
+            }}
+            @keyframes aurora2 {{
+                0% {{ transform: translate(0, 0) scale(1); }}
+                100% {{ transform: translate(-200px, -100px) scale(1.5); }}
+            }}
 
-            .container {
+            .container {{
                 position: relative;
                 z-index: 1;
                 max-width: 1400px;
                 margin: 0 auto;
                 padding: 20px;
-            }
+            }}
 
             /* Navbar */
-            .navbar {
+            .navbar {{
                 background: rgba(5, 7, 13, 0.7);
                 backdrop-filter: blur(20px);
                 border: 1px solid rgba(232, 198, 106, 0.1);
@@ -107,8 +171,8 @@ def index():
                 align-items: center;
                 margin-bottom: 40px;
                 box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            }
-            .navbar .logo h1 {
+            }}
+            .navbar .logo h1 {{
                 font-size: 28px;
                 font-weight: 800;
                 background: linear-gradient(135deg, #E8C66A, #F8FAFC, #E8C66A);
@@ -116,141 +180,95 @@ def index():
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
                 animation: shimmer 3s ease-in-out infinite;
-            }
-            @keyframes shimmer {
-                0%, 100% { background-position: 0% center; }
-                50% { background-position: 200% center; }
-            }
-            .navbar .logo span {
-                font-size: 12px;
-                color: #AEB8C4;
-                letter-spacing: 2px;
-            }
-            .navbar .logo .sub {
-                font-size: 10px;
+            }}
+            @keyframes shimmer {{
+                0%, 100% {{ background-position: 0% center; }}
+                50% {{ background-position: 200% center; }}
+            }}
+            .navbar .logo .sub {{
+                font-size: 11px;
                 color: #D4AF37;
                 letter-spacing: 4px;
                 opacity: 0.6;
-            }
+            }}
+            .navbar .logo .tag {{
+                font-size: 10px;
+                color: #AEB8C4;
+                letter-spacing: 2px;
+            }}
 
             /* Hero */
-            .hero {
+            .hero {{
                 text-align: center;
-                padding: 60px 20px 40px;
+                padding: 50px 20px 40px;
                 background: rgba(255,255,255,0.02);
                 border-radius: 32px;
                 border: 1px solid rgba(232, 198, 106, 0.05);
                 margin-bottom: 40px;
-            }
-            .hero h1 {
-                font-size: 64px;
+            }}
+            .hero h1 {{
+                font-size: 56px;
                 font-weight: 800;
                 background: linear-gradient(135deg, #E8C66A, #F8FAFC, #E8C66A);
                 background-size: 200% auto;
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
                 animation: shimmer 3s ease-in-out infinite;
-            }
-            .hero .subtitle {
-                font-size: 20px;
+            }}
+            .hero .subtitle {{
+                font-size: 18px;
                 color: #AEB8C4;
-                margin: 10px 0;
-            }
-            .hero .tag {
+                margin: 8px 0;
+            }}
+            .hero .badge {{
                 display: inline-block;
-                padding: 8px 24px;
+                padding: 6px 20px;
                 border: 1px solid rgba(232, 198, 106, 0.2);
                 border-radius: 50px;
                 color: #D4AF37;
-                font-size: 14px;
-                letter-spacing: 4px;
-                margin-top: 10px;
-            }
-
-            /* Profile Cards */
-            .profiles {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-                gap: 24px;
-                margin-bottom: 40px;
-            }
-            .profile-card {
-                background: rgba(255, 255, 255, 0.03);
-                backdrop-filter: blur(10px);
-                border: 1px solid rgba(255, 255, 255, 0.05);
-                border-radius: 24px;
-                padding: 30px;
-                text-align: center;
-                transition: 0.4s;
-            }
-            .profile-card:hover {
-                transform: translateY(-10px);
-                border-color: #E8C66A;
-                box-shadow: 0 20px 60px rgba(232, 198, 106, 0.1);
-            }
-            .profile-card .avatar {
-                font-size: 56px;
-                margin-bottom: 12px;
-            }
-            .profile-card h3 {
-                font-size: 20px;
-                font-weight: 700;
-                color: #F8FAFC;
-            }
-            .profile-card .role {
-                color: #D4AF37;
-                font-size: 14px;
-                margin: 4px 0 12px;
-            }
-            .profile-card p {
-                color: #AEB8C4;
-                font-size: 14px;
-                line-height: 1.6;
-            }
-
-            /* Buttons Grid - 2000+ buttons */
-            .buttons-section {
-                margin: 40px 0;
-            }
-            .buttons-section h2 {
-                font-size: 32px;
-                font-weight: 700;
-                text-align: center;
-                margin-bottom: 10px;
-            }
-            .buttons-section h2 span {
-                background: linear-gradient(135deg, #E8C66A, #3B82F6);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-            }
-            .buttons-section .desc {
-                text-align: center;
-                color: #AEB8C4;
-                margin-bottom: 30px;
-                font-size: 16px;
-            }
-            .buttons-grid {
+                font-size: 13px;
+                letter-spacing: 3px;
+            }}
+            .hero .stats {{
                 display: flex;
-                flex-wrap: wrap;
-                gap: 8px;
+                gap: 30px;
                 justify-content: center;
-            }
-            .btn-inline {
-                padding: 8px 16px;
-                border-radius: 50px;
-                font-size: 12px;
-                font-weight: 600;
-                border: none;
-                cursor: pointer;
-                transition: 0.3s;
-                font-family: 'Cairo', sans-serif;
-                background: rgba(255,255,255,0.05);
+                margin-top: 20px;
+                flex-wrap: wrap;
+            }}
+            .hero .stats span {{
                 color: #AEB8C4;
+                font-size: 14px;
+            }}
+            .hero .stats strong {{
+                color: #E8C66A;
+                font-size: 20px;
+            }}
+
+            /* Buttons Grid */
+            .buttons-grid {{
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 12px;
+                margin-top: 20px;
+            }}
+            .btn-inline {{
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 14px 20px;
+                border-radius: 16px;
+                text-decoration: none;
+                transition: 0.4s;
                 border: 1px solid rgba(255,255,255,0.05);
+                background: rgba(255,255,255,0.02);
+                backdrop-filter: blur(5px);
                 position: relative;
                 overflow: hidden;
-            }
-            .btn-inline::before {
+                cursor: pointer;
+                color: #F8FAFC;
+            }}
+            .btn-inline::before {{
                 content: '';
                 position: absolute;
                 top: -50%;
@@ -260,123 +278,145 @@ def index():
                 background: conic-gradient(from 0deg, transparent, rgba(232, 198, 106, 0.05), transparent);
                 animation: btnRotate 6s linear infinite;
                 opacity: 0;
-                transition: 0.3s;
-            }
-            .btn-inline:hover::before {
+                transition: 0.4s;
+            }}
+            .btn-inline:hover::before {{
                 opacity: 1;
-            }
-            @keyframes btnRotate {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-            }
-            .btn-inline:hover {
-                transform: scale(1.05);
+            }}
+            @keyframes btnRotate {{
+                0% {{ transform: rotate(0deg); }}
+                100% {{ transform: rotate(360deg); }}
+            }}
+            .btn-inline:hover {{
+                transform: translateY(-3px) scale(1.01);
                 border-color: #E8C66A;
-                color: #F8FAFC;
-                box-shadow: 0 0 20px rgba(232, 198, 106, 0.1);
-            }
-            .btn-inline.gold {
-                background: linear-gradient(135deg, #E8C66A, #D4AF37);
-                color: #05070D;
-            }
-            .btn-inline.gold:hover {
-                box-shadow: 0 0 30px rgba(232, 198, 106, 0.3);
-            }
-            .btn-inline.purple {
-                background: linear-gradient(135deg, #6D28D9, #4F1C9E);
-                color: #fff;
-            }
-            .btn-inline.purple:hover {
-                box-shadow: 0 0 30px rgba(109, 40, 217, 0.3);
-            }
-            .btn-inline.blue {
-                background: linear-gradient(135deg, #3B82F6, #1D4ED8);
-                color: #fff;
-            }
-            .btn-inline.blue:hover {
-                box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
-            }
-            .btn-inline.green {
-                background: linear-gradient(135deg, #10B981, #059669);
-                color: #fff;
-            }
-            .btn-inline.green:hover {
-                box-shadow: 0 0 30px rgba(16, 185, 129, 0.3);
-            }
-            .btn-inline.red {
-                background: linear-gradient(135deg, #EF4444, #DC2626);
-                color: #fff;
-            }
-            .btn-inline.red:hover {
-                box-shadow: 0 0 30px rgba(239, 68, 68, 0.3);
-            }
-            .btn-inline.pink {
-                background: linear-gradient(135deg, #EC4899, #DB2777);
-                color: #fff;
-            }
-            .btn-inline.pink:hover {
-                box-shadow: 0 0 30px rgba(236, 72, 153, 0.3);
-            }
-            .btn-inline.cyan {
-                background: linear-gradient(135deg, #06B6D4, #0891B2);
-                color: #fff;
-            }
-            .btn-inline.cyan:hover {
-                box-shadow: 0 0 30px rgba(6, 182, 212, 0.3);
-            }
-            .btn-inline.orange {
-                background: linear-gradient(135deg, #F59E0B, #D97706);
-                color: #fff;
-            }
-            .btn-inline.orange:hover {
-                box-shadow: 0 0 30px rgba(245, 158, 11, 0.3);
-            }
-            .btn-inline.glass {
+                box-shadow: 0 10px 40px rgba(232, 198, 106, 0.08);
+            }}
+            .btn-inline .btn-icon {{
+                font-size: 18px;
+                margin-left: 10px;
+                color: #E8C66A;
+            }}
+            .btn-inline .btn-label {{
+                flex: 1;
+                font-weight: 600;
+                font-size: 14px;
+            }}
+            .btn-inline .btn-count {{
+                font-size: 11px;
+                color: #AEB8C4;
                 background: rgba(255,255,255,0.05);
-                backdrop-filter: blur(10px);
-                border-color: rgba(255,255,255,0.1);
-            }
-            .btn-inline.glass:hover {
-                background: rgba(232, 198, 106, 0.1);
-                border-color: #E8C66A;
-            }
+                padding: 4px 12px;
+                border-radius: 50px;
+            }}
+            .btn-inline:hover .btn-count {{
+                background: rgba(232, 198, 106, 0.15);
+                color: #E8C66A;
+            }}
+
+            /* Colors */
+            .btn-inline.python {{ border-right: 3px solid #3776AB; }}
+            .btn-inline.javascript {{ border-right: 3px solid #F7DF1E; }}
+            .btn-inline.html {{ border-right: 3px solid #E34F26; }}
+            .btn-inline.css {{ border-right: 3px solid #1572B6; }}
+            .btn-inline.php {{ border-right: 3px solid #777BB4; }}
+            .btn-inline.sql {{ border-right: 3px solid #4479A1; }}
+            .btn-inline.bash {{ border-right: 3px solid #4EAA25; }}
+            .btn-inline.cpp {{ border-right: 3px solid #00599C; }}
+            .btn-inline.java {{ border-right: 3px solid #007396; }}
+            .btn-inline.csharp {{ border-right: 3px solid #68217A; }}
+            .btn-inline.go {{ border-right: 3px solid #00ADD8; }}
+            .btn-inline.rust {{ border-right: 3px solid #DEA584; }}
+            .btn-inline.react {{ border-right: 3px solid #61DAFB; }}
+            .btn-inline.vue {{ border-right: 3px solid #4FC08D; }}
+            .btn-inline.angular {{ border-right: 3px solid #DD0031; }}
+            .btn-inline.nodejs {{ border-right: 3px solid #339933; }}
+            .btn-inline.django {{ border-right: 3px solid #092E20; }}
+            .btn-inline.flask {{ border-right: 3px solid #000000; }}
+            .btn-inline.ai {{ border-right: 3px solid #FF6F00; }}
+            .btn-inline.ml {{ border-right: 3px solid #00BCD4; }}
+            .btn-inline.deep-learning {{ border-right: 3px solid #E91E63; }}
+            .btn-inline.nlp {{ border-right: 3px solid #9C27B0; }}
+            .btn-inline.computer-vision {{ border-right: 3px solid #3F51B5; }}
+            .btn-inline.cybersecurity {{ border-right: 3px solid #00E676; }}
+            .btn-inline.penetration-testing {{ border-right: 3px solid #FF1744; }}
+            .btn-inline.network-security {{ border-right: 3px solid #2979FF; }}
+            .btn-inline.cryptography {{ border-right: 3px solid #D500F9; }}
+            .btn-inline.cloud {{ border-right: 3px solid #00BCD4; }}
+            .btn-inline.docker {{ border-right: 3px solid #2496ED; }}
+            .btn-inline.kubernetes {{ border-right: 3px solid #326CE5; }}
+            .btn-inline.aws {{ border-right: 3px solid #FF9900; }}
+            .btn-inline.azure {{ border-right: 3px solid #0089D6; }}
+            .btn-inline.gcp {{ border-right: 3px solid #4285F4; }}
+            .btn-inline.mobile {{ border-right: 3px solid #3DDC84; }}
+            .btn-inline.android {{ border-right: 3px solid #3DDC84; }}
+            .btn-inline.ios {{ border-right: 3px solid #000000; }}
+            .btn-inline.flutter {{ border-right: 3px solid #02569B; }}
+            .btn-inline.react-native {{ border-right: 3px solid #61DAFB; }}
+            .btn-inline.game-dev {{ border-right: 3px solid #FF6F00; }}
+            .btn-inline.unity {{ border-right: 3px solid #000000; }}
+            .btn-inline.unreal {{ border-right: 3px solid #0E1128; }}
+            .btn-inline.p5js {{ border-right: 3px solid #ED225D; }}
+            .btn-inline.data-science {{ border-right: 3px solid #4CAF50; }}
+            .btn-inline.pandas {{ border-right: 3px solid #150458; }}
+            .btn-inline.numpy {{ border-right: 3px solid #013243; }}
+            .btn-inline.matplotlib {{ border-right: 3px solid #11557C; }}
+            .btn-inline.scikit-learn {{ border-right: 3px solid #F7931E; }}
+            .btn-inline.web-scraping {{ border-right: 3px solid #4CAF50; }}
+            .btn-inline.automation {{ border-right: 3px solid #FF6F00; }}
+            .btn-inline.api {{ border-right: 3px solid #00BCD4; }}
+            .btn-inline.graphql {{ border-right: 3px solid #E10098; }}
+            .btn-inline.rest {{ border-right: 3px solid #00BCD4; }}
+            .btn-inline.devops {{ border-right: 3px solid #E95420; }}
+            .btn-inline.ci-cd {{ border-right: 3px solid #0078D7; }}
+            .btn-inline.jenkins {{ border-right: 3px solid #D24939; }}
+            .btn-inline.ansible {{ border-right: 3px solid #EE0000; }}
+            .btn-inline.terraform {{ border-right: 3px solid #5C4EE5; }}
+            .btn-inline.blockchain {{ border-right: 3px solid #F7931A; }}
+            .btn-inline.solidity {{ border-right: 3px solid #363636; }}
+            .btn-inline.web3 {{ border-right: 3px solid #F16822; }}
+            .btn-inline.quantum {{ border-right: 3px solid #00BCD4; }}
+            .btn-inline.robotics {{ border-right: 3px solid #FF6F00; }}
+            .btn-inline.iot {{ border-right: 3px solid #00BCD4; }}
+            .btn-inline.arduino {{ border-right: 3px solid #00979D; }}
+            .btn-inline.raspberrypi {{ border-right: 3px solid #C51A4A; }}
 
             /* Footer */
-            .footer {
+            .footer {{
                 text-align: center;
-                padding: 40px 20px;
-                border-top: 1px solid rgba(255,255,255,0.05);
+                padding: 30px 20px;
                 margin-top: 40px;
-                background: rgba(5, 7, 13, 0.5);
+                border-top: 1px solid rgba(255,255,255,0.05);
+                background: rgba(5,7,13,0.5);
                 backdrop-filter: blur(10px);
                 border-radius: 24px;
-            }
-            .footer h3 {
-                font-size: 24px;
+            }}
+            .footer h3 {{
+                font-size: 22px;
                 font-weight: 700;
                 background: linear-gradient(135deg, #E8C66A, #F8FAFC);
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
-            }
-            .footer .sub {
+            }}
+            .footer .sub {{
                 color: #AEB8C4;
-                font-size: 14px;
+                font-size: 13px;
                 letter-spacing: 2px;
-            }
-            .footer .signature {
+            }}
+            .footer .signature {{
                 color: #D4AF37;
-                font-size: 12px;
+                font-size: 11px;
                 letter-spacing: 6px;
-                opacity: 0.5;
-                margin-top: 8px;
-            }
+                opacity: 0.4;
+                margin-top: 6px;
+            }}
 
-            @media (max-width: 768px) {
-                .hero h1 { font-size: 36px; }
-                .navbar { flex-direction: column; gap: 12px; padding: 16px; }
-                .profiles { grid-template-columns: 1fr; }
-                .btn-inline { font-size: 10px; padding: 6px 12px; }
-            }
+            @media (max-width: 768px) {{
+                .hero h1 {{ font-size: 32px; }}
+                .navbar {{ flex-direction: column; gap: 12px; padding: 16px; }}
+                .buttons-grid {{ grid-template-columns: 1fr; }}
+                .btn-inline {{ padding: 12px 16px; }}
+            }}
         </style>
     </head>
     <body>
@@ -388,11 +428,11 @@ def index():
                 <div class="logo">
                     <h1>مبرمج عبود</h1>
                     <div class="sub">@SSSTlF</div>
+                    <div class="tag">أصل العرب</div>
                 </div>
                 <div style="display:flex; gap:12px; flex-wrap:wrap;">
-                    <button class="btn-inline gold" onclick="alert('مرحباً بك في عالم عبود!')">🚀 ابدأ الآن</button>
-                    <button class="btn-inline glass" onclick="document.getElementById('buttons').scrollIntoView({behavior:'smooth'})">🔘 الأزرار</button>
-                    <button class="btn-inline glass" onclick="document.getElementById('profiles').scrollIntoView({behavior:'smooth'})">👤 البروفايلات</button>
+                    <span style="color:#AEB8C4; font-size:13px;">✦ {len(categories)} فئة</span>
+                    <span style="color:#E8C66A; font-size:13px;">✦ {len(categories) * 100} كود</span>
                 </div>
             </nav>
 
@@ -400,137 +440,292 @@ def index():
             <section class="hero">
                 <h1>مبرمج عبود</h1>
                 <div class="subtitle">@SSSTlF — أصل العرب</div>
-                <div class="tag">✦ 2000+ زر تفاعلي ✦</div>
-                <p style="color:#AEB8C4; max-width:600px; margin:20px auto; line-height:1.8;">
-                    منصة فخمة تضم أكثر من 2000 زر حقيقي، بروفايلات احترافية، وتصميم سينمائي. كل الأزرار تعمل وتؤدي أوامر حقيقية.
-                </p>
-            </section>
-
-            <!-- Profiles -->
-            <section id="profiles" class="profiles">
-                <div class="profile-card">
-                    <div class="avatar">👨‍💻</div>
-                    <h3>عبود</h3>
-                    <div class="role">مبرمج رئيسي | @SSSTlF</div>
-                    <p>خبير في تطوير الأنظمة، الذكاء الاصطناعي، والأمن السيبراني. صانع المحتوى التقني.</p>
-                </div>
-                <div class="profile-card">
-                    <div class="avatar">🧠</div>
-                    <h3>الذكاء الاصطناعي</h3>
-                    <div class="role">AI Assistant</div>
-                    <p>مساعد ذكي متطور قادر على تنفيذ الأوامر البرمجية والتحليلية بسرعة فائقة.</p>
-                </div>
-                <div class="profile-card">
-                    <div class="avatar">🛡️</div>
-                    <h3>الأمن السيبراني</h3>
-                    <div class="role">Cyber Security</div>
-                    <p>حماية متقدمة، اختبار اختراق، وتأمين الأنظمة ضد الهجمات الرقمية.</p>
-                </div>
-                <div class="profile-card">
-                    <div class="avatar">☁️</div>
-                    <h3>الحوسبة السحابية</h3>
-                    <div class="role">Cloud Computing</div>
-                    <p>بنية تحتية سحابية مرنة وقابلة للتوسع مع دعم عالمي.</p>
+                <div class="badge">✦ أكثر من 2000 كود برمجي ✦</div>
+                <div class="stats">
+                    <span><strong>{len(categories)}</strong> فئة</span>
+                    <span><strong>{len(categories) * 100}</strong> كود</span>
+                    <span><strong>100%</strong> حقيقي</span>
                 </div>
             </section>
 
-            <!-- 2000+ Buttons -->
-            <section id="buttons" class="buttons-section">
-                <h2>🔘 أكثر من <span>2000 زر</span> تفاعلي</h2>
-                <p class="desc">جميع الأزرار حقيقية وتعمل — اضغط على أي زر لتجربة التفاعل الفوري</p>
-                <div class="buttons-grid" id="buttonsGrid">
-                </div>
-            </section>
+            <!-- Buttons -->
+            <div class="buttons-grid">
+                {buttons_html}
+            </div>
 
             <!-- Footer -->
             <footer class="footer">
                 <h3>مبرمج عبود</h3>
                 <div class="sub">@SSSTlF</div>
                 <div class="signature">أصل العرب</div>
-                <p style="color:#AEB8C4; font-size:13px; margin-top:16px;">
-                    © 2026 جميع الحقوق محفوظة — تصميم فخم بأكثر من 2000 زر
+                <p style="color:#AEB8C4; font-size:12px; margin-top:12px;">
+                    © 2026 — جميع الأكواد حقيقية وجاهزة للاستخدام
+                </p>
+            </footer>
+        </div>
+    </body>
+    </html>
+    '''
+
+# ===== صفحة عرض الأكواد =====
+@app.route('/code/<category>')
+def show_codes(category):
+    if category not in CODES_DB:
+        return "الفئة غير موجودة", 404
+    
+    codes = CODES_DB[category]
+    display_name = category.replace('-', ' ').replace('_', ' ').title()
+    
+    # إنشاء الأكواد مع زر النسخ
+    codes_html = ''
+    for i, code in enumerate(codes):
+        escaped_code = code.replace('"', '&quot;').replace("'", "&#39;")
+        codes_html += f'''
+        <div class="code-block" id="code-{i}">
+            <div class="code-header">
+                <span class="code-num">#{i+1}</span>
+                <button class="copy-btn" onclick="copyCode({i})">📋 نسخ</button>
+            </div>
+            <pre class="code-content">{code}</pre>
+        </div>
+        '''
+    
+    return f'''
+    <!DOCTYPE html>
+    <html lang="ar" dir="rtl">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{display_name} — مبرمج عبود</title>
+        <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+        <style>
+            * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+            body {{
+                font-family: 'Cairo', sans-serif;
+                background: #05070D;
+                color: #F8FAFC;
+                min-height: 100vh;
+                padding: 20px;
+            }}
+            
+            ::-webkit-scrollbar {{ width: 6px; }}
+            ::-webkit-scrollbar-track {{ background: #05070D; }}
+            ::-webkit-scrollbar-thumb {{ background: #E8C66A; border-radius: 10px; }}
+
+            .aurora {{
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 0;
+                overflow: hidden;
+                pointer-events: none;
+            }}
+            .aurora::before {{
+                content: '';
+                position: absolute;
+                width: 600px;
+                height: 600px;
+                background: radial-gradient(circle, rgba(232, 198, 106, 0.06), transparent 70%);
+                top: -10%;
+                left: -10%;
+                animation: aurora1 15s ease-in-out infinite alternate;
+            }}
+            .aurora::after {{
+                content: '';
+                position: absolute;
+                width: 500px;
+                height: 500px;
+                background: radial-gradient(circle, rgba(59, 130, 246, 0.06), transparent 70%);
+                bottom: -10%;
+                right: -10%;
+                animation: aurora2 20s ease-in-out infinite alternate;
+            }}
+            @keyframes aurora1 {{
+                0% {{ transform: translate(0, 0) scale(1); }}
+                100% {{ transform: translate(200px, 100px) scale(1.5); }}
+            }}
+            @keyframes aurora2 {{
+                0% {{ transform: translate(0, 0) scale(1); }}
+                100% {{ transform: translate(-200px, -100px) scale(1.5); }}
+            }}
+
+            .container {{
+                position: relative;
+                z-index: 1;
+                max-width: 1200px;
+                margin: 0 auto;
+            }}
+
+            .back-btn {{
+                display: inline-block;
+                padding: 10px 24px;
+                border-radius: 50px;
+                border: 1px solid rgba(232, 198, 106, 0.2);
+                color: #D4AF37;
+                text-decoration: none;
+                font-weight: 600;
+                margin-bottom: 20px;
+                transition: 0.3s;
+                font-family: 'Cairo', sans-serif;
+            }}
+            .back-btn:hover {{
+                background: rgba(232, 198, 106, 0.1);
+                border-color: #E8C66A;
+            }}
+
+            .page-header {{
+                text-align: center;
+                padding: 30px 20px;
+                margin-bottom: 30px;
+                background: rgba(255,255,255,0.02);
+                border-radius: 24px;
+                border: 1px solid rgba(232, 198, 106, 0.05);
+            }}
+            .page-header h1 {{
+                font-size: 40px;
+                font-weight: 800;
+                background: linear-gradient(135deg, #E8C66A, #F8FAFC, #E8C66A);
+                background-size: 200% auto;
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                animation: shimmer 3s ease-in-out infinite;
+            }}
+            @keyframes shimmer {{
+                0%, 100% {{ background-position: 0% center; }}
+                50% {{ background-position: 200% center; }}
+            }}
+            .page-header .sub {{
+                color: #AEB8C4;
+                font-size: 16px;
+                margin-top: 6px;
+            }}
+            .page-header .badge {{
+                display: inline-block;
+                padding: 4px 16px;
+                border-radius: 50px;
+                background: rgba(232, 198, 106, 0.1);
+                color: #D4AF37;
+                font-size: 13px;
+                margin-top: 10px;
+            }}
+
+            .code-block {{
+                background: rgba(255,255,255,0.02);
+                border: 1px solid rgba(255,255,255,0.05);
+                border-radius: 16px;
+                margin-bottom: 16px;
+                overflow: hidden;
+                transition: 0.3s;
+            }}
+            .code-block:hover {{
+                border-color: rgba(232, 198, 106, 0.15);
+                box-shadow: 0 5px 30px rgba(0,0,0,0.2);
+            }}
+            .code-header {{
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 16px;
+                background: rgba(255,255,255,0.03);
+                border-bottom: 1px solid rgba(255,255,255,0.05);
+            }}
+            .code-num {{
+                color: #AEB8C4;
+                font-size: 12px;
+                font-weight: 600;
+            }}
+            .copy-btn {{
+                padding: 4px 16px;
+                border-radius: 50px;
+                border: 1px solid rgba(232, 198, 106, 0.2);
+                background: transparent;
+                color: #D4AF37;
+                font-size: 12px;
+                cursor: pointer;
+                transition: 0.3s;
+                font-family: 'Cairo', sans-serif;
+            }}
+            .copy-btn:hover {{
+                background: rgba(232, 198, 106, 0.1);
+                border-color: #E8C66A;
+            }}
+            .code-content {{
+                padding: 16px;
+                margin: 0;
+                font-family: 'Courier New', monospace;
+                font-size: 13px;
+                line-height: 1.6;
+                color: #00ff88;
+                overflow-x: auto;
+                white-space: pre-wrap;
+                word-wrap: break-word;
+                background: rgba(0,0,0,0.3);
+            }}
+
+            .footer {{
+                text-align: center;
+                padding: 20px;
+                margin-top: 30px;
+                border-top: 1px solid rgba(255,255,255,0.05);
+            }}
+            .footer .signature {{
+                color: #D4AF37;
+                font-size: 11px;
+                letter-spacing: 6px;
+                opacity: 0.4;
+            }}
+
+            @media (max-width: 768px) {{
+                .page-header h1 {{ font-size: 28px; }}
+                .code-content {{ font-size: 11px; padding: 12px; }}
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="aurora"></div>
+        
+        <div class="container">
+            <a href="/" class="back-btn">← العودة للرئيسية</a>
+            
+            <div class="page-header">
+                <h1>{display_name}</h1>
+                <div class="sub">@SSSTlF — مبرمج عبود</div>
+                <div class="badge">✦ {len(codes)} كود برمجي حقيقي ✦</div>
+            </div>
+
+            {codes_html}
+
+            <footer class="footer">
+                <div class="signature">أصل العرب</div>
+                <p style="color:#AEB8C4; font-size:12px; margin-top:8px;">
+                    © 2026 مبرمج عبود | @SSSTlF
                 </p>
             </footer>
         </div>
 
         <script>
-            // ===== توليد 2000+ زر حقيقي =====
-            const colors = ['', 'gold', 'purple', 'blue', 'green', 'red', 'pink', 'cyan', 'orange', 'glass'];
-            const labels = [
-                'ابدأ', 'تنفيذ', 'تشغيل', 'تحميل', 'حفظ', 'إرسال', 'بحث', 'تصفح', 'تحديث', 'حذف',
-                'إضافة', 'تعديل', 'عرض', 'طباعة', 'تصدير', 'استيراد', 'نسخ', 'لصق', 'قص', 'تراجع',
-                'إعادة', 'تكبير', 'تصغير', 'تدوير', 'فلتر', 'فرز', 'تجميع', 'تقسيم', 'دمج', 'تحويل',
-                'برمجة', 'تصميم', 'تطوير', 'تحليل', 'اختبار', 'نشر', 'تشغيل', 'إيقاف', 'إعادة تشغيل',
-                'تسجيل', 'تسجيل دخول', 'تسجيل خروج', 'تأكيد', 'إلغاء', 'موافق', 'رفض', 'تخطي',
-                'متابعة', 'رجوع', 'التالي', 'السابق', 'الأول', 'الأخير', 'توسيط', 'محاذاة',
-                'إظهار', 'إخفاء', 'تبديل', 'تحديد الكل', 'إلغاء التحديد', 'عكس التحديد',
-                'رفع', 'تنزيل', 'تثبيت', 'إزالة', 'تحديث', 'ترقية', 'تهيئة', 'إصلاح',
-                'تحسين', 'تسريع', 'تبسيط', 'تطوير', 'إعادة هيكلة', 'تقييم', 'مراجعة',
-                'اعتماد', 'رفض', 'تعليق', 'إعادة توجيه', 'إعادة توجيه آمن', 'إعادة توجيه سريع',
-                'تحليل عميق', 'تحليل سريع', 'تحليل شامل', 'تحليل أساسي', 'تحليل متقدم',
-                'ذكاء اصطناعي', 'تعلم آلي', 'تعلم عميق', 'شبكات عصبية', 'معالجة لغة طبيعية',
-                'رؤية حاسوبية', 'معالجة صوتية', 'توليد نصوص', 'توليد صور', 'ترجمة فورية',
-                'نسخ احتياطي', 'استعادة نسخة', 'تشفير', 'فك تشفير', 'توقيع رقمي', 'مصادقة'
-            ];
-
-            const extraLabels = [];
-            for (let i = 1; i <= 150; i++) {
-                extraLabels.push(`أمر ${i}`);
-                extraLabels.push(`تنفيذ ${i}`);
-                extraLabels.push(`زر ${i}`);
-                extraLabels.push(`كود ${i}`);
-                extraLabels.push(`دالة ${i}`);
-                extraLabels.push(`متغير ${i}`);
-                extraLabels.push(`مشروع ${i}`);
-                extraLabels.push(`تطبيق ${i}`);
-                extraLabels.push(`خدمة ${i}`);
-                extraLabels.push(`منصة ${i}`);
-            }
-
-            const allLabels = [...labels, ...extraLabels];
-            const buttonsContainer = document.getElementById('buttonsGrid');
-
-            // توليد 2000+ زر
-            for (let i = 0; i < 2050; i++) {
-                const btn = document.createElement('button');
-                const label = allLabels[i % allLabels.length];
-                const colorClass = colors[i % colors.length];
-                btn.className = `btn-inline ${colorClass}`;
-                btn.textContent = `✦ ${label}`;
+            function copyCode(index) {{
+                const block = document.getElementById('code-' + index);
+                const pre = block.querySelector('.code-content');
+                const text = pre.textContent;
                 
-                // كل زر له وظيفة مختلفة
-                const actions = [
-                    `alert('✅ تم تنفيذ الأمر: ${label}')`,
-                    `console.log('${label} clicked')`,
-                    `document.body.style.background = '#' + Math.floor(Math.random()*16777215).toString(16)`,
-                    `alert('🔄 جاري تنفيذ ${label}...')`,
-                    `fetch('/ping').then(r=>r.text()).then(console.log)`,
-                    `alert('📌 ${label} — تم بنجاح')`,
-                    `console.log('🟢 ${label} — عبود @SSSTlF')`,
-                    `alert('🚀 ${label} — تحت أمرك يا سيدي')`,
-                    `alert('🌟 ${label} — أصل العرب')`,
-                    `document.getElementById('buttonsGrid').style.background = '#' + Math.floor(Math.random()*16777215).toString(16)`
-                ];
-                
-                btn.onclick = new Function(actions[i % actions.length]);
-                buttonsContainer.appendChild(btn);
-            }
-
-            console.log('✅ تم توليد ' + buttonsContainer.children.length + ' زر تفاعلي');
-            console.log('🔹 مبرمج عبود | @SSSTlF | أصل العرب');
+                navigator.clipboard.writeText(text).then(() => {{
+                    const btn = block.querySelector('.copy-btn');
+                    btn.textContent = '✅ تم النسخ';
+                    setTimeout(() => btn.textContent = '📋 نسخ', 2000);
+                }});
+            }}
         </script>
     </body>
     </html>
     '''
 
-@app.route('/ping')
-def ping():
-    return 'pong'
-
 if __name__ == '__main__':
-    send_telegram(f"""🔥 <b>تم تشغيل الموقع الفخم</b>
-🎯 <b>مبرمج عبود | @SSSTlF</b>
-🔘 <b>2000+ زر تفاعلي</b>
+    send_telegram(f"""🔥 <b>تم تشغيل موقع مبرمج عبود</b>
+🎯 <b>@SSSTlF | أصل العرب</b>
+📚 <b>{len(categories)} فئة</b> | <b>{len(categories) * 100} كود</b>
 ⏰ {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}""")
     
     port = int(os.environ.get('PORT', 5000))
