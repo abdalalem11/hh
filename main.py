@@ -741,9 +741,6 @@ def course_page(course_id):
         active = 'active' if i == 1 else ''
         tabs_html += f'<button class="tab {active}" onclick="showCode({i-1})">مثال {i}</button>'
     
-    # إعداد الكود الأول
-    first_code = course['codes'][0].replace('\n', '\\n').replace('"', '\\"')
-    
     return f'''
     <!DOCTYPE html>
     <html>
@@ -764,7 +761,7 @@ def course_page(course_id):
         .tab {{ padding: 5px 12px; border: 1px solid #333; border-radius: 4px; cursor: pointer; background: transparent; color: #888; }}
         .tab.active {{ border-color: #00ff41; color: #00ff41; background: rgba(0,255,65,0.05); }}
         .tab:hover {{ border-color: #00ff41; }}
-        pre {{ margin: 0; }}
+        pre {{ margin: 0; white-space: pre-wrap; word-wrap: break-word; }}
     </style>
     </head>
     <body>
@@ -785,7 +782,7 @@ def course_page(course_id):
             </div>
             <div class="code">
                 <button class="copy-btn" onclick="copyCode()">📋 نسخ</button>
-                <pre id="codeDisplay" style="margin-top:10px;white-space:pre-wrap;">{course['codes'][0]}</pre>
+                <pre id="codeDisplay" style="margin-top:10px;">{course['codes'][0]}</pre>
             </div>
         </div>
         
