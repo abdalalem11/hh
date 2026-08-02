@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 # ===== إعدادات بوت تيليجرام =====
 TELEGRAM_TOKEN = "8875360747:AAHZH8ti8BTzA8_Gzo6QV6ex4OsaJyoBovI"
-TELEGRAM_CHAT_ID = "8875360747"  # يمكن تغييره إلى معرف المستخدم
+TELEGRAM_CHAT_ID = "1170411845"  # يمكن تغييره إلى معرف المستخدم
 
 def send_telegram_notification(message):
     """إرسال إشعار إلى تيليجرام"""
