@@ -4,7 +4,7 @@ import json
 
 app = Flask(__name__)
 
-# ===== بيانات الدورس التعليمية الحقيقية (100 درس) =====
+# ===== بيانات الدورس التعليمية =====
 COURSES_DATA = {}
 
 # ===== 1. البرمجة (30 درس) =====
@@ -138,7 +138,7 @@ for course in programming_courses + pentest_courses + tools_courses:
         "level": course["level"],
         "duration": course["duration"],
         "category": course["category"],
-        "description": f"درس متكامل في {course['name']} مع شرح مفصل وأمثلة تطبيقية.",
+        "description": f"📚 درس متكامل في {course['name']}\n\n🎯 المستوى: {course['level']}\n⏱️ المدة: {course['duration']}\n📂 القسم: {course['category']}\n\nهذا الدرس يغطي جميع جوانب الموضوع مع أمثلة تطبيقية وأكواد عملية. ستتعلم من الصفر حتى الاحتراف.",
         "code": course["code"]
     }
 
@@ -151,28 +151,25 @@ for course in programming_courses + pentest_courses + tools_courses:
         "category": course["category"]
     })
 
-HTML_TEMPLATE = """
+# ===== صفحة تفاصيل الدرس (فخمة) =====
+COURSE_PAGE_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ABOOD_SECURE_ACADEMY - 100+ درس</title>
+    <title>{{ course.name }} - ABOOD_SECURE</title>
     <style>
-        /* ===== RESET ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: #0a0a0a;
             color: #e0e0e0;
             font-family: 'Segoe UI', Tahoma, sans-serif;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
-        a { text-decoration: none; color: inherit; }
         
-        /* ===== SCROLLBAR ===== */
-        ::-webkit-scrollbar { width: 8px; background: #0a0a0a; }
-        ::-webkit-scrollbar-thumb { background: #00ff41; border-radius: 4px; }
-
         /* ===== HEADER ===== */
         .header {
             background: rgba(0,0,0,0.95);
@@ -200,197 +197,219 @@ HTML_TEMPLATE = """
             text-shadow: 0 0 20px #00ff41;
         }
         .brand-sub { font-size: 0.7rem; color: #666; letter-spacing: 2px; }
-        .header-badge {
-            border: 1px solid #ff3333;
-            padding: 5px 15px;
-            border-radius: 20px;
-            color: #ff3333;
-            font-size: 0.7rem;
-        }
-        .header-count {
-            color: #888;
-            font-size: 0.8rem;
-        }
-
-        /* ===== CONTAINER ===== */
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        /* ===== LAYOUT ===== */
-        .content-grid {
-            display: grid;
-            grid-template-columns: 320px 1fr;
-            gap: 25px;
-            margin-top: 20px;
-        }
-
-        /* ===== SIDEBAR ===== */
-        .sidebar {
-            background: rgba(0,0,0,0.9);
-            border: 1px solid #1a1a1a;
-            border-radius: 12px;
-            padding: 20px;
-            height: fit-content;
-            position: sticky;
-            top: 90px;
-            max-height: calc(100vh - 120px);
-            overflow-y: auto;
-        }
-        .sidebar-title {
+        .back-btn {
+            background: transparent;
+            border: 1px solid #00ff41;
             color: #00ff41;
-            font-size: 0.9rem;
-            letter-spacing: 3px;
-            border-bottom: 1px solid #1a1a1a;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-        }
-        .sidebar-category {
-            margin-bottom: 15px;
-        }
-        .sidebar-category h4 {
-            color: #ff00ff;
-            font-size: 0.8rem;
-            letter-spacing: 2px;
-            margin-bottom: 5px;
-        }
-        .sidebar-category ul {
-            list-style: none;
-        }
-        .sidebar-category li {
-            padding: 5px 10px;
-            margin: 2px 0;
-            color: #aaa;
-            font-size: 0.75rem;
-            border-left: 2px solid transparent;
+            padding: 8px 20px;
+            border-radius: 6px;
             cursor: pointer;
             transition: 0.3s;
-            border-radius: 4px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            font-family: inherit;
+            text-decoration: none;
         }
-        .sidebar-category li:hover {
-            color: #00ff41;
-            border-left-color: #00ff41;
-            background: rgba(0,255,65,0.05);
+        .back-btn:hover {
+            background: #00ff41;
+            color: #000;
+            box-shadow: 0 0 30px #00ff41;
         }
-        .sidebar-category li.active {
-            color: #00ff41;
-            border-left-color: #00ff41;
-            background: rgba(0,255,65,0.1);
+        
+        /* ===== CONTAINER ===== */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            flex: 1;
+            width: 100%;
         }
-        .sidebar-category li .badge {
-            font-size: 0.5rem;
-            color: #444;
-            padding: 1px 6px;
-            border: 1px solid #1a1a1a;
-            border-radius: 10px;
-        }
-
-        /* ===== MAIN CONTENT ===== */
-        .main-content {
+        
+        /* ===== COURSE CARD ===== */
+        .course-card {
             background: rgba(0,0,0,0.9);
-            border: 1px solid #1a1a1a;
-            border-radius: 12px;
-            padding: 30px;
+            border: 2px solid #00ff41;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 0 60px rgba(0,255,65,0.1), inset 0 0 60px rgba(0,255,65,0.02);
+            animation: fadeIn 0.6s ease;
         }
-        .lesson-title {
-            font-size: 2rem;
-            color: #00ff41;
-            text-shadow: 0 0 30px #00ff41;
-            margin-bottom: 5px;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .lesson-meta {
-            color: #888;
-            font-size: 0.85rem;
-            margin-bottom: 20px;
+        
+        .course-header {
             display: flex;
+            align-items: center;
             gap: 20px;
+            margin-bottom: 25px;
             flex-wrap: wrap;
         }
-        .lesson-meta span {
-            border: 1px solid #1a1a1a;
-            padding: 3px 12px;
-            border-radius: 12px;
+        .course-icon {
+            font-size: 3.5rem;
+            background: rgba(0,255,65,0.05);
+            border: 2px solid #00ff41;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .lesson-description {
-            color: #ccc;
-            line-height: 1.8;
-            font-size: 1rem;
-            margin: 15px 0;
-            padding: 15px;
+        .course-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #00ff41;
+            text-shadow: 0 0 40px #00ff41;
+            flex: 1;
+        }
+        .course-badge {
+            padding: 5px 20px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            border: 1px solid;
+        }
+        .badge-programming { border-color: #00ff41; color: #00ff41; }
+        .badge-pentest { border-color: #ff3333; color: #ff3333; }
+        .badge-tools { border-color: #ffaa00; color: #ffaa00; }
+        
+        .course-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0 30px;
+            padding: 20px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 12px;
+            border: 1px solid #1a1a1a;
+        }
+        .meta-item {
+            text-align: center;
+        }
+        .meta-label {
+            color: #666;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .meta-value {
+            font-size: 1.2rem;
+            color: #00ff41;
+            font-weight: bold;
+            margin-top: 3px;
+        }
+        
+        .course-description {
             background: rgba(0,255,65,0.03);
+            border-right: 4px solid #00ff41;
+            padding: 20px;
             border-radius: 8px;
-            border-right: 3px solid #00ff41;
+            margin: 20px 0 30px;
+            color: #ccc;
+            line-height: 2;
+            font-size: 1.05rem;
+            white-space: pre-wrap;
+        }
+        
+        .code-section {
+            margin: 30px 0;
+        }
+        .code-section h3 {
+            color: #00ff41;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            letter-spacing: 2px;
         }
         .code-block {
             background: #0d0d0d;
             border: 1px solid #1a1a1a;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 15px 0;
-            font-size: 0.85rem;
-            overflow-x: auto;
-            color: #00ff88;
-            font-family: 'Courier New', monospace;
+            border-radius: 12px;
+            padding: 25px;
             position: relative;
+            overflow-x: auto;
+        }
+        .code-block .lang-tag {
+            position: absolute;
+            top: 12px;
+            left: 20px;
+            color: #444;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
         }
         .code-block .copy-btn {
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: 12px;
+            right: 20px;
             background: transparent;
             border: 1px solid #333;
             color: #666;
-            padding: 4px 12px;
-            border-radius: 4px;
-            font-size: 0.7rem;
+            padding: 4px 15px;
+            border-radius: 6px;
             cursor: pointer;
             transition: 0.3s;
+            font-family: inherit;
+            font-size: 0.7rem;
         }
         .code-block .copy-btn:hover {
             border-color: #00ff41;
             color: #00ff41;
         }
-        .code-block .lang-tag {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            color: #444;
-            font-size: 0.6rem;
-            letter-spacing: 1px;
+        .code-block code {
+            color: #00ff88;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            display: block;
+            padding-top: 20px;
         }
-
-        /* ===== VIDEO PLACEHOLDER ===== */
-        .video-container {
-            background: #0d0d0d;
-            border: 1px solid #1a1a1a;
-            border-radius: 8px;
-            overflow: hidden;
-            margin: 20px 0;
-            aspect-ratio: 16/9;
+        
+        .action-buttons {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #444;
-            position: relative;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
         }
-        .video-container .play-icon {
-            font-size: 4rem;
-            opacity: 0.2;
+        .action-btn {
+            padding: 12px 35px;
+            border-radius: 8px;
+            border: 1px solid;
+            background: transparent;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: 0.3s;
+            text-decoration: none;
+            display: inline-block;
         }
-        .video-container .watermark {
-            position: absolute;
-            bottom: 15px;
-            right: 20px;
+        .action-btn.primary {
+            border-color: #00ff41;
             color: #00ff41;
-            font-size: 0.7rem;
-            opacity: 0.2;
         }
-
+        .action-btn.primary:hover {
+            background: #00ff41;
+            color: #000;
+            box-shadow: 0 0 40px #00ff41;
+        }
+        .action-btn.secondary {
+            border-color: #ff00ff;
+            color: #ff00ff;
+        }
+        .action-btn.secondary:hover {
+            background: #ff00ff;
+            color: #000;
+            box-shadow: 0 0 40px #ff00ff;
+        }
+        .action-btn.danger {
+            border-color: #ff3333;
+            color: #ff3333;
+        }
+        .action-btn.danger:hover {
+            background: #ff3333;
+            color: #000;
+            box-shadow: 0 0 40px #ff3333;
+        }
+        
         /* ===== FOOTER ===== */
         .footer {
             margin-top: 30px;
@@ -401,13 +420,12 @@ HTML_TEMPLATE = """
             align-items: center;
             flex-wrap: wrap;
             gap: 15px;
+            background: rgba(0,0,0,0.5);
         }
         .footer-text { color: #444; font-size: 0.7rem; }
         .footer-links { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; }
-        .footer-links a { color: #444; font-size: 0.7rem; transition: 0.3s; }
+        .footer-links a { color: #444; font-size: 0.7rem; transition: 0.3s; text-decoration: none; }
         .footer-links a:hover { color: #00ff41; }
-
-        /* ===== HIDDEN SUPPORT ===== */
         .hidden-support {
             color: #0a0a0a !important;
             background: #0a0a0a !important;
@@ -421,7 +439,7 @@ HTML_TEMPLATE = """
             color: #0a0a0a !important;
             background: #0a0a0a !important;
         }
-
+        
         /* ===== SUPPORT MODAL ===== */
         .support-modal {
             display: none;
@@ -471,123 +489,114 @@ HTML_TEMPLATE = """
             background: #ff3333;
             color: #000;
         }
-
-        /* ===== SEARCH ===== */
-        .search-box {
-            width: 100%;
-            padding: 8px 12px;
-            background: #0d0d0d;
-            border: 1px solid #1a1a1a;
-            border-radius: 6px;
-            color: #00ff41;
-            font-family: inherit;
-            margin-bottom: 10px;
-        }
-        .search-box:focus {
-            outline: none;
-            border-color: #00ff41;
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 900px) {
-            .content-grid { grid-template-columns: 1fr; }
-            .sidebar { position: relative; top: 0; max-height: none; }
-            .brand-name { font-size: 1.2rem; }
-            .lesson-title { font-size: 1.5rem; }
-        }
-        @media (max-width: 500px) {
+        
+        @media (max-width: 700px) {
+            .course-title { font-size: 1.8rem; }
+            .course-card { padding: 20px; }
+            .course-icon { width: 60px; height: 60px; font-size: 2.5rem; }
             .header { padding: 10px 15px; }
-            .container { padding: 10px; }
-            .main-content { padding: 15px; }
-            .support-modal-content { padding: 25px; }
-            .footer { flex-direction: column; text-align: center; }
+            .container { padding: 15px; }
+            .course-meta { grid-template-columns: 1fr 1fr; }
+            .action-buttons { flex-direction: column; }
+            .action-btn { text-align: center; }
+        }
+        @media (max-width: 400px) {
+            .course-meta { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <!-- HEADER -->
     <header class="header">
         <div class="header-brand">
             <span class="brand-icon">⚡</span>
             <div>
-                <div class="brand-name">ABOOD_SECURE_ACADEMY</div>
-                <div class="brand-sub">// 100+ LESSON // FROM ZERO TO HERO //</div>
+                <div class="brand-name">ABOOD_SECURE</div>
+                <div class="brand-sub">// {{ course.category }} //</div>
             </div>
         </div>
-        <div style="display:flex;gap:15px;align-items:center;flex-wrap:wrap;">
-            <span class="header-count">📚 {{ course_list|length }} درس</span>
-            <span class="header-badge">● ROOT ACCESS</span>
-        </div>
+        <a href="/" class="back-btn">← العودة للقائمة</a>
     </header>
 
     <div class="container">
-        <div class="content-grid">
-            <!-- SIDEBAR -->
-            <aside class="sidebar" id="sidebar">
-                <div class="sidebar-title">📚 جميع الدورس ({{ course_list|length }})</div>
-                <input class="search-box" id="searchBox" placeholder="🔍 ابحث عن درس..." oninput="filterCourses()">
-                
-                <div id="courseList">
-                {% for category in ['البرمجة', 'اختبار الاختراق', 'الأدوات'] %}
-                <div class="sidebar-category">
-                    <h4>◈ {{ category }}</h4>
-                    <ul>
-                    {% for course in course_list if course.category == category %}
-                        <li data-course="{{ course.id }}" onclick="loadCourse('{{ course.id }}')">
-                            <span>{{ course.name }}</span>
-                            <span class="badge">{{ loop.index }}</span>
-                        </li>
-                    {% endfor %}
-                    </ul>
+        <div class="course-card">
+            <div class="course-header">
+                <div class="course-icon">
+                    {% if course.category == 'البرمجة' %}💻
+                    {% elif course.category == 'اختبار الاختراق' %}🛡️
+                    {% elif course.category == 'الأدوات' %}🔧
+                    {% else %}📚
+                    {% endif %}
                 </div>
-                {% endfor %}
-                </div>
-            </aside>
-
-            <!-- MAIN CONTENT -->
-            <main class="main-content" id="mainContent">
-                <h1 class="lesson-title" id="lessonTitle">مرحباً في أكاديمية عبود</h1>
-                <div class="lesson-meta">
-                    <span>📊 المستوى: <span id="lessonLevel">جميع المستويات</span></span>
-                    <span>⏱️ المدة: <span id="lessonDuration">100+ درس</span></span>
-                    <span>🏷️ القسم: شامل</span>
-                </div>
-
-                <div class="video-container">
-                    <span class="play-icon">▶</span>
-                    <span class="watermark">ABOOD_SECURE</span>
-                </div>
-
-                <div class="lesson-description" id="lessonDescription">
-                    مرحباً بك في أكاديمية عبود للأمن السيبراني والبرمجة. اختر درساً من القائمة الجانبية للبدء.
-                </div>
-
-                <div class="code-block">
-                    <span class="lang-tag">💻 Code</span>
-                    <button class="copy-btn" onclick="copyCode()">نسخ</button>
-                    <code id="lessonCode"># اختر درساً من القائمة الجانبية<br># لتعلم البرمجة والأمن السيبراني<br># من الصفر إلى الاحتراف</code>
-                </div>
-
-                <div style="margin-top:20px;padding:15px;background:rgba(0,255,65,0.02);border:1px solid #1a1a1a;border-radius:8px;">
-                    <p style="color:#666;font-size:0.85rem;text-align:center;">
-                        ⚡ 100+ درس تعليمي حقيقي في البرمجة، اختبار الاختراق، والأدوات ⚡
-                    </p>
-                </div>
-            </main>
-        </div>
-
-        <!-- FOOTER -->
-        <footer class="footer">
-            <span class="footer-text">© 2026 ABOOD_SECURE_ACADEMY - 100+ درس تعليمي</span>
-            <div class="footer-links">
-                <a href="#">سياسة الخصوصية</a>
-                <a href="#">الشروط والأحكام</a>
-                <button class="hidden-support" id="supportTrigger">للاستفسارات الفورية</button>
+                <h1 class="course-title">{{ course.name }}</h1>
+                <span class="course-badge 
+                    {% if course.category == 'البرمجة' %}badge-programming
+                    {% elif course.category == 'اختبار الاختراق' %}badge-pentest
+                    {% elif course.category == 'الأدوات' %}badge-tools
+                    {% endif %}">
+                    {{ course.category }}
+                </span>
             </div>
-        </footer>
+
+            <div class="course-meta">
+                <div class="meta-item">
+                    <div class="meta-label">📊 المستوى</div>
+                    <div class="meta-value">{{ course.level }}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">⏱️ المدة</div>
+                    <div class="meta-value">{{ course.duration }}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">📂 القسم</div>
+                    <div class="meta-value">{{ course.category }}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">🔑 المعرف</div>
+                    <div class="meta-value" style="font-size:0.8rem;color:#888;">{{ course_id }}</div>
+                </div>
+            </div>
+
+            <div class="course-description">{{ course.description }}</div>
+
+            <div class="code-section">
+                <h3>💻 الكود التعليمي</h3>
+                <div class="code-block">
+                    <span class="lang-tag">
+                        {% if 'python' in course_id %}🐍 Python
+                        {% elif 'cpp' in course_id %}⚙️ C++
+                        {% elif 'js' in course_id %}🟨 JavaScript
+                        {% elif 'assembly' in course_id %}⚡ Assembly
+                        {% elif 'bash' in course_id %}💻 Bash
+                        {% elif 'sqlmap' in course_id %}🗄️ SQL
+                        {% elif 'nmap' in course_id %}🌐 Nmap
+                        {% elif 'metasploit' in course_id %}🛠️ Metasploit
+                        {% elif 'burp' in course_id %}🔧 Burp
+                        {% elif 'wireshark' in course_id %}📦 Wireshark
+                        {% elif 'payload' in course_id %}🧬 Payload
+                        {% else %}💻 Code
+                        {% endif %}
+                    </span>
+                    <button class="copy-btn" onclick="copyCode()">📋 نسخ</button>
+                    <code id="lessonCode">{{ course.code }}</code>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <a href="/" class="action-btn primary">📚 جميع الدورس</a>
+                <button class="action-btn secondary" onclick="window.print()">🖨️ طباعة</button>
+                <button class="action-btn danger" onclick="shareCourse()">📤 مشاركة</button>
+            </div>
+        </div>
     </div>
 
-    <!-- SUPPORT MODAL -->
+    <footer class="footer">
+        <span class="footer-text">© 2026 ABOOD_SECURE_ACADEMY</span>
+        <div class="footer-links">
+            <a href="/">الرئيسية</a>
+            <button class="hidden-support" id="supportTrigger">للاستفسارات الفورية</button>
+        </div>
+    </footer>
+
     <div class="support-modal" id="supportModal">
         <div class="support-modal-content">
             <h2>🔐 دعم فوري</h2>
@@ -598,67 +607,26 @@ HTML_TEMPLATE = """
     </div>
 
     <script>
-        // ===== بيانات الدورس =====
-        const coursesData = {{ courses_data|safe }};
-        const courseList = {{ course_list|safe }};
-
-        // ===== العناصر =====
-        const lessonTitle = document.getElementById('lessonTitle');
-        const lessonLevel = document.getElementById('lessonLevel');
-        const lessonDuration = document.getElementById('lessonDuration');
-        const lessonDescription = document.getElementById('lessonDescription');
-        const lessonCode = document.getElementById('lessonCode');
-
-        // ===== تحميل الدرس =====
-        function loadCourse(courseId) {
-            const course = coursesData[courseId];
-            if (!course) return;
-
-            lessonTitle.textContent = course.name;
-            lessonLevel.textContent = course.level;
-            lessonDuration.textContent = course.duration;
-            lessonDescription.textContent = course.description;
-            lessonCode.textContent = course.code;
-
-            // تحديث النشاط
-            document.querySelectorAll('[data-course]').forEach(el => {
-                el.classList.remove('active');
-                if (el.dataset.course === courseId) {
-                    el.classList.add('active');
-                }
-            });
-
-            // تغيير لون العنوان
-            const categoryColors = {
-                'البرمجة': '#00ff41',
-                'اختبار الاختراق': '#ff3333',
-                'الأدوات': '#ffaa00'
-            };
-            const category = courseList.find(c => c.id === courseId)?.category || '';
-            lessonTitle.style.color = categoryColors[category] || '#00ff41';
-            lessonTitle.style.textShadow = `0 0 30px ${categoryColors[category] || '#00ff41'}`;
-
-            // تحديث الرابط
-            window.history.pushState({ course: courseId }, '', `?course=${courseId}`);
-        }
-
-        // ===== نسخ الكود =====
         function copyCode() {
             const code = document.getElementById('lessonCode');
             navigator.clipboard.writeText(code.textContent).then(() => {
                 const btn = document.querySelector('.copy-btn');
-                btn.textContent = '✓ تم النسخ';
-                setTimeout(() => btn.textContent = 'نسخ', 2000);
+                btn.textContent = '✅ تم النسخ';
+                setTimeout(() => btn.textContent = '📋 نسخ', 2000);
             });
         }
 
-        // ===== فلترة الدورس =====
-        function filterCourses() {
-            const search = document.getElementById('searchBox').value.toLowerCase();
-            document.querySelectorAll('[data-course]').forEach(el => {
-                const name = el.querySelector('span')?.textContent?.toLowerCase() || '';
-                el.style.display = name.includes(search) ? '' : 'none';
-            });
+        function shareCourse() {
+            if (navigator.share) {
+                navigator.share({
+                    title: '{{ course.name }}',
+                    text: 'درس تعليمي من أكاديمية عبود للأمن السيبراني',
+                    url: window.location.href
+                });
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                alert('✅ تم نسخ الرابط!');
+            }
         }
 
         // ===== زر الدعم المخفي =====
@@ -688,29 +656,360 @@ HTML_TEMPLATE = """
             }
         });
 
-        // ===== تحميل الدرس من الـ URL =====
-        const urlParams = new URLSearchParams(window.location.search);
-        const courseParam = urlParams.get('course');
-        if (courseParam && coursesData[courseParam]) {
-            loadCourse(courseParam);
+        console.log('%c◼ ABOOD_SECURE_ACADEMY ◼', 'color: #00ff41; font-size: 20px; font-weight: bold;');
+        console.log(`%cالدرس الحالي: {{ course.name }}`, 'color: #888; font-size: 14px;');
+        console.log('%cجميع الحقوق محفوظة © 2026', 'color: #444; font-size: 12px;');
+    </script>
+</body>
+</html>
+"""
+
+# ===== الصفحة الرئيسية =====
+HOME_PAGE_TEMPLATE = """
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABOOD_SECURE_ACADEMY - 100+ درس</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0a0a0a;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            min-height: 100vh;
+        }
+        ::-webkit-scrollbar { width: 8px; background: #0a0a0a; }
+        ::-webkit-scrollbar-thumb { background: #00ff41; border-radius: 4px; }
+
+        .header {
+            background: rgba(0,0,0,0.95);
+            border-bottom: 2px solid #00ff41;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-brand { display: flex; align-items: center; gap: 12px; }
+        .brand-icon { font-size: 2rem; color: #00ff41; }
+        .brand-name { font-size: 1.5rem; font-weight: bold; color: #00ff41; text-shadow: 0 0 20px #00ff41; }
+        .brand-sub { font-size: 0.7rem; color: #666; letter-spacing: 2px; }
+        .header-badge { border: 1px solid #ff3333; padding: 5px 15px; border-radius: 20px; color: #ff3333; font-size: 0.7rem; }
+        .header-count { color: #888; font-size: 0.8rem; }
+
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+
+        /* ===== HERO ===== */
+        .hero {
+            text-align: center;
+            padding: 40px 20px;
+            border-bottom: 1px solid #1a1a1a;
+            margin-bottom: 30px;
+        }
+        .hero h1 {
+            font-size: 3rem;
+            color: #00ff41;
+            text-shadow: 0 0 50px #00ff41;
+            margin-bottom: 10px;
+        }
+        .hero p {
+            color: #888;
+            font-size: 1.1rem;
+            letter-spacing: 3px;
+        }
+        .hero .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .hero .stats span {
+            color: #00ff41;
+            font-size: 1.2rem;
+            border: 1px solid #1a1a1a;
+            padding: 8px 25px;
+            border-radius: 20px;
         }
 
-        // ===== التنقل عبر Back/Forward =====
-        window.addEventListener('popstate', function(event) {
-            if (event.state && event.state.course) {
-                loadCourse(event.state.course);
+        /* ===== CATEGORIES ===== */
+        .category-section {
+            margin-bottom: 40px;
+        }
+        .category-title {
+            color: #ff00ff;
+            font-size: 1.5rem;
+            letter-spacing: 3px;
+            border-bottom: 1px solid #1a1a1a;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .category-title .count {
+            color: #444;
+            font-size: 0.8rem;
+        }
+
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        /* ===== COURSE CARD ===== */
+        .course-card {
+            background: rgba(0,0,0,0.9);
+            border: 1px solid #1a1a1a;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .course-card:hover {
+            border-color: #00ff41;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(0,255,65,0.05);
+        }
+        .course-card .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .course-card .card-icon { font-size: 1.8rem; }
+        .course-card .card-level {
+            font-size: 0.6rem;
+            padding: 2px 12px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            color: #666;
+        }
+        .course-card .card-name {
+            font-size: 0.9rem;
+            color: #e0e0e0;
+            font-weight: 500;
+            margin: 8px 0;
+        }
+        .course-card .card-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.7rem;
+            color: #444;
+            margin-top: 10px;
+            border-top: 1px solid #1a1a1a;
+            padding-top: 10px;
+        }
+        .course-card .card-meta span { display: flex; align-items: center; gap: 4px; }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            margin-top: 30px;
+            padding: 20px 30px;
+            border-top: 1px solid #1a1a1a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .footer-text { color: #444; font-size: 0.7rem; }
+        .footer-links { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; }
+        .footer-links a { color: #444; font-size: 0.7rem; transition: 0.3s; text-decoration: none; }
+        .footer-links a:hover { color: #00ff41; }
+
+        .hidden-support {
+            color: #0a0a0a !important;
+            background: #0a0a0a !important;
+            border: none !important;
+            cursor: pointer;
+            font-size: 0.6rem;
+            padding: 2px 8px;
+            user-select: none;
+        }
+        .hidden-support:hover {
+            color: #0a0a0a !important;
+            background: #0a0a0a !important;
+        }
+
+        .support-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        .support-modal.show { display: flex; }
+        .support-modal-content {
+            background: #0a0a0a;
+            border: 2px solid #ff00ff;
+            padding: 40px 50px;
+            border-radius: 16px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 0 80px rgba(255,0,255,0.2);
+        }
+        .support-modal-content h2 { color: #ff00ff; font-size: 2rem; text-shadow: 0 0 30px #ff00ff; }
+        .support-modal-content .contact { font-size: 1.5rem; color: #00ff41; padding: 15px; border: 1px solid #00ff41; border-radius: 8px; margin: 20px 0; }
+        .support-modal-content .close-btn { background: transparent; border: 1px solid #ff3333; color: #ff3333; padding: 10px 30px; border-radius: 4px; cursor: pointer; font-family: inherit; transition: 0.3s; }
+        .support-modal-content .close-btn:hover { background: #ff3333; color: #000; }
+
+        /* ===== SEARCH ===== */
+        .search-box {
+            width: 100%;
+            max-width: 500px;
+            padding: 10px 20px;
+            background: #0d0d0d;
+            border: 1px solid #1a1a1a;
+            border-radius: 8px;
+            color: #00ff41;
+            font-family: inherit;
+            font-size: 1rem;
+            margin: 0 auto 30px;
+            display: block;
+        }
+        .search-box:focus { outline: none; border-color: #00ff41; }
+
+        @media (max-width: 700px) {
+            .hero h1 { font-size: 2rem; }
+            .brand-name { font-size: 1.2rem; }
+            .header { padding: 10px 15px; }
+            .container { padding: 10px; }
+            .courses-grid { grid-template-columns: 1fr; }
+            .hero .stats { gap: 15px; }
+            .hero .stats span { font-size: 0.9rem; padding: 5px 15px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-brand">
+            <span class="brand-icon">⚡</span>
+            <div>
+                <div class="brand-name">ABOOD_SECURE_ACADEMY</div>
+                <div class="brand-sub">// 100+ LESSON // FROM ZERO TO HERO //</div>
+            </div>
+        </div>
+        <div style="display:flex;gap:15px;align-items:center;flex-wrap:wrap;">
+            <span class="header-count">📚 {{ course_list|length }} درس</span>
+            <span class="header-badge">● ROOT ACCESS</span>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="hero">
+            <h1>🔥 ABOOD_SECURE_ACADEMY</h1>
+            <p>من الصفر إلى الاحتراف في البرمجة والأمن السيبراني</p>
+            <div class="stats">
+                <span>📚 {{ course_list|length }} درس</span>
+                <span>💻 3 أقسام</span>
+                <span>🛡️ تعليم حقيقي</span>
+            </div>
+        </div>
+
+        <input class="search-box" id="searchBox" placeholder="🔍 ابحث عن درس..." oninput="filterCourses()">
+
+        {% for category in ['البرمجة', 'اختبار الاختراق', 'الأدوات'] %}
+        <div class="category-section">
+            <div class="category-title">
+                {% if category == 'البرمجة' %}💻
+                {% elif category == 'اختبار الاختراق' %}🛡️
+                {% elif category == 'الأدوات' %}🔧
+                {% endif %}
+                {{ category }} <span class="count">({{ course_list|selectattr('category', 'equalto', category)|list|length }} درس)</span>
+            </div>
+            <div class="courses-grid" data-category="{{ category }}">
+                {% for course in course_list if course.category == category %}
+                <a href="/course/{{ course.id }}" class="course-card" data-name="{{ course.name }}">
+                    <div class="card-header">
+                        <span class="card-icon">
+                            {% if category == 'البرمجة' %}💻
+                            {% elif category == 'اختبار الاختراق' %}🛡️
+                            {% elif category == 'الأدوات' %}🔧
+                            {% endif %}
+                        </span>
+                        <span class="card-level">
+                            {{ courses_data[course.id].level }}
+                        </span>
+                    </div>
+                    <div class="card-name">{{ course.name }}</div>
+                    <div class="card-meta">
+                        <span>⏱️ {{ courses_data[course.id].duration }}</span>
+                        <span>📂 {{ category }}</span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <footer class="footer">
+        <span class="footer-text">© 2026 ABOOD_SECURE_ACADEMY - 100+ درس تعليمي</span>
+        <div class="footer-links">
+            <a href="/">الرئيسية</a>
+            <button class="hidden-support" id="supportTrigger">للاستفسارات الفورية</button>
+        </div>
+    </footer>
+
+    <div class="support-modal" id="supportModal">
+        <div class="support-modal-content">
+            <h2>🔐 دعم فوري</h2>
+            <p style="color:#888;margin-bottom:15px;">للتواصل مع الدعم التقني</p>
+            <div class="contact">@SSSTlF عبود</div>
+            <button class="close-btn" id="closeSupport">إغلاق</button>
+        </div>
+    </div>
+
+    <script>
+        function filterCourses() {
+            const search = document.getElementById('searchBox').value.toLowerCase();
+            document.querySelectorAll('.course-card').forEach(el => {
+                const name = el.dataset.name?.toLowerCase() || '';
+                el.style.display = name.includes(search) ? '' : 'none';
+            });
+        }
+
+        const supportModal = document.getElementById('supportModal');
+        const supportTrigger = document.getElementById('supportTrigger');
+        const closeSupport = document.getElementById('closeSupport');
+
+        supportTrigger.addEventListener('click', function(e) {
+            e.preventDefault();
+            supportModal.classList.add('show');
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.shiftKey && (e.key === 'S' || e.key === 's')) {
+                e.preventDefault();
+                supportModal.classList.add('show');
             }
         });
 
-        // ===== Console =====
+        closeSupport.addEventListener('click', function() {
+            supportModal.classList.remove('show');
+        });
+
+        supportModal.addEventListener('click', function(e) {
+            if (e.target === supportModal) {
+                supportModal.classList.remove('show');
+            }
+        });
+
         console.log('%c◼ ABOOD_SECURE_ACADEMY ◼', 'color: #00ff41; font-size: 20px; font-weight: bold;');
-        console.log(`%cمنصة تعليمية شاملة - ${courseList.length} درس تعليمي`, 'color: #888; font-size: 14px;');
+        console.log('%cمنصة تعليمية شاملة - 100+ درس تعليمي', 'color: #888; font-size: 14px;');
         console.log('%cجميع الحقوق محفوظة © 2026', 'color: #444; font-size: 12px;');
-        console.log('====================================');
-        console.log(`  عدد الدورس: ${courseList.length}`);
-        console.log('  المستوى: من الصفر للاحتراف');
-        console.log('  الأقسام: برمجة | اختبار اختراق | أدوات');
-        console.log('====================================');
     </script>
 </body>
 </html>
@@ -719,9 +1018,21 @@ HTML_TEMPLATE = """
 @app.route('/')
 def index():
     return render_template_string(
-        HTML_TEMPLATE,
-        courses_data=json.dumps(COURSES_DATA, ensure_ascii=False),
+        HOME_PAGE_TEMPLATE,
+        courses_data=COURSES_DATA,
         course_list=COURSE_LIST
+    )
+
+@app.route('/course/<course_id>')
+def course_page(course_id):
+    if course_id not in COURSES_DATA:
+        return "الدرس غير موجود", 404
+    
+    course = COURSES_DATA[course_id]
+    return render_template_string(
+        COURSE_PAGE_TEMPLATE,
+        course=course,
+        course_id=course_id
     )
 
 @app.route('/api/course/<course_id>')
