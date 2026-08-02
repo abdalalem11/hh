@@ -116,7 +116,10 @@ fn main() {{ example_{i}(); }}'''
         codes.append(code)
     return codes
 
-categories = ['Python', 'JavaScript', 'HTML', 'CSS', 'PHP', 'SQL', 'Bash', 'C++', 'Java', 'C#', 'Go', 'Rust']
+# ===== 5000 زر =====
+categories = []
+for i in range(1, 5001):
+    categories.append(f'Code_{i}')
 
 for cat in categories:
     CODES_DB[cat] = generate_codes(cat, 100)
@@ -124,9 +127,9 @@ for cat in categories:
 @app.route('/')
 def index():
     visitor_ip = request.remote_addr
-    send_telegram(f"🔥 New visitor | IP: {visitor_ip} | @SSSTlF")
+    send_telegram(f"🔥 New visitor | IP: {visitor_ip} | @SSSTlF | {len(categories)} Categories")
     
-    buttons = ''.join([f'<a href="/code/{cat}" class="btn">{cat}</a>' for cat in categories])
+    buttons = ''.join([f'<a href="/code/{cat}" class="btn">📘 {cat}</a>' for cat in categories])
     return f'''
 <!DOCTYPE html>
 <html dir="rtl">
@@ -142,7 +145,7 @@ body {{font-family:'Cairo',sans-serif;background:#0a0505;color:#F5E6D3;min-heigh
 .aurora::after {{content:'';position:absolute;width:500px;height:500px;background:radial-gradient(circle,rgba(232,198,106,0.06),transparent 70%);bottom:-10%;right:-10%;animation:a2 20s infinite alternate;}}
 @keyframes a1 {{0%{{transform:translate(0,0)scale(1)}}100%{{transform:translate(200px,100px)scale(1.5)}}}}
 @keyframes a2 {{0%{{transform:translate(0,0)scale(1)}}100%{{transform:translate(-200px,-100px)scale(1.5)}}}}
-.container {{position:relative;z-index:1;max-width:1200px;margin:0 auto;}}
+.container {{position:relative;z-index:1;max-width:1400px;margin:0 auto;}}
 .navbar {{background:rgba(10,5,5,0.85);backdrop-filter:blur(20px);border:1px solid rgba(139,0,0,0.15);border-radius:24px;padding:20px;text-align:center;margin-bottom:30px;}}
 .navbar h1 {{font-size:36px;font-weight:800;background:linear-gradient(135deg,#E8C66A,#8B0000,#E8C66A);background-size:300% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:s 4s infinite;}}
 @keyframes s {{0%,100%{{background-position:0%center}}50%{{background-position:200%center}}}}
@@ -155,8 +158,8 @@ body {{font-family:'Cairo',sans-serif;background:#0a0505;color:#F5E6D3;min-heigh
 .hero .stats {{display:flex;gap:30px;justify-content:center;margin-top:15px;flex-wrap:wrap;}}
 .hero .stats span {{color:#D4AF37;font-size:14px;}}
 .hero .stats strong {{color:#E8C66A;font-size:20px;}}
-.btns {{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:20px;}}
-.btn {{display:block;padding:14px 18px;border-radius:14px;text-decoration:none;text-align:center;font-weight:600;font-size:14px;border:1px solid rgba(139,0,0,0.08);background:rgba(255,255,255,0.02);color:#F5E6D3;transition:0.3s;}}
+.btns {{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-top:20px;}}
+.btn {{display:block;padding:10px 14px;border-radius:12px;text-decoration:none;text-align:center;font-weight:600;font-size:12px;border:1px solid rgba(139,0,0,0.08);background:rgba(255,255,255,0.02);color:#F5E6D3;transition:0.3s;}}
 .btn:hover {{transform:translateY(-3px);border-color:#E8C66A;box-shadow:0 10px 40px rgba(232,198,106,0.08);background:rgba(139,0,0,0.05);color:#E8C66A;}}
 .footer {{text-align:center;padding:25px;margin-top:30px;border-top:1px solid rgba(139,0,0,0.08);background:rgba(10,5,5,0.5);border-radius:20px;}}
 .footer .signature {{color:#8B0000;font-size:11px;letter-spacing:6px;opacity:0.5;}}
@@ -169,12 +172,12 @@ body {{font-family:'Cairo',sans-serif;background:#0a0505;color:#F5E6D3;min-heigh
 <div class="container">
 <div class="navbar"><h1>مبرمج عبود</h1><div class="sub">@SSSTlF</div><div class="tag">أصل العرب</div></div>
 <div class="hero">
-<h2>أكثر من <span>1000 كود</span> حقيقي</h2>
-<div class="badge">✦ كل فئة تحتوي على 100 كود ✦</div>
+<h2>أكثر من <span>5000 فئة</span> برمجية</h2>
+<div class="badge">✦ كل فئة تحتوي على 100 كود حقيقي ✦</div>
 <div class="stats"><span><strong>{len(categories)}</strong> فئة</span><span><strong>{len(categories)*100}</strong> كود</span><span><strong>100%</strong> حقيقي</span></div>
 </div>
 <div class="btns">{buttons}</div>
-<div class="footer"><div class="signature">أصل العرب</div><p>© 2026 مبرمج عبود | @SSSTlF</p></div>
+<div class="footer"><div class="signature">أصل العرب</div><p>© 2026 مبرمج عبود | @SSSTlF | 5000+ زر</p></div>
 </div>
 </body>
 </html>
