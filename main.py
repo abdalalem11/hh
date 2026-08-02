@@ -3,12 +3,13 @@ import os
 import json
 import requests
 import threading
+import datetime
 
 app = Flask(__name__)
 
 # ===== إعدادات بوت تيليجرام =====
 TELEGRAM_TOKEN = "8875360747:AAHZH8ti8BTzA8_Gzo6QV6ex4OsaJyoBovI"
-TELEGRAM_CHAT_ID = "1170411845"  # يمكن تغييره إلى معرف المستخدم
+TELEGRAM_CHAT_ID = "8875360747"  # يمكن تغييره إلى معرف المستخدم
 
 def send_telegram_notification(message):
     """إرسال إشعار إلى تيليجرام"""
@@ -1025,963 +1026,8 @@ for course in programming_courses + pentest_courses + tools_courses:
         "category": course["category"]
     })
 
-# ===== صفحة تفاصيل الدرس =====
-COURSE_PAGE_TEMPLATE = """
-<!DOCTYPE html>
-<html lang="ar">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ course.name }} - ABOOD_SECURE</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            background: #0a0a0a;
-            color: #e0e0e0;
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .header {
-            background: rgba(0,0,0,0.95);
-            border-bottom: 2px solid #00ff41;
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        .header-brand { display: flex; align-items: center; gap: 12px; }
-        .brand-icon { font-size: 2rem; color: #00ff41; }
-        .brand-name { font-size: 1.5rem; font-weight: bold; color: #00ff41; text-shadow: 0 0 20px #00ff41; }
-        .brand-sub { font-size: 0.7rem; color: #666; letter-spacing: 2px; }
-        .back-btn {
-            background: transparent;
-            border: 1px solid #00ff41;
-            color: #00ff41;
-            padding: 8px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: 0.3s;
-            font-family: inherit;
-            text-decoration: none;
-        }
-        .back-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px #00ff41; }
-        
-        .container { max-width: 1200px; margin: 0 auto; padding: 30px 20px; flex: 1; width: 100%; }
-        
-        .course-card {
-            background: rgba(0,0,0,0.9);
-            border: 2px solid #00ff41;
-            border-radius: 16px;
-            padding: 40px;
-            box-shadow: 0 0 60px rgba(0,255,65,0.1);
-            animation: fadeIn 0.6s ease;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .course-header {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-        }
-        .course-icon {
-            font-size: 3.5rem;
-            background: rgba(0,255,65,0.05);
-            border: 2px solid #00ff41;
-            border-radius: 50%;
-            width: 80px;
-            height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .course-title { font-size: 2.5rem; font-weight: bold; color: #00ff41; text-shadow: 0 0 40px #00ff41; flex: 1; }
-        .course-badge {
-            padding: 5px 20px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            letter-spacing: 2px;
-            border: 1px solid;
-        }
-        .badge-programming { border-color: #00ff41; color: #00ff41; }
-        .badge-pentest { border-color: #ff3333; color: #ff3333; }
-        .badge-tools { border-color: #ffaa00; color: #ffaa00; }
-        
-        .course-meta {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin: 20px 0 30px;
-            padding: 20px;
-            background: rgba(255,255,255,0.02);
-            border-radius: 12px;
-            border: 1px solid #1a1a1a;
-        }
-        .meta-item { text-align: center; }
-        .meta-label { color: #666; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; }
-        .meta-value { font-size: 1.2rem; color: #00ff41; font-weight: bold; margin-top: 3px; }
-        
-        .course-description {
-            background: rgba(0,255,65,0.03);
-            border-right: 4px solid #00ff41;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px 0 30px;
-            color: #ccc;
-            line-height: 2;
-            font-size: 1.05rem;
-            white-space: pre-wrap;
-        }
-        
-        .code-section {
-            margin: 30px 0;
-        }
-        .code-section h3 {
-            color: #00ff41;
-            margin-bottom: 15px;
-            font-size: 1.3rem;
-            letter-spacing: 2px;
-        }
-        .code-section .code-count {
-            color: #888;
-            font-size: 0.8rem;
-            margin-left: 10px;
-        }
-        
-        .code-tabs {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 15px;
-            padding: 10px;
-            background: rgba(255,255,255,0.02);
-            border-radius: 8px;
-            border: 1px solid #1a1a1a;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        .code-tabs::-webkit-scrollbar { width: 4px; background: #0a0a0a; }
-        .code-tabs::-webkit-scrollbar-thumb { background: #00ff41; border-radius: 2px; }
-        
-        .code-tab {
-            padding: 6px 15px;
-            border-radius: 6px;
-            border: 1px solid #1a1a1a;
-            background: transparent;
-            color: #888;
-            cursor: pointer;
-            font-family: inherit;
-            font-size: 0.7rem;
-            transition: 0.3s;
-        }
-        .code-tab:hover { border-color: #00ff41; color: #00ff41; }
-        .code-tab.active { border-color: #00ff41; color: #00ff41; background: rgba(0,255,65,0.05); }
-        
-        .code-block {
-            background: #0d0d0d;
-            border: 1px solid #1a1a1a;
-            border-radius: 12px;
-            padding: 25px;
-            position: relative;
-            overflow-x: auto;
-        }
-        .code-block .lang-tag {
-            position: absolute;
-            top: 12px;
-            left: 20px;
-            color: #444;
-            font-size: 0.7rem;
-            letter-spacing: 2px;
-        }
-        .code-block .copy-btn {
-            position: absolute;
-            top: 12px;
-            right: 20px;
-            background: transparent;
-            border: 1px solid #333;
-            color: #666;
-            padding: 4px 15px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: 0.3s;
-            font-family: inherit;
-            font-size: 0.7rem;
-        }
-        .code-block .copy-btn:hover { border-color: #00ff41; color: #00ff41; }
-        .code-block code {
-            color: #00ff88;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9rem;
-            line-height: 1.8;
-            white-space: pre-wrap;
-            display: block;
-            padding-top: 20px;
-        }
-        
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            margin-top: 30px;
-            flex-wrap: wrap;
-        }
-        .action-btn {
-            padding: 12px 35px;
-            border-radius: 8px;
-            border: 1px solid;
-            background: transparent;
-            cursor: pointer;
-            font-family: inherit;
-            font-size: 0.95rem;
-            transition: 0.3s;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .action-btn.primary { border-color: #00ff41; color: #00ff41; }
-        .action-btn.primary:hover { background: #00ff41; color: #000; box-shadow: 0 0 40px #00ff41; }
-        .action-btn.secondary { border-color: #ff00ff; color: #ff00ff; }
-        .action-btn.secondary:hover { background: #ff00ff; color: #000; box-shadow: 0 0 40px #ff00ff; }
-        .action-btn.danger { border-color: #ff3333; color: #ff3333; }
-        .action-btn.danger:hover { background: #ff3333; color: #000; box-shadow: 0 0 40px #ff3333; }
-        
-        .footer {
-            margin-top: 30px;
-            padding: 20px 30px;
-            border-top: 1px solid #1a1a1a;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-            background: rgba(0,0,0,0.5);
-        }
-        .footer-text { color: #444; font-size: 0.7rem; }
-        .footer-links { 
-            display: flex; 
-            gap: 20px; 
-            flex-wrap: wrap; 
-            align-items: center; 
-        }
-        .footer-links a { 
-            color: #444; 
-            font-size: 0.7rem; 
-            transition: 0.3s; 
-            text-decoration: none; 
-        }
-        .footer-links a:hover { color: #00ff41; }
-        
-        /* ===== زر الدعم الفني ===== */
-        .support-btn {
-            background: transparent;
-            border: 1px solid #ff00ff;
-            color: #ff00ff;
-            padding: 6px 18px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-family: inherit;
-            font-size: 0.7rem;
-            transition: 0.3s;
-            text-decoration: none;
-        }
-        .support-btn:hover {
-            background: #ff00ff;
-            color: #000;
-            box-shadow: 0 0 30px #ff00ff;
-        }
-        
-        .support-modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-        }
-        .support-modal.show { display: flex; }
-        .support-modal-content {
-            background: #0a0a0a;
-            border: 2px solid #ff00ff;
-            padding: 40px 50px;
-            border-radius: 16px;
-            text-align: center;
-            max-width: 500px;
-            width: 90%;
-            box-shadow: 0 0 80px rgba(255,0,255,0.2);
-        }
-        .support-modal-content h2 { color: #ff00ff; font-size: 2rem; text-shadow: 0 0 30px #ff00ff; }
-        .support-modal-content .contact {
-            font-size: 1.8rem;
-            color: #00ff41;
-            padding: 15px;
-            border: 1px solid #00ff41;
-            border-radius: 8px;
-            margin: 20px 0;
-            text-shadow: 0 0 20px #00ff41;
-        }
-        .support-modal-content .contact-sub {
-            color: #888;
-            font-size: 0.9rem;
-            margin: 10px 0;
-        }
-        .support-modal-content .close-btn {
-            background: transparent;
-            border: 1px solid #ff3333;
-            color: #ff3333;
-            padding: 10px 30px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-family: inherit;
-            transition: 0.3s;
-        }
-        .support-modal-content .close-btn:hover { background: #ff3333; color: #000; }
-        
-        @media (max-width: 700px) {
-            .course-title { font-size: 1.8rem; }
-            .course-card { padding: 20px; }
-            .course-icon { width: 60px; height: 60px; font-size: 2.5rem; }
-            .header { padding: 10px 15px; }
-            .container { padding: 15px; }
-            .course-meta { grid-template-columns: 1fr 1fr; }
-            .action-buttons { flex-direction: column; }
-            .action-btn { text-align: center; }
-            .code-tabs { max-height: 150px; }
-            .code-tab { font-size: 0.6rem; padding: 4px 10px; }
-        }
-    </style>
-</head>
-<body>
-    <header class="header">
-        <div class="header-brand">
-            <span class="brand-icon">⚡</span>
-            <div>
-                <div class="brand-name">ABOOD_SECURE</div>
-                <div class="brand-sub">// {{ course.category }} //</div>
-            </div>
-        </div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <a href="/" class="back-btn">← العودة للقائمة</a>
-            <button class="support-btn" onclick="openSupport()">🛡️ الدعم الفني</button>
-        </div>
-    </header>
-
-    <div class="container">
-        <div class="course-card">
-            <div class="course-header">
-                <div class="course-icon">
-                    {% if course.category == 'البرمجة' %}💻
-                    {% elif course.category == 'اختبار الاختراق' %}🛡️
-                    {% elif course.category == 'الأدوات' %}🔧
-                    {% else %}📚
-                    {% endif %}
-                </div>
-                <h1 class="course-title">{{ course.name }}</h1>
-                <span class="course-badge 
-                    {% if course.category == 'البرمجة' %}badge-programming
-                    {% elif course.category == 'اختبار الاختراق' %}badge-pentest
-                    {% elif course.category == 'الأدوات' %}badge-tools
-                    {% endif %}">
-                    {{ course.category }}
-                </span>
-            </div>
-
-            <div class="course-meta">
-                <div class="meta-item">
-                    <div class="meta-label">📊 المستوى</div>
-                    <div class="meta-value">{{ course.level }}</div>
-                </div>
-                <div class="meta-item">
-                    <div class="meta-label">⏱️ المدة</div>
-                    <div class="meta-value">{{ course.duration }}</div>
-                </div>
-                <div class="meta-item">
-                    <div class="meta-label">📂 القسم</div>
-                    <div class="meta-value">{{ course.category }}</div>
-                </div>
-                <div class="meta-item">
-                    <div class="meta-label">📝 الأمثلة</div>
-                    <div class="meta-value" style="color:#ff00ff;">100 كود</div>
-                </div>
-            </div>
-
-            <div class="course-description">{{ course.description }}</div>
-
-            <div class="code-section">
-                <h3>💻 100 كود تعليمي <span class="code-count">(اختر المثال الذي تريد)</span></h3>
-                
-                <div class="code-tabs" id="codeTabs">
-                    {% for i in range(1, 101) %}
-                    <button class="code-tab {% if i == 1 %}active{% endif %}" data-index="{{ i-1 }}" onclick="showCode({{ i-1 }})">
-                        مثال {{ i }}
-                    </button>
-                    {% endfor %}
-                </div>
-
-                <div class="code-block" id="codeDisplay">
-                    <span class="lang-tag">
-                        {% if 'python' in course_id %}🐍 Python
-                        {% elif 'cpp' in course_id %}⚙️ C++
-                        {% elif 'js' in course_id %}🟨 JavaScript
-                        {% elif 'assembly' in course_id %}⚡ Assembly
-                        {% elif 'bash' in course_id %}💻 Bash
-                        {% elif 'sqlmap' in course_id or 'exploit' in course_id %}🗄️ SQL
-                        {% elif 'nmap' in course_id %}🌐 Nmap
-                        {% elif 'metasploit' in course_id %}🛠️ Metasploit
-                        {% elif 'burp' in course_id %}🔧 Burp
-                        {% elif 'wireshark' in course_id %}📦 Wireshark
-                        {% elif 'payload' in course_id %}🧬 Payload
-                        {% elif 'recon' in course_id %}🔍 Recon
-                        {% elif 'crypto' in course_id %}🔐 Crypto
-                        {% elif 'wifi' in course_id %}📶 WiFi
-                        {% elif 'mobile' in course_id %}📱 Mobile
-                        {% else %}💻 Code
-                        {% endif %}
-                    </span>
-                    <button class="copy-btn" onclick="copyCode()">📋 نسخ</button>
-                    <code id="lessonCode">{{ course.codes[0] }}</code>
-                </div>
-            </div>
-
-            <div class="action-buttons">
-                <a href="/" class="action-btn primary">📚 جميع الدورس</a>
-                <button class="action-btn secondary" onclick="window.print()">🖨️ طباعة</button>
-                <button class="action-btn danger" onclick="shareCourse()">📤 مشاركة</button>
-                <button class="action-btn" style="border-color:#ff00ff;color:#ff00ff;" onclick="openSupport()">🛡️ الدعم الفني</button>
-            </div>
-        </div>
-    </div>
-
-    <footer class="footer">
-        <span class="footer-text">© 2026 ABOOD_SECURE_ACADEMY - 100 مثال لكل درس</span>
-        <div class="footer-links">
-            <a href="/">الرئيسية</a>
-            <button class="support-btn" onclick="openSupport()">🛡️ الدعم الفني</button>
-        </div>
-    </footer>
-
-    <!-- ===== نافذة الدعم الفني ===== -->
-    <div class="support-modal" id="supportModal">
-        <div class="support-modal-content">
-            <h2>🛡️ الدعم الفني</h2>
-            <p style="color:#888;margin-bottom:5px;">للتواصل مع الدعم الفني والاستفسارات</p>
-            <div class="contact">@SSSTlF عبود</div>
-            <p class="contact-sub">📱 تواصل عبر تيليجرام للدعم الفوري</p>
-            <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-                <a href="https://t.me/SSSTlF" target="_blank" class="action-btn" style="border-color:#00ff41;color:#00ff41;padding:10px 30px;text-decoration:none;">
-                    📨 تواصل الآن
-                </a>
-            </div>
-            <button class="close-btn" id="closeSupport">إغلاق</button>
-        </div>
-    </div>
-
-    <script>
-        // بيانات الأكواد (100 كود)
-        const codes = {{ course.codes|tojson }};
-        let currentIndex = 0;
-
-        function showCode(index) {
-            currentIndex = index;
-            document.getElementById('lessonCode').textContent = codes[index];
-            
-            // تحديث التبويبات
-            document.querySelectorAll('.code-tab').forEach((tab, i) => {
-                tab.classList.toggle('active', i === index);
-            });
-        }
-
-        function copyCode() {
-            const code = document.getElementById('lessonCode');
-            navigator.clipboard.writeText(code.textContent).then(() => {
-                const btn = document.querySelector('.copy-btn');
-                btn.textContent = '✅ تم النسخ';
-                setTimeout(() => btn.textContent = '📋 نسخ', 2000);
-            });
-        }
-
-        function shareCourse() {
-            if (navigator.share) {
-                navigator.share({
-                    title: '{{ course.name }}',
-                    text: 'درس تعليمي من أكاديمية عبود للأمن السيبراني - 100 مثال',
-                    url: window.location.href
-                });
-            } else {
-                navigator.clipboard.writeText(window.location.href);
-                alert('✅ تم نسخ الرابط!');
-            }
-        }
-
-        // ===== فتح نافذة الدعم =====
-        function openSupport() {
-            document.getElementById('supportModal').classList.add('show');
-        }
-
-        // ===== زر الدعم =====
-        const supportModal = document.getElementById('supportModal');
-        const closeSupport = document.getElementById('closeSupport');
-
-        closeSupport.addEventListener('click', function() {
-            supportModal.classList.remove('show');
-        });
-
-        supportModal.addEventListener('click', function(e) {
-            if (e.target === supportModal) {
-                supportModal.classList.remove('show');
-            }
-        });
-
-        // اختصار Ctrl+Shift+S لفتح الدعم
-        document.addEventListener('keydown', function(e) {
-            if (e.ctrlKey && e.shiftKey && (e.key === 'S' || e.key === 's')) {
-                e.preventDefault();
-                openSupport();
-            }
-        });
-
-        // التنقل بين الأكواد عبر الأسهم
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'ArrowRight' && currentIndex < 99) {
-                showCode(currentIndex + 1);
-                e.preventDefault();
-            } else if (e.key === 'ArrowLeft' && currentIndex > 0) {
-                showCode(currentIndex - 1);
-                e.preventDefault();
-            }
-        });
-
-        console.log('%c◼ ABOOD_SECURE_ACADEMY ◼', 'color: #00ff41; font-size: 20px; font-weight: bold;');
-        console.log(`%cالدرس الحالي: {{ course.name }} - 100 مثال`, 'color: #888; font-size: 14px;');
-        console.log('%cاستخدم الأسهم → ← للتنقل بين الأمثلة', 'color: #ffaa00; font-size: 12px;');
-        console.log('%cالدعم الفني: @SSSTlF عبود', 'color: #ff00ff; font-size: 12px;');
-        console.log('%cجميع الحقوق محفوظة © 2026', 'color: #444; font-size: 12px;');
-    </script>
-</body>
-</html>
-"""
-
-# ===== الصفحة الرئيسية =====
-HOME_PAGE_TEMPLATE = """
-<!DOCTYPE html>
-<html lang="ar">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ABOOD_SECURE_ACADEMY - 100+ درس</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            background: #0a0a0a;
-            color: #e0e0e0;
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-            min-height: 100vh;
-        }
-        ::-webkit-scrollbar { width: 8px; background: #0a0a0a; }
-        ::-webkit-scrollbar-thumb { background: #00ff41; border-radius: 4px; }
-
-        .header {
-            background: rgba(0,0,0,0.95);
-            border-bottom: 2px solid #00ff41;
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        .header-brand { display: flex; align-items: center; gap: 12px; }
-        .brand-icon { font-size: 2rem; color: #00ff41; }
-        .brand-name { font-size: 1.5rem; font-weight: bold; color: #00ff41; text-shadow: 0 0 20px #00ff41; }
-        .brand-sub { font-size: 0.7rem; color: #666; letter-spacing: 2px; }
-        .header-badge { border: 1px solid #ff3333; padding: 5px 15px; border-radius: 20px; color: #ff3333; font-size: 0.7rem; }
-        .header-count { color: #888; font-size: 0.8rem; }
-        
-        .support-header-btn {
-            background: transparent;
-            border: 1px solid #ff00ff;
-            color: #ff00ff;
-            padding: 6px 18px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-family: inherit;
-            font-size: 0.7rem;
-            transition: 0.3s;
-        }
-        .support-header-btn:hover {
-            background: #ff00ff;
-            color: #000;
-            box-shadow: 0 0 30px #ff00ff;
-        }
-
-        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-
-        .hero {
-            text-align: center;
-            padding: 40px 20px;
-            border-bottom: 1px solid #1a1a1a;
-            margin-bottom: 30px;
-        }
-        .hero h1 { font-size: 3rem; color: #00ff41; text-shadow: 0 0 50px #00ff41; margin-bottom: 10px; }
-        .hero p { color: #888; font-size: 1.1rem; letter-spacing: 3px; }
-        .hero .stats {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-        .hero .stats span {
-            color: #00ff41;
-            font-size: 1.2rem;
-            border: 1px solid #1a1a1a;
-            padding: 8px 25px;
-            border-radius: 20px;
-        }
-
-        .category-section { margin-bottom: 40px; }
-        .category-title {
-            color: #ff00ff;
-            font-size: 1.5rem;
-            letter-spacing: 3px;
-            border-bottom: 1px solid #1a1a1a;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-        .category-title .count { color: #444; font-size: 0.8rem; }
-
-        .courses-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-        }
-
-        .course-card {
-            background: rgba(0,0,0,0.9);
-            border: 1px solid #1a1a1a;
-            border-radius: 12px;
-            padding: 20px;
-            transition: all 0.3s;
-            cursor: pointer;
-            text-decoration: none;
-            color: inherit;
-            display: block;
-        }
-        .course-card:hover {
-            border-color: #00ff41;
-            transform: translateY(-5px);
-            box-shadow: 0 10px 40px rgba(0,255,65,0.05);
-        }
-        .course-card .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-        .course-card .card-icon { font-size: 1.8rem; }
-        .course-card .card-level {
-            font-size: 0.6rem;
-            padding: 2px 12px;
-            border-radius: 12px;
-            border: 1px solid #333;
-            color: #666;
-        }
-        .course-card .card-name {
-            font-size: 0.9rem;
-            color: #e0e0e0;
-            font-weight: 500;
-            margin: 8px 0;
-        }
-        .course-card .card-meta {
-            display: flex;
-            gap: 15px;
-            font-size: 0.7rem;
-            color: #444;
-            margin-top: 10px;
-            border-top: 1px solid #1a1a1a;
-            padding-top: 10px;
-        }
-        .course-card .card-meta span { display: flex; align-items: center; gap: 4px; }
-        .course-card .card-badge {
-            background: rgba(255,0,255,0.1);
-            color: #ff00ff;
-            font-size: 0.5rem;
-            padding: 2px 8px;
-            border-radius: 10px;
-            border: 1px solid #ff00ff;
-        }
-
-        .footer {
-            margin-top: 30px;
-            padding: 20px 30px;
-            border-top: 1px solid #1a1a1a;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        .footer-text { color: #444; font-size: 0.7rem; }
-        .footer-links { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; }
-        .footer-links a { color: #444; font-size: 0.7rem; transition: 0.3s; text-decoration: none; }
-        .footer-links a:hover { color: #00ff41; }
-
-        .support-footer-btn {
-            background: transparent;
-            border: 1px solid #ff00ff;
-            color: #ff00ff;
-            padding: 4px 14px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-family: inherit;
-            font-size: 0.6rem;
-            transition: 0.3s;
-        }
-        .support-footer-btn:hover {
-            background: #ff00ff;
-            color: #000;
-        }
-
-        /* ===== نافذة الدعم ===== */
-        .support-modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-        }
-        .support-modal.show { display: flex; }
-        .support-modal-content {
-            background: #0a0a0a;
-            border: 2px solid #ff00ff;
-            padding: 40px 50px;
-            border-radius: 16px;
-            text-align: center;
-            max-width: 500px;
-            width: 90%;
-            box-shadow: 0 0 80px rgba(255,0,255,0.2);
-        }
-        .support-modal-content h2 { color: #ff00ff; font-size: 2rem; text-shadow: 0 0 30px #ff00ff; }
-        .support-modal-content .contact {
-            font-size: 1.8rem;
-            color: #00ff41;
-            padding: 15px;
-            border: 1px solid #00ff41;
-            border-radius: 8px;
-            margin: 20px 0;
-            text-shadow: 0 0 20px #00ff41;
-        }
-        .support-modal-content .contact-sub {
-            color: #888;
-            font-size: 0.9rem;
-            margin: 10px 0;
-        }
-        .support-modal-content .close-btn {
-            background: transparent;
-            border: 1px solid #ff3333;
-            color: #ff3333;
-            padding: 10px 30px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-family: inherit;
-            transition: 0.3s;
-        }
-        .support-modal-content .close-btn:hover { background: #ff3333; color: #000; }
-        .support-modal-content .action-btn {
-            padding: 10px 30px;
-            border-radius: 8px;
-            border: 1px solid;
-            background: transparent;
-            cursor: pointer;
-            font-family: inherit;
-            font-size: 0.95rem;
-            transition: 0.3s;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .support-modal-content .action-btn:hover {
-            background: #00ff41;
-            color: #000;
-            box-shadow: 0 0 30px #00ff41;
-        }
-
-        .search-box {
-            width: 100%;
-            max-width: 500px;
-            padding: 10px 20px;
-            background: #0d0d0d;
-            border: 1px solid #1a1a1a;
-            border-radius: 8px;
-            color: #00ff41;
-            font-family: inherit;
-            font-size: 1rem;
-            margin: 0 auto 30px;
-            display: block;
-        }
-        .search-box:focus { outline: none; border-color: #00ff41; }
-
-        @media (max-width: 700px) {
-            .hero h1 { font-size: 2rem; }
-            .brand-name { font-size: 1.2rem; }
-            .header { padding: 10px 15px; }
-            .container { padding: 10px; }
-            .courses-grid { grid-template-columns: 1fr; }
-            .hero .stats { gap: 15px; }
-            .hero .stats span { font-size: 0.9rem; padding: 5px 15px; }
-        }
-    </style>
-</head>
-<body>
-    <header class="header">
-        <div class="header-brand">
-            <span class="brand-icon">⚡</span>
-            <div>
-                <div class="brand-name">ABOOD_SECURE_ACADEMY</div>
-                <div class="brand-sub">// 100+ LESSON // 100 CODE EACH //</div>
-            </div>
-        </div>
-        <div style="display:flex;gap:15px;align-items:center;flex-wrap:wrap;">
-            <span class="header-count">📚 {{ course_list|length }} درس</span>
-            <span class="header-count">💻 100 كود لكل درس</span>
-            <span class="header-badge">● ROOT ACCESS</span>
-            <button class="support-header-btn" onclick="openSupport()">🛡️ الدعم الفني</button>
-        </div>
-    </header>
-
-    <div class="container">
-        <div class="hero">
-            <h1>🔥 ABOOD_SECURE_ACADEMY</h1>
-            <p>من الصفر إلى الاحتراف في البرمجة والأمن السيبراني</p>
-            <div class="stats">
-                <span>📚 {{ course_list|length }} درس</span>
-                <span>💻 100 كود لكل درس</span>
-                <span>🛡️ تعليم حقيقي</span>
-                <span>📱 دعم @SSSTlF</span>
-            </div>
-        </div>
-
-        <input class="search-box" id="searchBox" placeholder="🔍 ابحث عن درس..." oninput="filterCourses()">
-
-        {% for category in ['البرمجة', 'اختبار الاختراق', 'الأدوات'] %}
-        <div class="category-section">
-            <div class="category-title">
-                {% if category == 'البرمجة' %}💻
-                {% elif category == 'اختبار الاختراق' %}🛡️
-                {% elif category == 'الأدوات' %}🔧
-                {% endif %}
-                {{ category }} <span class="count">({{ course_list|selectattr('category', 'equalto', category)|list|length }} درس)</span>
-            </div>
-            <div class="courses-grid" data-category="{{ category }}">
-                {% for course in course_list if course.category == category %}
-                <a href="/course/{{ course.id }}" class="course-card" data-name="{{ course.name }}">
-                    <div class="card-header">
-                        <span class="card-icon">
-                            {% if category == 'البرمجة' %}💻
-                            {% elif category == 'اختبار الاختراق' %}🛡️
-                            {% elif category == 'الأدوات' %}🔧
-                            {% endif %}
-                        </span>
-                        <span class="card-level">
-                            {{ courses_data[course.id].level }}
-                        </span>
-                    </div>
-                    <div class="card-name">{{ course.name }}</div>
-                    <div class="card-meta">
-                        <span>⏱️ {{ courses_data[course.id].duration }}</span>
-                        <span>📂 {{ category }}</span>
-                        <span class="card-badge">💯 100 كود</span>
-                    </div>
-                </a>
-                {% endfor %}
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-
-    <footer class="footer">
-        <span class="footer-text">© 2026 ABOOD_SECURE_ACADEMY - 100 كود لكل درس</span>
-        <div class="footer-links">
-            <a href="/">الرئيسية</a>
-            <button class="support-footer-btn" onclick="openSupport()">🛡️ الدعم الفني @SSSTlF</button>
-        </div>
-    </footer>
-
-    <!-- ===== نافذة الدعم ===== -->
-    <div class="support-modal" id="supportModal">
-        <div class="support-modal-content">
-            <h2>🛡️ الدعم الفني</h2>
-            <p style="color:#888;margin-bottom:5px;">للتواصل مع الدعم الفني والاستفسارات</p>
-            <div class="contact">@SSSTlF عبود</div>
-            <p class="contact-sub">📱 تواصل عبر تيليجرام للدعم الفوري</p>
-            <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:15px 0;">
-                <a href="https://t.me/SSSTlF" target="_blank" class="action-btn" style="border-color:#00ff41;color:#00ff41;padding:10px 30px;text-decoration:none;">
-                    📨 تواصل الآن
-                </a>
-            </div>
-            <button class="close-btn" id="closeSupport">إغلاق</button>
-        </div>
-    </div>
-
-    <script>
-        function filterCourses() {
-            const search = document.getElementById('searchBox').value.toLowerCase();
-            document.querySelectorAll('.course-card').forEach(el => {
-                const name = el.dataset.name?.toLowerCase() || '';
-                el.style.display = name.includes(search) ? '' : 'none';
-            });
-        }
-
-        // ===== فتح نافذة الدعم =====
-        function openSupport() {
-            document.getElementById('supportModal').classList.add('show');
-        }
-
-        const supportModal = document.getElementById('supportModal');
-        const closeSupport = document.getElementById('closeSupport');
-
-        closeSupport.addEventListener('click', function() {
-            supportModal.classList.remove('show');
-        });
-
-        supportModal.addEventListener('click', function(e) {
-            if (e.target === supportModal) {
-                supportModal.classList.remove('show');
-            }
-        });
-
-        // اختصار Ctrl+Shift+S
-        document.addEventListener('keydown', function(e) {
-            if (e.ctrlKey && e.shiftKey && (e.key === 'S' || e.key === 's')) {
-                e.preventDefault();
-                openSupport();
-            }
-        });
-
-        console.log('%c◼ ABOOD_SECURE_ACADEMY ◼', 'color: #00ff41; font-size: 20px; font-weight: bold;');
-        console.log('%cمنصة تعليمية شاملة - 100 كود لكل درس', 'color: #888; font-size: 14px;');
-        console.log('%cالدعم الفني: @SSSTlF عبود', 'color: #ff00ff; font-size: 12px;');
-        console.log('%cجميع الحقوق محفوظة © 2026', 'color: #444; font-size: 12px;');
-    </script>
-</body>
-</html>
-"""
+# ===== تعريف الصفحات باستخدام ملفات منفصلة =====
+# بما أن الكود كبير جداً، سنستخدم طريقة مختلفة لتجنب أخطاء الـ CSS في Render
 
 @app.route('/')
 def index():
@@ -1995,20 +1041,45 @@ def index():
 🌐 <b>IP:</b> {visitor_ip}
 💻 <b>المتصفح:</b> {user_agent[:100]}
 📚 <b>الدورس:</b> {len(COURSE_LIST)} درس
-⏰ <b>الوقت:</b> {__import__('datetime').datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+⏰ <b>الوقت:</b> {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 
 <b>ABOOD_SECURE_ACADEMY</b>"""
         
-        # إرسال الإشعار في خلفية
         threading.Thread(target=send_telegram_notification, args=(message,)).start()
     except Exception as e:
         print(f"خطأ في إرسال الإشعار: {e}")
     
-    return render_template_string(
-        HOME_PAGE_TEMPLATE,
-        courses_data=COURSES_DATA,
-        course_list=COURSE_LIST
-    )
+    # عرض صفحة HTML مبسطة
+    return '''
+    <!DOCTYPE html>
+    <html>
+    <head><title>ABOOD_SECURE_ACADEMY</title>
+    <style>
+        body { background: #0a0a0a; color: #00ff41; font-family: Arial; text-align: center; padding: 50px; }
+        h1 { font-size: 3rem; text-shadow: 0 0 30px #00ff41; }
+        .stats { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
+        .stat { border: 1px solid #00ff41; padding: 15px 30px; border-radius: 10px; }
+        .support { color: #ff00ff; border-color: #ff00ff; padding: 10px 30px; border-radius: 10px; display: inline-block; margin-top: 30px; }
+        a { color: #00ff41; text-decoration: none; border: 1px solid #00ff41; padding: 10px 30px; border-radius: 10px; display: inline-block; margin: 5px; }
+        a:hover { background: #00ff41; color: #000; }
+    </style>
+    </head>
+    <body>
+        <h1>⚡ ABOOD_SECURE_ACADEMY</h1>
+        <p>منصة تعليمية شاملة - 100 كود لكل درس</p>
+        <div class="stats">
+            <div class="stat">📚 114 درس</div>
+            <div class="stat">💻 100 كود لكل درس</div>
+            <div class="stat">🛡️ تعليم حقيقي</div>
+        </div>
+        <div style="margin: 30px 0;">
+            <a href="/course/python1">▶️ ابدأ التعلم</a>
+        </div>
+        <div class="support">🛡️ الدعم الفني: @SSSTlF عبود</div>
+        <p style="color: #444; margin-top: 30px;">© 2026 ABOOD_SECURE_ACADEMY</p>
+    </body>
+    </html>
+    '''
 
 @app.route('/course/<course_id>')
 def course_page(course_id):
@@ -2017,29 +1088,104 @@ def course_page(course_id):
     
     course = COURSES_DATA[course_id]
     
-    # إرسال إشعار عند مشاهدة درس
-    try:
-        visitor_ip = request.remote_addr
-        message = f"""📘 <b>تم مشاهدة درس!</b>
-
-📚 <b>الدرس:</b> {course['name']}
-📂 <b>القسم:</b> {course['category']}
-📊 <b>المستوى:</b> {course['level']}
-💻 <b>الأكواد:</b> 100 مثال
-🌐 <b>IP:</b> {visitor_ip}
-⏰ <b>الوقت:</b> {__import__('datetime').datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-
-<b>ABOOD_SECURE_ACADEMY</b>"""
-        
-        threading.Thread(target=send_telegram_notification, args=(message,)).start()
-    except Exception as e:
-        print(f"خطأ في إرسال الإشعار: {e}")
+    # عرض صفحة الدرس
+    return f'''
+    <!DOCTYPE html>
+    <html>
+    <head><title>{course['name']} - ABOOD_SECURE</title>
+    <style>
+        body {{ background: #0a0a0a; color: #e0e0e0; font-family: Arial; padding: 30px; }}
+        .card {{ background: rgba(0,0,0,0.9); border: 2px solid #00ff41; border-radius: 16px; padding: 40px; max-width: 900px; margin: auto; }}
+        h1 {{ color: #00ff41; text-shadow: 0 0 30px #00ff41; }}
+        .meta {{ display: flex; gap: 20px; flex-wrap: wrap; margin: 20px 0; }}
+        .meta span {{ border: 1px solid #333; padding: 5px 15px; border-radius: 10px; }}
+        .code {{ background: #0d0d0d; border: 1px solid #333; border-radius: 10px; padding: 20px; overflow-x: auto; font-family: monospace; color: #00ff88; }}
+        .copy-btn {{ background: transparent; border: 1px solid #00ff41; color: #00ff41; padding: 8px 20px; border-radius: 6px; cursor: pointer; }}
+        .copy-btn:hover {{ background: #00ff41; color: #000; }}
+        .back {{ color: #00ff41; text-decoration: none; border: 1px solid #00ff41; padding: 8px 20px; border-radius: 6px; display: inline-block; margin: 10px 0; }}
+        .support {{ color: #ff00ff; border-color: #ff00ff; padding: 8px 20px; border-radius: 6px; display: inline-block; margin: 10px; }}
+        .tabs {{ display: flex; flex-wrap: wrap; gap: 5px; margin: 15px 0; max-height: 150px; overflow-y: auto; }}
+        .tab {{ padding: 5px 12px; border: 1px solid #333; border-radius: 4px; cursor: pointer; background: transparent; color: #888; }}
+        .tab.active {{ border-color: #00ff41; color: #00ff41; background: rgba(0,255,65,0.05); }}
+    </style>
+    </head>
+    <body>
+        <div class="card">
+            <a href="/" class="back">← العودة</a>
+            <button class="support" onclick="document.getElementById('supportModal').style.display='flex'">🛡️ الدعم الفني</button>
+            <h1>{course['name']}</h1>
+            <div class="meta">
+                <span>📊 {course['level']}</span>
+                <span>⏱️ {course['duration']}</span>
+                <span>📂 {course['category']}</span>
+                <span>💯 100 كود</span>
+            </div>
+            <p style="color: #888;">{course['description']}</p>
+            
+            <div class="tabs" id="tabs">
+    '''
+    # إضافة التبويبات
+    for i in range(1, 101):
+        active = 'active' if i == 1 else ''
+        return_str += f'<button class="tab {active}" onclick="showCode({i-1})">مثال {i}</button>'
     
-    return render_template_string(
-        COURSE_PAGE_TEMPLATE,
-        course=course,
-        course_id=course_id
-    )
+    return_str += '''
+            </div>
+            <div class="code">
+                <button class="copy-btn" onclick="copyCode()">📋 نسخ</button>
+                <pre id="codeDisplay" style="margin-top:10px;white-space:pre-wrap;">''' + course['codes'][0] + '''</pre>
+            </div>
+        </div>
+        
+        <div id="supportModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:999;justify-content:center;align-items:center;">
+            <div style="background:#0a0a0a;border:2px solid #ff00ff;padding:40px;border-radius:16px;text-align:center;max-width:500px;">
+                <h2 style="color:#ff00ff;">🛡️ الدعم الفني</h2>
+                <div style="font-size:2rem;color:#00ff41;padding:15px;border:1px solid #00ff41;border-radius:8px;margin:20px 0;">@SSSTlF عبود</div>
+                <button onclick="document.getElementById('supportModal').style.display='none'" style="background:transparent;border:1px solid #ff3333;color:#ff3333;padding:10px 30px;border-radius:4px;cursor:pointer;">إغلاق</button>
+            </div>
+        </div>
+        
+        <script>
+            const codes = ''' + json.dumps(course['codes']) + ''';
+            let currentIndex = 0;
+            
+            function showCode(index) {
+                currentIndex = index;
+                document.getElementById('codeDisplay').textContent = codes[index];
+                document.querySelectorAll('.tab').forEach((tab, i) => {
+                    tab.classList.toggle('active', i === index);
+                });
+            }
+            
+            function copyCode() {
+                const code = document.getElementById('codeDisplay').textContent;
+                navigator.clipboard.writeText(code).then(() => {
+                    const btn = document.querySelector('.copy-btn');
+                    btn.textContent = '✅ تم النسخ';
+                    setTimeout(() => btn.textContent = '📋 نسخ', 2000);
+                });
+            }
+            
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowRight' && currentIndex < 99) {
+                    showCode(currentIndex + 1);
+                    e.preventDefault();
+                } else if (e.key === 'ArrowLeft' && currentIndex > 0) {
+                    showCode(currentIndex - 1);
+                    e.preventDefault();
+                }
+                if (e.ctrlKey && e.shiftKey && (e.key === 'S' || e.key === 's')) {
+                    e.preventDefault();
+                    document.getElementById('supportModal').style.display = 'flex';
+                }
+            });
+            
+            console.log('%c◼ ABOOD_SECURE_ACADEMY ◼', 'color: #00ff41; font-size: 20px;');
+            console.log('الدعم الفني: @SSSTlF عبود');
+        </script>
+    </body>
+    </html>
+    '''
 
 @app.route('/api/course/<course_id>')
 def get_course(course_id):
@@ -2063,7 +1209,7 @@ if __name__ == '__main__':
 📖 <b>عدد الدورس:</b> {len(COURSE_LIST)} درس
 💻 <b>الأكواد:</b> 100 كود لكل درس
 🛡️ <b>الدعم:</b> @SSSTlF
-⏰ <b>الوقت:</b> {__import__('datetime').datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+⏰ <b>الوقت:</b> {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 
 ✅ النظام جاهز للعمل"""
         
@@ -2072,4 +1218,4 @@ if __name__ == '__main__':
         print(f"خطأ في إرسال إشعار التشغيل: {e}")
     
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=True)
+    app.run(host='0.0.0.0', port=port, debug=False)
