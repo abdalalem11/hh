@@ -86,6 +86,14 @@ int main() {{ example_{i}(); return 0; }}'''
         System.out.println("ID: {i}\\nValue: " + result + "\\nStatus: " + (result % 2 == 0 ? "success" : "pending"));
     }}
 }}'''
+        elif category == 'C#':
+            code = f'''using System;
+class Example_{i} {{
+    static void Main() {{
+        int result = {i * 7 + 3};
+        Console.WriteLine($"ID: {{i}}\\nValue: {{result}}\\nStatus: {{(result % 2 == 0 ? "success" : "pending")}}");
+    }}
+}}'''
         elif category == 'Go':
             code = f'''package main
 import "fmt"
@@ -100,7 +108,7 @@ func main() {{ example_{i}() }}'''
             code = f'''fn example_{i}() {{
     let result = {i * 7 + 3};
     let status = if result % 2 == 0 {{ "success" }} else {{ "pending" }};
-    println!("ID: {}\\nValue: {}\\nStatus: {}", {i}, result, status);
+    println!("ID: {{}}\\nValue: {{}}\\nStatus: {{}}", {i}, result, status);
 }}
 fn main() {{ example_{i}(); }}'''
         else:
