@@ -160,7 +160,6 @@ else
     echo "Status: pending"
 fi
 
-# Create output file
 echo "ID: {i}" > output_{i}.txt
 echo "Value: $result" >> output_{i}.txt
 echo "Created output_{i}.txt"
@@ -338,10 +337,8 @@ def index():
 ⏰ {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 <b>مبرمج عبود | @SSSTlF</b>""")
     
-    # إنشاء الأزرار
     buttons_html = ''
     for cat in categories:
-        # ألوان ذهبية وحمراء فخمة
         colors = ['#E8C66A', '#8B0000', '#D4AF37', '#B22222', '#FFD700', '#800000', '#C41E3A', '#F5C842']
         color = colors[hash(cat) % len(colors)]
         buttons_html += f'''
@@ -421,7 +418,6 @@ def index():
                 padding: 20px;
             }}
 
-            /* Navbar - شعار واحد */
             .navbar {{
                 background: rgba(10, 5, 5, 0.85);
                 backdrop-filter: blur(20px);
@@ -460,7 +456,6 @@ def index():
                 opacity: 0.6;
             }}
 
-            /* Hero */
             .hero {{
                 text-align: center;
                 padding: 40px 20px 30px;
@@ -505,7 +500,6 @@ def index():
                 font-size: 22px;
             }}
 
-            /* Buttons Grid */
             .buttons-grid {{
                 display: grid;
                 grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -577,7 +571,6 @@ def index():
                 border-color: #E8C66A;
             }}
 
-            /* Footer */
             .footer {{
                 text-align: center;
                 padding: 30px 20px;
@@ -620,7 +613,6 @@ def index():
         <div class="aurora"></div>
         
         <div class="container">
-            <!-- Navbar - شعار واحد -->
             <nav class="navbar">
                 <div class="logo">
                     <h1>مبرمج عبود</h1>
@@ -629,7 +621,6 @@ def index():
                 </div>
             </nav>
 
-            <!-- Hero -->
             <section class="hero">
                 <h2>أكثر من <span>1000 فئة برمجية</span> حقيقية</h2>
                 <div class="badge">✦ كل فئة تحتوي على 100 كود حقيقي ✦</div>
@@ -640,12 +631,10 @@ def index():
                 </div>
             </section>
 
-            <!-- Buttons -->
             <div class="buttons-grid">
                 {buttons_html}
             </div>
 
-            <!-- Footer -->
             <footer class="footer">
                 <h3>مبرمج عبود</h3>
                 <div class="sub">@SSSTlF</div>
@@ -667,7 +656,6 @@ def show_codes(category):
     
     codes = CODES_DB[category]
     
-    # إنشاء الأكواد مع زر النسخ
     codes_html = ''
     for i, code in enumerate(codes):
         escaped_code = code.replace('"', '&quot;').replace("'", "&#39;")
