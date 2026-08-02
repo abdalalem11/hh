@@ -18,54 +18,7 @@ def send_telegram(message):
 
 CODES_DB = {}
 
-def generate_bot_codes():
-    codes = []
-    lessons = [
-        ("مقدمة عن البوتات", "ما هو البوت؟\nالبوت هو برنامج يعمل تلقائياً"),
-        ("أنواع البوتات", "أنواع البوتات:\n1. محادثة\n2. ويب\n3. ألعاب"),
-        ("لغة بايثون للبوتات", "لماذا بايثون؟\nسهلة التعلم\nمكتبات جاهزة"),
-        ("تثبيت بايثون", "تثبيت بايثون:\n1. تحميل من python.org"),
-        ("مكتبة python-telegram-bot", "تثبيت المكتبة:\npip install python-telegram-bot"),
-        ("إنشاء بوت تليجرام", "خطوات:\n1. @BotFather\n2. /newbot"),
-        ("أول كود بوت", "from telegram import Update\nfrom telegram.ext import ApplicationBuilder"),
-        ("أوامر البوت", "إضافة أوامر start و help"),
-        ("مكتبة discord.py", "pip install discord.py"),
-        ("إنشاء بوت ديسكورد", "Discord Developer Portal"),
-        ("أول كود بوت ديسكورد", "import discord\nfrom discord.ext import commands"),
-        ("مكتبة requests", "import requests\nresponse = requests.get()"),
-        ("مكتبة BeautifulSoup", "from bs4 import BeautifulSoup"),
-        ("مكتبة selenium", "from selenium import webdriver"),
-        ("بوتات الواتساب", "pip install pywhatkit"),
-        ("بوتات الانستغرام", "pip install instabot"),
-        ("بوتات تويتر", "pip install tweepy"),
-        ("معالجة النصوص", "مكتبات: re, nltk, spaCy"),
-        ("معالجة الصور", "مكتبات: PIL, OpenCV"),
-        ("بوتات الذكاء الاصطناعي", "مكتبات: transformers, openai"),
-        ("بوتات الصوت", "مكتبات: speech_recognition, pyttsx3"),
-        ("قواعد البيانات", "مكتبات: sqlite3, pymongo"),
-        ("التعامل مع APIs", "مكتبات: requests, aiohttp"),
-        ("جدولة المهام", "مكتبات: schedule, APScheduler"),
-        ("الأمان في البوتات", "نصائح أمان مهمة"),
-        ("نشر البوت", "طرق النشر: Render, Heroku"),
-        ("تحسين الأداء", "استخدام async/await, caching"),
-        ("أخطاء شائعة", "Invalid Token, Rate Limits"),
-        ("مشاريع تطبيقية", "بوت طقس, بوت تذكير, بوت مساعد"),
-        ("خاتمة", "مبروك! أنت الآن مبرمج بوتات")
-    ]
-    
-    for i, (title, content) in enumerate(lessons, 1):
-        code = f'''# ===== الدرس {i}: {title} =====
-# مبرمج عبود | @SSSTlF
-
-'''
-        code += f'# {content}\n\n'
-        code += f'print("الدرس {i}: {title}")\n'
-        code += f'print("{content[:100]}...")\n'
-        code += f'print("✅ تم إكمال الدرس {i}")\n'
-        codes.append(code)
-    return codes
-
-def generate_codes(category, count=100):
+def generate_codes(category, count=50):
     codes = []
     for i in range(1, count + 1):
         code = f'''# {category} - مثال {i}
@@ -87,10 +40,7 @@ categories = [
 ]
 
 for cat in categories:
-    if cat == 'تعليم البوتات':
-        CODES_DB[cat] = generate_bot_codes()
-    else:
-        CODES_DB[cat] = generate_codes(cat, 100)
+    CODES_DB[cat] = generate_codes(cat, 50)
 
 @app.route('/')
 def index():
@@ -98,12 +48,12 @@ def index():
     send_telegram(f"🔥 زائر جديد | IP: {visitor_ip} | @SSSTlF | {len(categories)} فئة")
     
     buttons = ''.join([f'''
-    <div class="card glass" data-category="{cat}">
+    <div class="card glass" data-category="{cat}" onclick="location.href='/code/{cat}'">
         <div class="card-icon">⌨</div>
         <div class="card-title">{cat}</div>
         <div class="card-count">{len(CODES_DB[cat])} كود</div>
         <div class="card-desc">مكتبة أكواد احترافية في {cat}</div>
-        <a href="/code/{cat}" class="card-btn">استكشف <span>→</span></a>
+        <button class="card-btn" onclick="event.stopPropagation();location.href='/code/{cat}'">استكشف <span>→</span></button>
     </div>
     ''' for cat in categories])
     
@@ -139,7 +89,7 @@ body {{
     cursor: none;
 }}
 
-/* ===== Cursor Glow ===== */
+/* Cursor */
 .cursor-glow {{
     position: fixed;
     width: 600px;
@@ -163,12 +113,11 @@ body {{
     box-shadow: 0 0 20px rgba(232,198,106,0.5);
 }}
 
-/* ===== Scrollbar ===== */
 ::-webkit-scrollbar {{ width: 8px; }}
 ::-webkit-scrollbar-track {{ background: var(--bg); }}
 ::-webkit-scrollbar-thumb {{ background: var(--gold); border-radius: 10px; }}
 
-/* ===== Loading Screen ===== */
+/* Loading */
 .loading-screen {{
     position: fixed;
     top: 0; left: 0;
@@ -181,10 +130,7 @@ body {{
     z-index: 99999;
     transition: opacity 0.8s ease, visibility 0.8s ease;
 }}
-.loading-screen.hidden {{
-    opacity: 0;
-    visibility: hidden;
-}}
+.loading-screen.hidden {{ opacity: 0; visibility: hidden; }}
 .loading-screen .logo {{
     font-size: 48px;
     font-weight: 900;
@@ -194,15 +140,9 @@ body {{
     -webkit-text-fill-color: transparent;
     animation: shimmer 3s ease-in-out infinite;
 }}
-.loading-screen .sub {{
-    color: var(--gold);
-    font-size: 16px;
-    letter-spacing: 6px;
-    opacity: 0.6;
-}}
+.loading-screen .sub {{ color: var(--gold); font-size: 16px; letter-spacing: 6px; opacity: 0.6; }}
 .loading-screen .loader {{
-    width: 60px;
-    height: 60px;
+    width: 60px; height: 60px;
     border: 3px solid rgba(232,198,106,0.1);
     border-top-color: var(--gold);
     border-radius: 50%;
@@ -210,8 +150,7 @@ body {{
     margin-top: 30px;
 }}
 .loading-screen .progress-bar {{
-    width: 200px;
-    height: 2px;
+    width: 200px; height: 2px;
     background: rgba(232,198,106,0.1);
     border-radius: 10px;
     margin-top: 20px;
@@ -230,7 +169,6 @@ body {{
     50% {{ background-position: 200% center; }}
 }}
 
-/* ===== Scroll Progress ===== */
 .scroll-progress {{
     position: fixed;
     top: 0; left: 0;
@@ -241,7 +179,6 @@ body {{
     transition: width 0.1s;
 }}
 
-/* ===== Back to Top ===== */
 .back-top {{
     position: fixed;
     bottom: 30px; right: 30px;
@@ -258,16 +195,10 @@ body {{
     transition: all 0.3s ease;
     backdrop-filter: blur(10px);
 }}
-.back-top.visible {{
-    opacity: 1;
-    transform: scale(1);
-}}
-.back-top:hover {{
-    background: rgba(232,198,106,0.2);
-    box-shadow: 0 0 40px rgba(232,198,106,0.2);
-}}
+.back-top.visible {{ opacity: 1; transform: scale(1); }}
+.back-top:hover {{ background: rgba(232,198,106,0.2); box-shadow: 0 0 40px rgba(232,198,106,0.2); }}
 
-/* ===== Background ===== */
+/* Background */
 .background {{
     position: fixed;
     top: 0; left: 0;
@@ -276,8 +207,6 @@ body {{
     pointer-events: none;
     overflow: hidden;
 }}
-
-/* Animated Mesh Gradient */
 .mesh {{
     position: absolute;
     width: 100%; height: 100%;
@@ -292,28 +221,29 @@ body {{
     0% {{ transform: scale(1) rotate(0deg); }}
     100% {{ transform: scale(1.1) rotate(5deg); }}
 }}
-
-/* Aurora */
 .aurora {{
     position: absolute;
     width: 100%; height: 100%;
 }}
-.aurora .a1 {{
+.aurora .a1, .aurora .a2, .aurora .a3 {{
     position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.3;
+}}
+.aurora .a1 {{
     width: 800px; height: 800px;
     background: radial-gradient(circle, rgba(232,198,106,0.06), transparent 70%);
     top: -200px; left: -200px;
     animation: auroraMove1 15s ease-in-out infinite alternate;
 }}
 .aurora .a2 {{
-    position: absolute;
     width: 600px; height: 600px;
     background: radial-gradient(circle, rgba(124,58,237,0.06), transparent 70%);
     bottom: -100px; right: -100px;
     animation: auroraMove2 20s ease-in-out infinite alternate;
 }}
 .aurora .a3 {{
-    position: absolute;
     width: 500px; height: 500px;
     background: radial-gradient(circle, rgba(59,130,246,0.05), transparent 70%);
     top: 40%; left: 50%;
@@ -331,8 +261,6 @@ body {{
     0% {{ transform: translate(0,0) scale(1); }}
     100% {{ transform: translate(-150px,80px) scale(1.6); }}
 }}
-
-/* Grid */
 .grid {{
     position: absolute;
     width: 100%; height: 100%;
@@ -341,8 +269,6 @@ body {{
         linear-gradient(90deg, rgba(232,198,106,0.02) 1px, transparent 1px);
     background-size: 60px 60px;
 }}
-
-/* Particles */
 .particles {{
     position: absolute;
     width: 100%; height: 100%;
@@ -361,8 +287,6 @@ body {{
     90% {{ opacity: 1; }}
     100% {{ opacity: 0; transform: translateY(-10vh) scale(1); }}
 }}
-
-/* Glow Orbs */
 .orb {{
     position: absolute;
     border-radius: 50%;
@@ -370,29 +294,14 @@ body {{
     opacity: 0.3;
     animation: orbFloat 8s ease-in-out infinite alternate;
 }}
-.orb.orb1 {{
-    width: 400px; height: 400px;
-    background: rgba(139,0,0,0.2);
-    top: 10%; left: 5%;
-}}
-.orb.orb2 {{
-    width: 300px; height: 300px;
-    background: rgba(232,198,106,0.15);
-    bottom: 20%; right: 10%;
-    animation-delay: 2s;
-}}
-.orb.orb3 {{
-    width: 250px; height: 250px;
-    background: rgba(124,58,237,0.1);
-    top: 50%; left: 50%;
-    animation-delay: 4s;
-}}
+.orb.orb1 {{ width: 400px; height: 400px; background: rgba(139,0,0,0.2); top: 10%; left: 5%; }}
+.orb.orb2 {{ width: 300px; height: 300px; background: rgba(232,198,106,0.15); bottom: 20%; right: 10%; animation-delay: 2s; }}
+.orb.orb3 {{ width: 250px; height: 250px; background: rgba(124,58,237,0.1); top: 50%; left: 50%; animation-delay: 4s; }}
 @keyframes orbFloat {{
     0% {{ transform: translate(0,0) scale(1); }}
     100% {{ transform: translate(100px,-50px) scale(1.2); }}
 }}
 
-/* ===== Container ===== */
 .container {{
     position: relative;
     z-index: 1;
@@ -401,14 +310,13 @@ body {{
     padding: 20px;
 }}
 
-/* ===== Navbar ===== */
+/* Navbar */
 .navbar {{
     position: sticky;
     top: 20px;
     z-index: 100;
     background: rgba(5,7,13,0.6);
     backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
     border: 1px solid rgba(255,255,255,0.08);
     border-radius: 20px;
     padding: 16px 30px;
@@ -418,10 +326,7 @@ body {{
     transition: all 0.3s ease;
     box-shadow: 0 20px 60px rgba(0,0,0,0.45);
 }}
-.navbar.scrolled {{
-    background: rgba(5,7,13,0.9);
-    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-}}
+.navbar.scrolled {{ background: rgba(5,7,13,0.9); }}
 .navbar .logo h1 {{
     font-size: 28px;
     font-weight: 900;
@@ -431,17 +336,8 @@ body {{
     -webkit-text-fill-color: transparent;
     animation: shimmer 4s ease-in-out infinite;
 }}
-.navbar .logo .sub {{
-    font-size: 11px;
-    color: var(--gold);
-    letter-spacing: 5px;
-    opacity: 0.5;
-}}
-.navbar .nav-controls {{
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}}
+.navbar .logo .sub {{ font-size: 11px; color: var(--gold); letter-spacing: 5px; opacity: 0.5; }}
+.navbar .nav-controls {{ display: flex; align-items: center; gap: 15px; }}
 .navbar .search-box {{
     display: flex;
     align-items: center;
@@ -451,10 +347,7 @@ body {{
     padding: 6px 16px;
     transition: 0.3s;
 }}
-.navbar .search-box:focus-within {{
-    border-color: var(--gold);
-    box-shadow: 0 0 30px rgba(232,198,106,0.05);
-}}
+.navbar .search-box:focus-within {{ border-color: var(--gold); box-shadow: 0 0 30px rgba(232,198,106,0.05); }}
 .navbar .search-box input {{
     background: transparent;
     border: none;
@@ -481,12 +374,9 @@ body {{
     font-size: 18px;
     transition: 0.3s;
 }}
-.theme-toggle:hover {{
-    background: rgba(232,198,106,0.1);
-    border-color: var(--gold);
-}}
+.theme-toggle:hover {{ background: rgba(232,198,106,0.1); border-color: var(--gold); }}
 
-/* ===== Top Stats Bar ===== */
+/* Top Stats */
 .top-stats {{
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -502,35 +392,13 @@ body {{
     text-align: center;
     transition: 0.3s;
 }}
-.stat-card:hover {{
-    border-color: rgba(232,198,106,0.2);
-    transform: translateY(-3px);
-}}
-.stat-card .number {{
-    font-size: 28px;
-    font-weight: 800;
-    color: var(--gold);
-}}
-.stat-card .label {{
-    font-size: 12px;
-    color: rgba(255,255,255,0.5);
-    letter-spacing: 2px;
-    margin-top: 2px;
-}}
-.stat-card .status-dot {{
-    display: inline-block;
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: #28c840;
-    animation: blink 2s infinite;
-    margin-left: 6px;
-}}
-@keyframes blink {{
-    0%, 100% {{ opacity: 1; }}
-    50% {{ opacity: 0.3; }}
-}}
+.stat-card:hover {{ border-color: rgba(232,198,106,0.2); transform: translateY(-3px); }}
+.stat-card .number {{ font-size: 28px; font-weight: 800; color: var(--gold); }}
+.stat-card .label {{ font-size: 12px; color: rgba(255,255,255,0.5); letter-spacing: 2px; margin-top: 2px; }}
+.stat-card .status-dot {{ display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #28c840; animation: blink 2s infinite; margin-left: 6px; }}
+@keyframes blink {{ 0%, 100% {{ opacity: 1; }} 50% {{ opacity: 0.3; }} }}
 
-/* ===== Hero ===== */
+/* Hero */
 .hero {{
     text-align: center;
     padding: 60px 30px 50px;
@@ -571,16 +439,8 @@ body {{
     opacity: 0;
     pointer-events: none;
 }}
-.hero .glitch::before {{
-    color: var(--red);
-    animation: glitch1 3s infinite;
-    left: 2px;
-}}
-.hero .glitch::after {{
-    color: var(--gold);
-    animation: glitch2 3s infinite;
-    left: -2px;
-}}
+.hero .glitch::before {{ color: var(--red); animation: glitch1 3s infinite; left: 2px; }}
+.hero .glitch::after {{ color: var(--gold); animation: glitch2 3s infinite; left: -2px; }}
 @keyframes glitch1 {{
     0%, 90%, 100% {{ opacity: 0; transform: translate(0); }}
     92% {{ opacity: 1; transform: translate(-3px, -2px); }}
@@ -619,7 +479,7 @@ body {{
 }}
 .hero .badge i {{ animation: blink 2s infinite; font-style: normal; }}
 
-/* ===== Cards Grid ===== */
+/* Cards Grid */
 .cards-grid {{
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -627,11 +487,10 @@ body {{
     margin-top: 20px;
 }}
 
-/* ===== Glass Card ===== */
+/* Glass Card */
 .card {{
     background: rgba(255,255,255,0.04);
     backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
     border: 1px solid rgba(255,255,255,0.08);
     border-radius: 20px;
     padding: 24px 20px;
@@ -640,6 +499,7 @@ body {{
     box-shadow: 0 0 40px rgba(232,198,106,0.04), 0 20px 60px rgba(0,0,0,0.3);
     position: relative;
     overflow: hidden;
+    cursor: pointer;
     opacity: 0;
     transform: translateY(30px);
     animation: fadeInUp 0.6s ease forwards;
@@ -659,42 +519,26 @@ body {{
     0% {{ transform: rotate(0deg); }}
     100% {{ transform: rotate(360deg); }}
 }}
-
 .card:hover {{
     transform: translateY(-8px) scale(1.02) rotate(1deg);
     border-color: rgba(232,198,106,0.2);
     box-shadow: 0 0 60px rgba(232,198,106,0.08), 0 30px 80px rgba(0,0,0,0.4);
 }}
-.card .card-icon {{
-    font-size: 32px;
-    margin-bottom: 8px;
-}}
-.card .card-title {{
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--white);
-}}
-.card .card-count {{
-    font-size: 12px;
-    color: var(--gold);
-    margin: 4px 0 8px;
-}}
-.card .card-desc {{
-    font-size: 12px;
-    color: rgba(255,255,255,0.4);
-    line-height: 1.5;
-    margin-bottom: 12px;
-}}
+.card .card-icon {{ font-size: 32px; margin-bottom: 8px; }}
+.card .card-title {{ font-size: 16px; font-weight: 700; color: var(--white); }}
+.card .card-count {{ font-size: 12px; color: var(--gold); margin: 4px 0 8px; }}
+.card .card-desc {{ font-size: 12px; color: rgba(255,255,255,0.4); line-height: 1.5; margin-bottom: 12px; }}
 .card .card-btn {{
     display: inline-block;
     padding: 6px 20px;
     border-radius: 50px;
     border: 1px solid rgba(232,198,106,0.12);
     color: var(--gold);
-    text-decoration: none;
+    background: transparent;
     font-size: 12px;
     transition: 0.3s;
     font-family: 'Cairo', sans-serif;
+    cursor: pointer;
 }}
 .card .card-btn:hover {{
     background: rgba(232,198,106,0.1);
@@ -704,40 +548,25 @@ body {{
 .card .card-btn span {{ transition: 0.3s; display: inline-block; }}
 .card .card-btn:hover span {{ transform: translateX(-4px); }}
 
-/* ===== Animations ===== */
+/* Animations */
 @keyframes fadeInUp {{
     from {{ opacity: 0; transform: translateY(30px) scale(0.95); }}
     to {{ opacity: 1; transform: translateY(0) scale(1); }}
 }}
-@keyframes fadeIn {{
-    from {{ opacity: 0; }}
-    to {{ opacity: 1; }}
-}}
-@keyframes slideUp {{
-    from {{ opacity: 0; transform: translateY(40px); }}
-    to {{ opacity: 1; transform: translateY(0); }}
-}}
-@keyframes zoomIn {{
-    from {{ opacity: 0; transform: scale(0.9); }}
-    to {{ opacity: 1; transform: scale(1); }}
-}}
-@keyframes blurReveal {{
-    from {{ opacity: 0; filter: blur(10px); }}
-    to {{ opacity: 1; filter: blur(0); }}
-}}
-
+@keyframes fadeIn {{ from {{ opacity: 0; }} to {{ opacity: 1; }} }}
+@keyframes slideUp {{ from {{ opacity: 0; transform: translateY(40px); }} to {{ opacity: 1; transform: translateY(0); }} }}
+@keyframes zoomIn {{ from {{ opacity: 0; transform: scale(0.9); }} to {{ opacity: 1; transform: scale(1); }} }}
+@keyframes blurReveal {{ from {{ opacity: 0; filter: blur(10px); }} to {{ opacity: 1; filter: blur(0); }} }}
 .animate-fade-in {{ animation: fadeIn 0.8s ease forwards; }}
 .animate-slide-up {{ animation: slideUp 0.8s ease forwards; }}
 .animate-zoom {{ animation: zoomIn 0.6s ease forwards; }}
 .animate-blur {{ animation: blurReveal 0.8s ease forwards; }}
-
 .delay-1 {{ animation-delay: 0.1s; }}
 .delay-2 {{ animation-delay: 0.2s; }}
 .delay-3 {{ animation-delay: 0.3s; }}
 .delay-4 {{ animation-delay: 0.4s; }}
 .delay-5 {{ animation-delay: 0.5s; }}
 
-/* ===== Footer ===== */
 .footer {{
     text-align: center;
     padding: 30px 20px;
@@ -747,27 +576,11 @@ body {{
     backdrop-filter: blur(20px);
     border-radius: 20px;
 }}
-.footer .signature {{
-    color: var(--red);
-    font-size: 12px;
-    letter-spacing: 8px;
-    opacity: 0.3;
-}}
-.footer p {{
-    color: rgba(255,255,255,0.2);
-    font-size: 12px;
-    margin-top: 6px;
-    letter-spacing: 2px;
-}}
+.footer .signature {{ color: var(--red); font-size: 12px; letter-spacing: 8px; opacity: 0.3; }}
+.footer p {{ color: rgba(255,255,255,0.2); font-size: 12px; margin-top: 6px; letter-spacing: 2px; }}
 
-/* ===== Responsive ===== */
 @media (max-width: 768px) {{
-    .navbar {{
-        flex-direction: column;
-        gap: 12px;
-        padding: 14px 18px;
-        top: 10px;
-    }}
+    .navbar {{ flex-direction: column; gap: 12px; padding: 14px 18px; top: 10px; }}
     .navbar .search-box input {{ width: 100px; }}
     .hero .glitch {{ font-size: 32px; }}
     .hero h2 {{ font-size: 20px; }}
@@ -775,15 +588,12 @@ body {{
     .top-stats {{ grid-template-columns: 1fr 1fr; }}
     .cursor-glow, .cursor-dot {{ display: none; }}
 }}
-@media (max-width: 480px) {{
-    .cards-grid {{ grid-template-columns: 1fr; }}
-    .top-stats {{ grid-template-columns: 1fr; }}
-}}
+@media (max-width: 480px) {{ .cards-grid {{ grid-template-columns: 1fr; }} .top-stats {{ grid-template-columns: 1fr; }} }}
 </style>
 </head>
 <body>
 
-<!-- ===== Loading Screen ===== -->
+<!-- Loading -->
 <div class="loading-screen" id="loadingScreen">
     <div class="logo">مبرمج عبود</div>
     <div class="sub">@SSSTlF</div>
@@ -791,24 +601,20 @@ body {{
     <div class="progress-bar"><div class="fill"></div></div>
 </div>
 
-<!-- ===== Scroll Progress ===== -->
+<!-- Scroll Progress -->
 <div class="scroll-progress" id="scrollProgress"></div>
 
-<!-- ===== Back to Top ===== -->
+<!-- Back to Top -->
 <button class="back-top" id="backTop" onclick="window.scrollTo({{top:0,behavior:'smooth'}})">↑</button>
 
-<!-- ===== Cursor ===== -->
+<!-- Cursor -->
 <div class="cursor-glow" id="cursorGlow"></div>
 <div class="cursor-dot" id="cursorDot"></div>
 
-<!-- ===== Background ===== -->
+<!-- Background -->
 <div class="background">
     <div class="mesh"></div>
-    <div class="aurora">
-        <div class="a1"></div>
-        <div class="a2"></div>
-        <div class="a3"></div>
-    </div>
+    <div class="aurora"><div class="a1"></div><div class="a2"></div><div class="a3"></div></div>
     <div class="grid"></div>
     <div class="particles" id="particles"></div>
     <div class="orb orb1"></div>
@@ -818,7 +624,7 @@ body {{
 
 <div class="container">
 
-    <!-- ===== Navbar ===== -->
+    <!-- Navbar -->
     <nav class="navbar" id="navbar">
         <div class="logo">
             <h1>مبرمج عبود</h1>
@@ -829,44 +635,32 @@ body {{
                 <span class="icon">🔍</span>
                 <input type="text" id="searchInput" placeholder="بحث..." oninput="filterCards(this.value)">
             </div>
-            <button class="theme-toggle" onclick="toggleTheme()" title="تبديل الوضع">🌙</button>
+            <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
         </div>
     </nav>
 
-    <!-- ===== Top Stats ===== -->
+    <!-- Top Stats -->
     <div class="top-stats">
-        <div class="stat-card animate-fade-in delay-1">
-            <div class="number" id="statCategories">0</div>
-            <div class="label">📂 الفئات</div>
-        </div>
-        <div class="stat-card animate-fade-in delay-2">
-            <div class="number" id="statCodes">0</div>
-            <div class="label">📚 الأكواد</div>
-        </div>
-        <div class="stat-card animate-fade-in delay-3">
-            <div class="number" id="statVisits">0</div>
-            <div class="label">👁️ الزيارات</div>
-        </div>
-        <div class="stat-card animate-fade-in delay-4">
-            <div class="number"><span class="status-dot"></span> ONLINE</div>
-            <div class="label">🛡️ الحالة</div>
-        </div>
+        <div class="stat-card"><div class="number" id="statCategories">0</div><div class="label">📂 الفئات</div></div>
+        <div class="stat-card"><div class="number" id="statCodes">0</div><div class="label">📚 الأكواد</div></div>
+        <div class="stat-card"><div class="number" id="statVisits">0</div><div class="label">👁️ الزيارات</div></div>
+        <div class="stat-card"><div class="number"><span class="status-dot"></span> ONLINE</div><div class="label">🛡️ الحالة</div></div>
     </div>
 
-    <!-- ===== Hero ===== -->
+    <!-- Hero -->
     <section class="hero">
         <div class="glow-sphere"></div>
         <div class="glitch">هكر</div>
         <h2>أكثر من <span>24 فئة</span> برمجية احترافية</h2>
-        <div class="badge"><i>✦</i> كل فئة تحتوي على 100 كود حقيقي <i>✦</i></div>
+        <div class="badge"><i>✦</i> كل فئة تحتوي على 50 كود حقيقي <i>✦</i></div>
     </section>
 
-    <!-- ===== Cards ===== -->
+    <!-- Cards -->
     <div class="cards-grid" id="cardsGrid">
         {buttons}
     </div>
 
-    <!-- ===== Footer ===== -->
+    <!-- Footer -->
     <footer class="footer">
         <div class="signature">أصل العرب</div>
         <p>© 2026 مبرمج عبود | @SSSTlF</p>
@@ -875,7 +669,7 @@ body {{
 </div>
 
 <script>
-// ===== Loading Screen =====
+// Loading
 window.addEventListener('load', () => {{
     setTimeout(() => {{
         document.getElementById('loadingScreen').classList.add('hidden');
@@ -883,7 +677,7 @@ window.addEventListener('load', () => {{
     }}, 2500);
 }});
 
-// ===== Cursor Glow =====
+// Cursor
 const glow = document.getElementById('cursorGlow');
 const dot = document.getElementById('cursorDot');
 document.addEventListener('mousemove', (e) => {{
@@ -893,7 +687,7 @@ document.addEventListener('mousemove', (e) => {{
     dot.style.top = e.clientY + 'px';
 }});
 
-// ===== Particles =====
+// Particles
 const particlesContainer = document.getElementById('particles');
 for (let i = 0; i < 60; i++) {{
     const p = document.createElement('div');
@@ -906,67 +700,49 @@ for (let i = 0; i < 60; i++) {{
     particlesContainer.appendChild(p);
 }}
 
-// ===== Scroll Progress =====
+// Scroll
 window.addEventListener('scroll', () => {{
     const scrollTop = window.scrollY;
     const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-    const progress = (scrollTop / docHeight) * 100;
-    document.getElementById('scrollProgress').style.width = progress + '%';
+    document.getElementById('scrollProgress').style.width = (scrollTop / docHeight * 100) + '%';
     
-    // Back to top
     const backTop = document.getElementById('backTop');
-    if (scrollTop > 500) {{
-        backTop.classList.add('visible');
-    }} else {{
-        backTop.classList.remove('visible');
-    }}
+    if (scrollTop > 500) backTop.classList.add('visible');
+    else backTop.classList.remove('visible');
     
-    // Navbar
     const navbar = document.getElementById('navbar');
-    if (scrollTop > 50) {{
-        navbar.classList.add('scrolled');
-    }} else {{
-        navbar.classList.remove('scrolled');
-    }}
+    if (scrollTop > 50) navbar.classList.add('scrolled');
+    else navbar.classList.remove('scrolled');
 }});
 
-// ===== Counters =====
+// Counters
 function animateCounter(el, target, duration = 2000) {{
     let start = 0;
     const step = Math.max(1, Math.floor(target / 60));
-    const interval = duration / 60;
     const timer = setInterval(() => {{
         start += step;
-        if (start >= target) {{
-            start = target;
-            clearInterval(timer);
-        }}
+        if (start >= target) {{ start = target; clearInterval(timer); }}
         el.textContent = start;
-    }}, interval);
+    }}, duration / 60);
 }}
-
 document.addEventListener('DOMContentLoaded', () => {{
     animateCounter(document.getElementById('statCategories'), {len(categories)});
-    animateCounter(document.getElementById('statCodes'), {len(categories) * 100});
+    animateCounter(document.getElementById('statCodes'), {len(categories) * 50});
     animateCounter(document.getElementById('statVisits'), Math.floor(Math.random() * 1000) + 100);
 }});
 
-// ===== Search Filter =====
+// Search
 function filterCards(query) {{
     const cards = document.querySelectorAll('.card');
     const q = query.toLowerCase().trim();
     cards.forEach(card => {{
         const title = card.querySelector('.card-title').textContent.toLowerCase();
         const desc = card.querySelector('.card-desc').textContent.toLowerCase();
-        if (title.includes(q) || desc.includes(q)) {{
-            card.style.display = '';
-        }} else {{
-            card.style.display = 'none';
-        }}
+        card.style.display = (title.includes(q) || desc.includes(q)) ? '' : 'none';
     }});
 }}
 
-// ===== Theme Toggle =====
+// Theme
 let darkMode = true;
 function toggleTheme() {{
     darkMode = !darkMode;
@@ -980,26 +756,15 @@ function toggleTheme() {{
         document.body.style.color = '#F8FAFC';
     }} else {{
         root.style.setProperty('--bg', '#F8FAFC');
-        root.style.setproperty('--white', '#05070D');
+        root.style.setProperty('--white', '#05070D');
         btn.textContent = '☀️';
         document.body.style.background = '#F8FAFC';
         document.body.style.color = '#05070D';
     }}
 }}
 
-// ===== Keyboard Shortcuts =====
-document.addEventListener('keydown', (e) => {{
-    if (e.ctrlKey && e.key === '/') {{
-        e.preventDefault();
-        document.getElementById('searchInput').focus();
-    }}
-    if (e.key === 'Escape') {{
-        document.getElementById('searchInput').blur();
-    }}
-}});
-
 console.log('🔥 مبرمج عبود | @SSSTlF | أصل العرب');
-console.log('📚 {len(categories)} فئة | {len(categories) * 100} كود');
+console.log('📚 {len(categories)} فئة | {len(categories) * 50} كود');
 </script>
 </body>
 </html>
@@ -1104,17 +869,13 @@ function toggleFav(i) {{
     localStorage.setItem('favCodes', JSON.stringify(favs));
 }}
 
-// تحميل المفضلة
 document.addEventListener('DOMContentLoaded', () => {{
     const favs = JSON.parse(localStorage.getItem('favCodes') || '[]');
     favs.forEach(id => {{
         const parts = id.split('-');
         if (parts[0] === '{category}') {{
             const btn = document.getElementById('fav-' + parts[1]);
-            if (btn) {{
-                btn.classList.add('active');
-                btn.textContent = '❤️';
-            }}
+            if (btn) {{ btn.classList.add('active'); btn.textContent = '❤️'; }}
         }}
     }});
 }});
@@ -1124,6 +885,6 @@ document.addEventListener('DOMContentLoaded', () => {{
 '''
 
 if __name__ == '__main__':
-    send_telegram(f"🔥 مبرمج عبود | @SSSTlF | {len(categories)} فئة | {len(categories)*100} كود")
+    send_telegram(f"🔥 مبرمج عبود | @SSSTlF | {len(categories)} فئة | {len(categories)*50} كود")
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
