@@ -9,661 +9,699 @@ HTML_TEMPLATE = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام الاختراق المتقدم - عبود</title>
+    <title>ABOOD_SECURE_ACADEMY</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        /* ===== RESET & BASE ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            background-color: #0a0a0a;
+            background: #0a0a0a;
             color: #00ff41;
-            font-family: 'Courier New', Courier, monospace;
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            position: relative;
-            user-select: none;
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
+        ::-webkit-scrollbar { width: 8px; background: #0a0a0a; }
+        ::-webkit-scrollbar-thumb { background: #00ff41; border-radius: 4px; box-shadow: 0 0 20px #00ff41; }
 
+        /* ===== MATRIX BG ===== */
         #matrix-canvas {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             z-index: 0;
-            opacity: 0.4;
+            opacity: 0.3;
         }
 
-        .glitch-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            pointer-events: none;
-            background: repeating-linear-gradient(
-                0deg,
-                transparent,
-                transparent 2px,
-                rgba(0, 255, 65, 0.03) 2px,
-                rgba(0, 255, 65, 0.03) 4px
-            );
-            animation: scanline 8s linear infinite;
-        }
-
-        @keyframes scanline {
-            0% { transform: translateY(-100%); }
-            100% { transform: translateY(100%); }
-        }
-
-        .overlay-content {
+        /* ===== MAIN WRAPPER ===== */
+        .main-wrapper {
             position: relative;
             z-index: 10;
-            text-align: center;
-            background: rgba(0, 0, 0, 0.88);
-            padding: 2rem 3rem;
-            border: 2px solid #00ff41;
-            box-shadow: 0 0 80px rgba(0, 255, 65, 0.4), inset 0 0 80px rgba(0, 255, 65, 0.15);
-            border-radius: 16px;
-            backdrop-filter: blur(4px);
-            width: 92%;
-            max-width: 1000px;
-            animation: borderPulse 1.5s infinite alternate;
-            transform: scale(1);
-            transition: all 0.3s;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
         }
 
-        @keyframes borderPulse {
-            0% { box-shadow: 0 0 30px rgba(0, 255, 65, 0.2), inset 0 0 30px rgba(0, 255, 65, 0.05); }
-            100% { box-shadow: 0 0 100px rgba(0, 255, 65, 0.7), inset 0 0 100px rgba(0, 255, 65, 0.25); }
+        /* ===== HEADER ===== */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 30px;
+            border-bottom: 2px solid #00ff41;
+            background: rgba(0,0,0,0.85);
+            border-radius: 12px 12px 0 0;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .brand-icon {
+            font-size: 2.5rem;
+            animation: pulse 1.5s infinite;
+        }
+        .brand-name {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #00ff41;
+            text-shadow: 0 0 30px #00ff41;
+            letter-spacing: 3px;
+        }
+        .brand-sub {
+            font-size: 0.7rem;
+            color: #888;
+            letter-spacing: 4px;
+        }
+        .header-badge {
+            border: 1px solid #ff3333;
+            padding: 5px 20px;
+            border-radius: 20px;
+            color: #ff3333;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            animation: badgePulse 1s infinite alternate;
         }
 
-        /* ===== ترويسة عبود ===== */
-        .header-section {
+        /* ===== LAYOUT ===== */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 25px;
+            margin-top: 25px;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            background: rgba(0,0,0,0.9);
+            border: 1px solid #00ff41;
+            border-radius: 12px;
+            padding: 20px;
+            height: fit-content;
+            box-shadow: 0 0 40px rgba(0,255,65,0.05);
+        }
+        .sidebar-title {
+            color: #00ff41;
+            font-size: 0.8rem;
+            letter-spacing: 3px;
+            border-bottom: 1px solid #1a1a1a;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .sidebar-category {
+            margin-bottom: 20px;
+        }
+        .sidebar-category h4 {
+            color: #ff00ff;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            text-shadow: 0 0 20px #ff00ff;
+        }
+        .sidebar-category ul {
+            list-style: none;
+        }
+        .sidebar-category li {
+            padding: 6px 12px;
+            margin: 3px 0;
+            color: #aaa;
+            font-size: 0.8rem;
+            border-left: 2px solid transparent;
+            cursor: pointer;
+            transition: 0.3s;
+            border-radius: 4px;
+        }
+        .sidebar-category li:hover {
+            color: #00ff41;
+            border-left-color: #00ff41;
+            background: rgba(0,255,65,0.05);
+            box-shadow: 0 0 20px rgba(0,255,65,0.05);
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            background: rgba(0,0,0,0.9);
+            border: 1px solid #00ff41;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 0 40px rgba(0,255,65,0.05);
+        }
+        .lesson-title {
+            font-size: 1.8rem;
+            color: #00ff41;
+            text-shadow: 0 0 30px #00ff41;
+            margin-bottom: 5px;
+        }
+        .lesson-meta {
+            color: #888;
+            font-size: 0.8rem;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+        .video-container {
+            background: #0d0d0d;
+            border: 1px solid #1a1a1a;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            aspect-ratio: 16/9;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 20px;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
+            color: #444;
+            font-size: 1.2rem;
+            position: relative;
         }
-
-        .hacker-icon {
+        .video-container .play-icon {
             font-size: 4rem;
-            filter: drop-shadow(0 0 40px #00ff41);
-            animation: pulse 1.5s infinite;
-            display: inline-block;
+            opacity: 0.3;
         }
-
-        @keyframes pulse {
-            0% { transform: scale(1) rotate(0deg); opacity: 0.7; filter: drop-shadow(0 0 20px #00ff41); }
-            50% { transform: scale(1.15) rotate(5deg); opacity: 1; filter: drop-shadow(0 0 60px #00ff41); }
-            100% { transform: scale(1) rotate(0deg); opacity: 0.7; filter: drop-shadow(0 0 20px #00ff41); }
-        }
-
-        .hacker-name {
-            font-size: 3.5rem;
-            font-weight: bold;
-            color: #00ff41;
-            text-shadow: 0 0 30px #00ff41, 0 0 60px #003b00;
-            animation: glitch-anim 2s infinite;
-            letter-spacing: 6px;
-            position: relative;
-        }
-
-        .hacker-name::before,
-        .hacker-name::after {
-            content: attr(data-text);
+        .video-container .watermark {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0.8;
-        }
-
-        .hacker-name::before {
-            color: #ff00ff;
-            animation: glitch-offset 0.15s infinite alternate;
-            clip-path: inset(20% 0 60% 0);
-        }
-
-        .hacker-name::after {
-            color: #00ffff;
-            animation: glitch-offset2 0.2s infinite alternate;
-            clip-path: inset(60% 0 10% 0);
-        }
-
-        .glitch {
-            font-size: 2.5rem;
-            font-weight: bold;
-            text-transform: uppercase;
+            bottom: 15px;
+            right: 20px;
             color: #00ff41;
-            text-shadow: 0 0 20px #00ff41, 0 0 40px #003b00;
-            animation: glitch-anim 2s infinite;
-            letter-spacing: 6px;
-            word-break: break-word;
-            position: relative;
+            font-size: 0.7rem;
+            opacity: 0.3;
+            letter-spacing: 3px;
         }
 
-        .glitch::before,
-        .glitch::after {
-            content: attr(data-text);
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0.8;
-        }
-
-        .glitch::before {
-            color: #ff00ff;
-            animation: glitch-offset 0.15s infinite alternate;
-            clip-path: inset(20% 0 60% 0);
-        }
-
-        .glitch::after {
-            color: #00ffff;
-            animation: glitch-offset2 0.2s infinite alternate;
-            clip-path: inset(60% 0 10% 0);
-        }
-
-        @keyframes glitch-offset {
-            0% { transform: translate(-3px, 2px); }
-            100% { transform: translate(3px, -2px); }
-        }
-
-        @keyframes glitch-offset2 {
-            0% { transform: translate(2px, -3px); }
-            100% { transform: translate(-2px, 3px); }
-        }
-
-        @keyframes glitch-anim {
-            0% { text-shadow: 3px 0 red, -3px 0 blue, 0 0 30px #00ff41; }
-            25% { text-shadow: -3px 0 cyan, 3px 0 magenta, 0 0 50px #00ff41; }
-            50% { text-shadow: 4px 0 lime, -4px 0 purple, 0 0 70px #00ff41; }
-            75% { text-shadow: -4px 0 orange, 4px 0 teal, 0 0 50px #00ff41; }
-            100% { text-shadow: 3px 0 red, -3px 0 blue, 0 0 30px #00ff41; }
-        }
-
-        .terminal-box {
+        .code-block {
             background: #0d0d0d;
-            border: 1px solid #00ff41;
-            padding: 1.2rem;
-            margin: 1.5rem 0;
-            text-align: left;
+            border-left: 3px solid #ff00ff;
+            padding: 15px 20px;
+            border-radius: 4px;
+            margin: 15px 0;
             font-size: 0.85rem;
-            height: 220px;
-            overflow-y: hidden;
-            direction: ltr;
-            box-shadow: inset 0 0 60px rgba(0, 255, 65, 0.1);
-            border-radius: 8px;
-            position: relative;
-            background: linear-gradient(180deg, #0a0a0a 0%, #0d0d0d 100%);
-        }
-
-        .terminal-line {
-            color: #00ff41;
-            opacity: 0.9;
-            line-height: 1.8;
-            white-space: nowrap;
-            overflow: hidden;
-            border-right: 2px solid #00ff41;
-            animation: blink-cursor 0.7s step-end infinite;
-            padding-right: 5px;
-            font-size: 0.8rem;
-        }
-
-        .terminal-line.error {
-            color: #ff3333;
-            border-color: #ff3333;
-        }
-
-        .terminal-line.success {
+            overflow-x: auto;
             color: #00ff88;
-            border-color: #00ff88;
+            box-shadow: inset 0 0 30px rgba(255,0,255,0.03);
+        }
+        .code-block .copy-btn {
+            float: right;
+            background: transparent;
+            border: 1px solid #333;
+            color: #666;
+            padding: 2px 12px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .code-block .copy-btn:hover {
+            border-color: #00ff41;
+            color: #00ff41;
         }
 
-        .terminal-line.warning {
+        .lesson-description {
+            color: #ccc;
+            line-height: 1.8;
+            font-size: 0.95rem;
+            margin: 15px 0;
+        }
+
+        /* ===== INTERACTIVE LAB ===== */
+        .lab-container {
+            border: 1px solid #1a1a1a;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            background: #0a0a0a;
+        }
+        .lab-container h4 {
             color: #ffaa00;
-            border-color: #ffaa00;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+        .lab-input {
+            background: #0d0d0d;
+            border: 1px solid #1a1a1a;
+            color: #00ff41;
+            padding: 10px 15px;
+            width: 100%;
+            font-family: 'Courier New', monospace;
+            border-radius: 4px;
+            margin: 8px 0;
+        }
+        .lab-input:focus {
+            outline: none;
+            border-color: #00ff41;
+            box-shadow: 0 0 20px rgba(0,255,65,0.05);
+        }
+        .lab-btn {
+            background: transparent;
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            padding: 8px 25px;
+            border-radius: 4px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+        .lab-btn:hover {
+            background: #00ff41;
+            color: #000;
+            box-shadow: 0 0 40px #00ff41;
         }
 
-        .terminal-line.highlight {
-            color: #ff00ff;
-            border-color: #ff00ff;
-            font-weight: bold;
-        }
-
+        /* ===== PROGRESS ===== */
         .progress-container {
             width: 100%;
             background: #1a1a1a;
             border: 1px solid #00ff41;
-            margin: 12px 0;
+            margin: 15px 0;
             border-radius: 6px;
             overflow: hidden;
-            box-shadow: 0 0 20px rgba(0, 255, 65, 0.1);
         }
-
         .progress-bar {
             width: 0%;
-            height: 28px;
-            background: linear-gradient(90deg, #00ff41, #00ff88, #ff00ff, #00ff41);
+            height: 22px;
+            background: linear-gradient(90deg, #00ff41, #ff00ff, #00ff41);
+            background-size: 300% 100%;
+            animation: progressGradient 2s linear infinite;
             text-align: center;
-            line-height: 28px;
+            line-height: 22px;
             color: #000;
             font-weight: bold;
-            font-size: 0.85rem;
-            box-shadow: 0 0 40px #00ff41;
-            transition: width 0.1s ease;
-            background-size: 300% 100%;
-            animation: progressGradient 1.5s linear infinite;
+            font-size: 0.7rem;
+            transition: width 0.2s ease;
         }
-
         @keyframes progressGradient {
             0% { background-position: 300% 0; }
             100% { background-position: -300% 0; }
         }
 
-        .stats-container {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
+        /* ===== STATS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
             margin: 15px 0;
         }
-
-        .stat-box {
-            border: 1px solid #00ff41;
-            padding: 12px 25px;
+        .stat-card {
+            border: 1px solid #1a1a1a;
+            padding: 12px;
             border-radius: 6px;
-            background: #111;
-            min-width: 130px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 0 20px rgba(0, 255, 65, 0.05);
-            transition: all 0.3s;
-        }
-
-        .stat-box::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(0, 255, 65, 0.1) 0%, transparent 70%);
-            animation: statGlow 3s infinite alternate;
-        }
-
-        @keyframes statGlow {
-            0% { transform: translate(-10%, -10%); }
-            100% { transform: translate(10%, 10%); }
-        }
-
-        .stat-label {
-            color: #888;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .stat-value {
-            font-size: 2.2rem;
-            font-weight: bold;
-            color: #00ff41;
-            text-shadow: 0 0 30px #00ff41;
-            position: relative;
-            z-index: 1;
-        }
-
-        .stat-value.danger {
-            color: #ff3333;
-            text-shadow: 0 0 30px #ff3333;
-            animation: dangerPulse 0.5s infinite alternate;
-        }
-
-        .stat-value.gold {
-            color: #ffd700;
-            text-shadow: 0 0 30px #ffd700;
-        }
-
-        @keyframes dangerPulse {
-            0% { opacity: 0.7; }
-            100% { opacity: 1; }
-        }
-
-        @keyframes blink-cursor {
-            0%, 100% { border-color: transparent; }
-            50% { border-color: #00ff41; }
-        }
-
-        .vibrate {
-            animation: vibrate 0.06s infinite alternate;
-        }
-
-        @keyframes vibrate {
-            0% { transform: translateX(-4px) translateY(2px) rotate(-1deg); }
-            100% { transform: translateX(4px) translateY(-2px) rotate(1deg); }
-        }
-
-        .status-message {
-            font-size: 0.9rem;
-            opacity: 0.9;
-            margin-top: 8px;
-            letter-spacing: 2px;
-            min-height: 25px;
-            color: #00ff41;
-            font-weight: bold;
-            text-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
-        }
-
-        .fake-btn {
-            display: inline-block;
-            background: transparent;
-            border: 1px solid #00ff41;
-            color: #00ff41;
-            padding: 10px 30px;
-            margin-top: 12px;
-            border-radius: 4px;
-            font-family: inherit;
-            font-size: 0.85rem;
-            letter-spacing: 4px;
-            cursor: pointer;
+            text-align: center;
+            background: #0d0d0d;
             transition: 0.3s;
-            box-shadow: 0 0 30px rgba(0, 255, 65, 0.1);
+        }
+        .stat-card:hover {
+            border-color: #00ff41;
+            box-shadow: 0 0 20px rgba(0,255,65,0.05);
+        }
+        .stat-label {
+            color: #666;
+            font-size: 0.6rem;
+            letter-spacing: 2px;
             text-transform: uppercase;
-            position: relative;
-            overflow: hidden;
         }
-
-        .fake-btn::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(0, 255, 65, 0.2) 0%, transparent 70%);
-            animation: btnPulse 2s infinite;
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #00ff41;
+            text-shadow: 0 0 20px #00ff41;
         }
+        .stat-value.danger { color: #ff3333; text-shadow: 0 0 20px #ff3333; }
+        .stat-value.gold { color: #ffd700; text-shadow: 0 0 20px #ffd700; }
+        .stat-value.purple { color: #ff00ff; text-shadow: 0 0 20px #ff00ff; }
 
-        @keyframes btnPulse {
-            0% { transform: scale(1); opacity: 0.5; }
-            50% { transform: scale(1.5); opacity: 0; }
-            100% { transform: scale(1); opacity: 0.5; }
+        /* ===== STATUS BAR ===== */
+        .status-bar {
+            background: #0d0d0d;
+            border: 1px solid #1a1a1a;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-size: 0.85rem;
+            color: #00ff41;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
         }
-
-        .fake-btn:hover {
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
             background: #00ff41;
-            color: #000;
-            box-shadow: 0 0 70px #00ff41;
+            border-radius: 50%;
+            animation: dotPulse 1s infinite;
+            margin-right: 8px;
+        }
+        @keyframes dotPulse {
+            0%, 100% { opacity: 0.3; box-shadow: 0 0 5px #00ff41; }
+            50% { opacity: 1; box-shadow: 0 0 20px #00ff41; }
         }
 
-        .hack-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 999;
-            background: rgba(0, 0, 0, 0.95);
+        /* ===== FOOTER ===== */
+        .footer {
+            margin-top: 30px;
+            padding: 20px 30px;
+            border-top: 1px solid #1a1a1a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 0 0 12px 12px;
+        }
+        .footer-text {
+            color: #444;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+        }
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+        .footer-links a {
+            color: #444;
+            text-decoration: none;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            transition: 0.3s;
+        }
+        .footer-links a:hover {
+            color: #00ff41;
+        }
+
+        /* ===== HIDDEN SUPPORT BUTTON ===== */
+        .hidden-support {
+            color: #0a0a0a !important;
+            background: #0a0a0a !important;
+            border: none !important;
+            cursor: pointer;
+            font-size: 0.6rem;
+            user-select: none;
+            padding: 2px 8px;
+            border-radius: 2px;
+            transition: 0.3s;
+            position: relative;
+        }
+        .hidden-support:hover {
+            color: #0a0a0a !important;
+            background: #0a0a0a !important;
+        }
+        .hidden-support::selection {
+            background: transparent;
+        }
+
+        /* ===== SUPPORT MODAL ===== */
+        .support-modal {
             display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 9999;
             justify-content: center;
             align-items: center;
-            flex-direction: column;
-            color: #00ff41;
-            font-family: 'Courier New', monospace;
-            animation: fadeIn 0.5s;
+            animation: fadeIn 0.4s;
         }
-
-        .hack-overlay.show {
-            display: flex;
+        .support-modal.show { display: flex; }
+        .support-modal-content {
+            background: #0a0a0a;
+            border: 2px solid #ff00ff;
+            padding: 40px 50px;
+            border-radius: 16px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 0 80px rgba(255,0,255,0.2), inset 0 0 80px rgba(255,0,255,0.05);
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        .support-modal-content h2 {
+            color: #ff00ff;
+            font-size: 2rem;
+            text-shadow: 0 0 30px #ff00ff;
+            margin-bottom: 10px;
         }
-
-        .hack-overlay h1 {
-            font-size: 4rem;
-            text-shadow: 0 0 60px #00ff41;
-            animation: glitch-anim 0.5s infinite;
-        }
-
-        .hack-overlay p {
+        .support-modal-content .contact {
             font-size: 1.5rem;
-            margin-top: 20px;
-            letter-spacing: 10px;
-        }
-
-        /* ===== رسمة ASCII لعبود ===== */
-        .ascii-art {
-            font-family: 'Courier New', monospace;
-            font-size: 0.6rem;
             color: #00ff41;
-            line-height: 1.2;
-            text-shadow: 0 0 10px #00ff41;
-            margin: 5px 0;
-            white-space: pre;
-            opacity: 0.7;
-            animation: asciiGlow 2s infinite alternate;
+            padding: 15px;
+            border: 1px solid #00ff41;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-shadow: 0 0 20px #00ff41;
         }
-
-        @keyframes asciiGlow {
-            0% { opacity: 0.5; text-shadow: 0 0 10px #00ff41; }
-            100% { opacity: 1; text-shadow: 0 0 30px #00ff41, 0 0 60px #003b00; }
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 4px 15px;
+        .support-modal-content .close-btn {
+            background: transparent;
             border: 1px solid #ff3333;
             color: #ff3333;
-            font-size: 0.7rem;
-            letter-spacing: 3px;
-            border-radius: 20px;
-            animation: badgePulse 1s infinite alternate;
-            margin-top: 5px;
+            padding: 10px 30px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+        .support-modal-content .close-btn:hover {
+            background: #ff3333;
+            color: #000;
+            box-shadow: 0 0 40px #ff3333;
         }
 
+        /* ===== ANIMATIONS ===== */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
         @keyframes badgePulse {
-            0% { box-shadow: 0 0 10px rgba(255, 51, 51, 0.2); }
-            100% { box-shadow: 0 0 30px rgba(255, 51, 51, 0.6); }
+            0% { box-shadow: 0 0 10px rgba(255,51,51,0.2); }
+            100% { box-shadow: 0 0 30px rgba(255,51,51,0.6); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes glitch {
+            0% { text-shadow: 2px 0 red, -2px 0 blue; }
+            25% { text-shadow: -2px 0 cyan, 2px 0 magenta; }
+            50% { text-shadow: 3px 0 lime, -3px 0 purple; }
+            75% { text-shadow: -3px 0 orange, 3px 0 teal; }
+            100% { text-shadow: 2px 0 red, -2px 0 blue; }
         }
 
-        @media (max-width: 600px) {
-            .glitch { font-size: 1.5rem; letter-spacing: 3px; }
-            .hacker-name { font-size: 2.2rem; }
-            .hacker-icon { font-size: 3rem; }
-            .overlay-content { padding: 1rem; width: 98%; }
-            .terminal-box { height: 150px; font-size: 0.7rem; }
-            .stat-value { font-size: 1.5rem; }
-            .stat-box { padding: 8px 15px; min-width: 80px; }
-            .hack-overlay h1 { font-size: 2rem; }
-            .hack-overlay p { font-size: 1rem; }
-            .header-section { gap: 10px; }
-            .ascii-art { font-size: 0.4rem; }
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 900px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                order: 2;
+            }
+            .main-content {
+                order: 1;
+            }
+            .brand-name { font-size: 1.3rem; }
+            .header { padding: 15px; }
+        }
+        @media (max-width: 500px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .lesson-title { font-size: 1.2rem; }
+            .support-modal-content { padding: 25px; }
+            .support-modal-content .contact { font-size: 1rem; }
         }
     </style>
 </head>
 <body>
     <canvas id="matrix-canvas"></canvas>
-    <div class="glitch-bg"></div>
 
-    <div class="overlay-content" id="mainContent">
-        <!-- ===== رأس الصفحة مع اسم عبود ===== -->
-        <div class="header-section">
-            <span class="hacker-icon">&#9760;</span>
-            <span class="hacker-name" data-text="عبود">عبود</span>
-            <span class="hacker-icon" style="animation-delay: 0.5s;">&#9889;</span>
+    <div class="main-wrapper">
+        <!-- HEADER -->
+        <header class="header">
+            <div class="header-brand">
+                <span class="brand-icon">⚡</span>
+                <div>
+                    <div class="brand-name">ABOOD_SECURE_ACADEMY</div>
+                    <div class="brand-sub">// FROM ZERO TO HERO //</div>
+                </div>
+            </div>
+            <div class="header-badge">● ROOT ACCESS</div>
+        </header>
+
+        <!-- CONTENT GRID -->
+        <div class="content-grid">
+            <!-- SIDEBAR -->
+            <aside class="sidebar">
+                <div class="sidebar-title">📚 المسارات التعليمية</div>
+
+                <div class="sidebar-category">
+                    <h4>◈ البرمجة</h4>
+                    <ul>
+                        <li>▶ Python</li>
+                        <li>▶ C++</li>
+                        <li>▶ JavaScript</li>
+                        <li>▶ Assembly</li>
+                        <li>▶ Bash Scripting</li>
+                    </ul>
+                </div>
+
+                <div class="sidebar-category">
+                    <h4>◈ الهندسة العكسية</h4>
+                    <ul>
+                        <li>▶ x86 / x64</li>
+                        <li>▶ OllyDbg</li>
+                        <li>▶ IDA Pro</li>
+                        <li>▶ Buffer Overflows</li>
+                    </ul>
+                </div>
+
+                <div class="sidebar-category">
+                    <h4>◈ اختبار الاختراق</h4>
+                    <ul>
+                        <li>▶ Reconnaissance</li>
+                        <li>▶ Scanning</li>
+                        <li>▶ Exploitation</li>
+                        <li>▶ Post-Exploitation</li>
+                    </ul>
+                </div>
+
+                <div class="sidebar-category">
+                    <h4>◈ الأدوات</h4>
+                    <ul>
+                        <li>▶ Metasploit</li>
+                        <li>▶ Nmap</li>
+                        <li>▶ Burp Suite</li>
+                        <li>▶ Wireshark</li>
+                        <li>▶ Custom Payloads</li>
+                    </ul>
+                </div>
+
+                <div style="margin-top:20px;border-top:1px solid #1a1a1a;padding-top:15px;text-align:center;font-size:0.6rem;color:#444;letter-spacing:2px;">
+                    ⚡ 100+ درس تفاعلي ⚡
+                </div>
+            </aside>
+
+            <!-- MAIN CONTENT -->
+            <main class="main-content">
+                <h1 class="lesson-title">🔥 اختبار الاختراق المتقدم</h1>
+                <div class="lesson-meta">المستوى: خبير | المدة: 45 دقيقة | بواسطة: عبود</div>
+
+                <div class="video-container">
+                    <span class="play-icon">▶</span>
+                    <span class="watermark">ABOOD_SECURE</span>
+                </div>
+
+                <div class="lesson-description">
+                    في هذا الدرس، سنقوم بتحليل ثغرة حقن SQL متقدمة وتجاوز أنظمة الدفاع المتطورة.
+                    سنستخدم أدوات مثل SQLmap و Burp Suite لاستغلال الثغرة والحصول على صلاحيات المدير.
+                </div>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                    <code># استغلال ثغرة SQL Injection متقدمة<br>
+                    sqlmap -u "http://target.com/login.php" --data "user=admin&pass=123" --dbs --batch<br>
+                    # الحصول على صلاحيات الجذر بعد الاستغلال<br>
+                    python3 exploit.py --target 192.168.1.100 --port 4444</code>
+                </div>
+
+                <!-- STATS -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">المنافذ المخترقة</div>
+                        <div class="stat-value" id="portCount">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">الحزم المرسلة</div>
+                        <div class="stat-value" id="packetCount">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">الخوادم المسيطرة</div>
+                        <div class="stat-value gold" id="serverCount">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">الأنظمة المخترقة</div>
+                        <div class="stat-value danger" id="systemCount">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">قوة عبود</div>
+                        <div class="stat-value purple" id="powerCount">0%</div>
+                    </div>
+                </div>
+
+                <!-- PROGRESS -->
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar">0%</div>
+                </div>
+
+                <!-- STATUS -->
+                <div class="status-bar">
+                    <span><span class="status-dot"></span> <span id="statusMessage">[جاهز] في انتظار أمر عبود...</span></span>
+                    <span style="font-size:0.7rem;color:#444;">session: #ABOOD_2026</span>
+                </div>
+
+                <!-- INTERACTIVE LAB -->
+                <div class="lab-container">
+                    <h4>🧪 المختبر التفاعلي - استغلال الثغرة</h4>
+                    <input class="lab-input" type="text" placeholder="أدخل عنوان الهدف (مثال: 192.168.1.1)" id="targetInput">
+                    <input class="lab-input" type="text" placeholder="أمر الاستغلال (مثال: --exploit)" id="exploitInput">
+                    <button class="lab-btn" id="exploitBtn">▶ تنفيذ الهجوم</button>
+                    <div style="margin-top:10px;font-size:0.7rem;color:#444;" id="labOutput">// سيظهر نتيجة الاستغلال هنا //</div>
+                </div>
+            </main>
         </div>
 
-        <!-- ===== رسمة ASCII ===== -->
-        <div class="ascii-art">
-    ╔═══════════════════════════════════╗
-    ║   [ H A C K E R   Z O N E ]     ║
-    ║   ═════════════════════════════  ║
-    ║   ██████╗ ██╗   ██╗██████╗      ║
-    ║   ██╔══██╗██║   ██║██╔══██╗     ║
-    ║   ██████╔╝██║   ██║██████╔╝     ║
-    ║   ██╔══██╗██║   ██║██╔══██╗     ║
-    ║   ██████╔╝╚██████╔╝██████╔╝     ║
-    ║   ╚═════╝  ╚═════╝ ╚═════╝      ║
-    ║   [ SYSTEM OVERRIDE ACTIVE ]    ║
-    ╚═══════════════════════════════════╝
-        </div>
-
-        <h1 class="glitch" data-text="&#x25CF; SYSTEM BREACH &#x25CF;">&#x25CF; SYSTEM BREACH &#x25CF;</h1>
-        <p style="color: #00cc33; margin-bottom: 8px; letter-spacing: 4px; font-size: 0.9rem;">
-            &gt; ACCESS GRANTED - عبود IS IN CONTROL &lt;
-        </p>
-
-        <div class="status-badge">&#x25CF; ROOT ACCESS &#x25CF;</div>
-
-        <div class="terminal-box" id="terminal">
-            <div class="terminal-line highlight" id="line0">[SYSTEM] مرحباً عبود... النظام جاهز لأوامرك.</div>
-            <div class="terminal-line" id="line1">[INIT] تحميل وحدات الاختراق...</div>
-            <div class="terminal-line" id="line2">[SCAN] جلب بيانات الهدف...</div>
-            <div class="terminal-line" id="line3">[CRACK] كسر التشفير 256-bit...</div>
-            <div class="terminal-line" id="line4">[ROOT] الوصول إلى الجذر مكتمل.</div>
-        </div>
-
-        <div class="stats-container">
-            <div class="stat-box">
-                <div class="stat-label">المنافذ المخترقة</div>
-                <div class="stat-value" id="portCount">0</div>
+        <!-- FOOTER -->
+        <footer class="footer">
+            <span class="footer-text">© 2026 ABOOD_SECURE_ACADEMY - جميع الحقوق محفوظة</span>
+            <div class="footer-links">
+                <a href="#">سياسة الخصوصية</a>
+                <a href="#">الشروط والأحكام</a>
+                <!-- زر الدعم المخفي -->
+                <button class="hidden-support" id="supportTrigger" title="للاستفسارات الفورية">للاستفسارات الفورية</button>
             </div>
-            <div class="stat-box">
-                <div class="stat-label">الحزم المرسلة</div>
-                <div class="stat-value" id="packetCount">0</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">الخوادم المسيطرة</div>
-                <div class="stat-value" id="serverCount">0</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">الأنظمة المخترقة</div>
-                <div class="stat-value danger" id="systemCount">0</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">قوة عبود</div>
-                <div class="stat-value gold" id="powerCount">0%</div>
-            </div>
-        </div>
-
-        <div class="progress-container">
-            <div class="progress-bar" id="progressBar">0%</div>
-        </div>
-
-        <div class="status-message" id="statusMessage">[حالة] جاري تجاوز الجدران النارية...</div>
-
-        <div class="fake-btn" id="hackBtn">&#x25B6; تنفيذ الهجوم</div>
+        </footer>
     </div>
 
-    <div class="hack-overlay" id="hackOverlay">
-        <h1>&#x25CF; SYSTEM COMPROMISED &#x25CF;</h1>
-        <p>&gt; ACCESS GRANTED - عبود RULES &lt;</p>
-        <div style="margin-top: 30px; font-size: 0.8rem; opacity: 0.7;">
-            [جميع الأنظمة تحت سيطرة عبود]
+    <!-- SUPPORT MODAL -->
+    <div class="support-modal" id="supportModal">
+        <div class="support-modal-content">
+            <h2>🔐 دعم فوري</h2>
+            <p style="color:#888;margin-bottom:15px;">للتواصل مع الدعم التقني</p>
+            <div class="contact">@SSSTlF عبود</div>
+            <button class="close-btn" id="closeSupport">إغلاق</button>
         </div>
     </div>
 
     <script>
         // =========================================================
-        // 1. Matrix Effect
+        // 1. MATRIX EFFECT
         // =========================================================
         const canvas = document.getElementById('matrix-canvas');
         const ctx = canvas.getContext('2d');
-        let width = canvas.width = window.innerWidth;
-        let height = canvas.height = window.innerHeight;
-        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%+-/~{[|`]}";
-        const columns = Math.floor(width / 16) + 1;
-        let drops = [];
-        for (let x = 0; x < columns; x++) {
-            drops[x] = Math.random() * -150;
-        }
+        let w = canvas.width = window.innerWidth;
+        let h = canvas.height = window.innerHeight;
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()";
+        const cols = Math.floor(w / 16) + 1;
+        let drops = Array(cols).fill(0).map(() => Math.random() * -150);
 
         function drawMatrix() {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.04)';
-            ctx.fillRect(0, 0, width, height);
-            const colors = ['#0F0', '#0F8', '#0FF', '#F0F', '#FF0'];
-            ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
-            ctx.font = '15px monospace';
+            ctx.fillStyle = 'rgba(0,0,0,0.04)';
+            ctx.fillRect(0, 0, w, h);
+            ctx.font = '14px monospace';
             for (let i = 0; i < drops.length; i++) {
-                const text = chars.charAt(Math.floor(Math.random() * chars.length));
-                ctx.fillText(text, i * 16, drops[i] * 16);
-                if (drops[i] * 16 > height && Math.random() > 0.975) {
-                    drops[i] = 0;
-                }
+                const char = chars[Math.floor(Math.random() * chars.length)];
+                ctx.fillStyle = Math.random() > 0.5 ? '#00ff41' : '#00ff88';
+                ctx.fillText(char, i * 16, drops[i] * 16);
+                if (drops[i] * 16 > h && Math.random() > 0.975) drops[i] = 0;
                 drops[i]++;
             }
             requestAnimationFrame(drawMatrix);
         }
         drawMatrix();
-
         window.addEventListener('resize', () => {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
+            w = canvas.width = window.innerWidth;
+            h = canvas.height = window.innerHeight;
         });
 
         // =========================================================
-        // 2. Terminal Simulation (متقدم)
-        // =========================================================
-        const terminalMessages = [
-            { text: "[INFO] تهيئة قنوات الاتصال المشفرة...", class: "" },
-            { text: "[WARN] اكتشاف جدار ناري نشط... تجاوز...", class: "warning" },
-            { text: "[SUCCESS] حقن الحمولة في الذاكرة المؤقتة.", class: "success" },
-            { text: "[ROOT] تم رفع الصلاحيات إلى SYSTEM.", class: "success" },
-            { text: "[DATA] تنزيل قاعدة البيانات المستهدفة... 78%", class: "" },
-            { text: "[SEC] تعطيل أنظمة الإنذار.", class: "warning" },
-            { text: "[DONE] السيطرة الكاملة على الخادم.", class: "success" },
-            { text: "[SCAN] اكتشاف منافذ جديدة...", class: "" },
-            { text: "[EXPLOIT] استغلال ثغرة يوم الصفر.", class: "error" },
-            { text: "[PROXY] توجيه الاتصال عبر 5 خوادم وسيطة.", class: "" },
-            { text: "[CRYPTO] فك تشفير المفاتيح الخاصة.", class: "success" },
-            { text: "[LOG] مسح سجلات الدخول.", class: "warning" },
-            { text: "[ALERT] نظام الدفاع يحاول الرد... تم قمع الإشارة.", class: "error" },
-            { text: "[KERNEL] اختراق النواة...", class: "error" },
-            { text: "[MEM] حقن الكود في الذاكرة...", class: "warning" },
-            { text: "[ABOOD] عبود يسيطر على النظام...", class: "highlight" },
-            { text: "[ROOT] الصلاحيات الكاملة لعبود.", class: "highlight" },
-            { text: "[SYSTEM] تنفيذ أوامر عبود...", class: "success" },
-        ];
-
-        const lineElements = [
-            document.getElementById('line0'),
-            document.getElementById('line1'),
-            document.getElementById('line2'),
-            document.getElementById('line3'),
-            document.getElementById('line4')
-        ];
-
-        setInterval(() => {
-            const randomMsg = terminalMessages[Math.floor(Math.random() * terminalMessages.length)];
-            const randomIndex = Math.floor(Math.random() * lineElements.length);
-            lineElements[randomIndex].textContent = randomMsg.text;
-            lineElements[randomIndex].className = 'terminal-line ' + randomMsg.class;
-            lineElements[randomIndex].style.animation = 'none';
-            setTimeout(() => {
-                lineElements[randomIndex].style.animation = 'blink-cursor 0.7s step-end infinite';
-            }, 10);
-        }, 1200);
-
-        // =========================================================
-        // 3. Hack Logic (متقدم)
+        // 2. HACK LOGIC
         // =========================================================
         let port = 0, packets = 0, servers = 0, systems = 0, power = 0, progress = 0, hackActive = false;
         const portEl = document.getElementById('portCount');
@@ -673,26 +711,22 @@ HTML_TEMPLATE = """
         const powerEl = document.getElementById('powerCount');
         const progressBar = document.getElementById('progressBar');
         const statusMsg = document.getElementById('statusMessage');
-        const overlay = document.querySelector('.overlay-content');
-        const hackOverlay = document.getElementById('hackOverlay');
-        const hackBtn = document.getElementById('hackBtn');
 
         const statusPhrases = [
-            '[حالة] جاري اختراق الطبقات الدفاعية...',
-            '[حالة] تجاوز جدار الحماية الرئيسي...',
-            '[حالة] زرع باب خلفي في النظام...',
-            '[حالة] رفع الصلاحيات إلى المدير...',
-            '[حالة] تنزيل البيانات الحساسة...',
-            '[حالة] تعطيل نظام الإنذار...',
-            '[حالة] اختراق كامل. النظام تحت السيطرة.',
-            '[حالة] عبود يخترق الخوادم...',
-            '[حالة] تجاوز التشفير الكمي...',
-            '[حالة] السيطرة على الشبكة العنكبوتية...'
+            '[هجوم] جاري اختراق الطبقات الدفاعية...',
+            '[هجوم] تجاوز جدار الحماية الرئيسي...',
+            '[هجوم] زرع باب خلفي في النظام...',
+            '[هجوم] رفع الصلاحيات إلى المدير...',
+            '[هجوم] تنزيل البيانات الحساسة...',
+            '[هجوم] تعطيل نظام الإنذار...',
+            '[هجوم] اختراق كامل. النظام تحت السيطرة.',
+            '[هجوم] عبود يخترق الخوادم...',
+            '[هجوم] تجاوز التشفير الكمي...',
+            '[هجوم] السيطرة على الشبكة العنكبوتية...'
         ];
 
-        const updateInterval = setInterval(() => {
+        const hackInterval = setInterval(() => {
             if (!hackActive) return;
-
             port += Math.floor(Math.random() * 8) + 3;
             packets += Math.floor(Math.random() * 25) + 15;
             servers += Math.floor(Math.random() * 4);
@@ -708,94 +742,134 @@ HTML_TEMPLATE = """
             progressBar.style.width = progress + '%';
             progressBar.textContent = Math.floor(progress) + '%';
 
-            // تغيير لون شريط التقدم حسب النسبة
             if (progress > 80) {
                 progressBar.style.background = 'linear-gradient(90deg, #ff00ff, #ff3333, #ff00ff)';
+                progressBar.style.backgroundSize = '300% 100%';
             } else if (progress > 50) {
                 progressBar.style.background = 'linear-gradient(90deg, #ffaa00, #ff00ff, #ffaa00)';
+                progressBar.style.backgroundSize = '300% 100%';
+            } else {
+                progressBar.style.background = 'linear-gradient(90deg, #00ff41, #ff00ff, #00ff41)';
+                progressBar.style.backgroundSize = '300% 100%';
             }
 
             if (progress >= 100) {
-                statusMsg.innerHTML = '[حالة] ⚡ اختراق كامل. عبود يسيطر على كل شيء.';
+                statusMsg.innerHTML = '[نجاح] ⚡ اختراق كامل. عبود يسيطر على كل شيء.';
                 statusMsg.style.color = '#ff3333';
-                overlay.classList.add('vibrate');
+                hackActive = false;
+                document.querySelector('.main-content').style.borderColor = '#ff3333';
                 setTimeout(() => {
-                    hackOverlay.classList.add('show');
-                    setTimeout(() => {
-                        hackOverlay.classList.remove('show');
-                        resetHack();
-                    }, 5000);
-                }, 500);
-
-                if (progress < 105) {
-                    document.body.style.animation = 'vibrate 0.05s infinite alternate';
-                    setTimeout(() => {
-                        document.body.style.animation = '';
-                    }, 2000);
-                }
+                    document.querySelector('.main-content').style.borderColor = '#00ff41';
+                }, 3000);
+                setTimeout(() => {
+                    progress = 0; port = 0; packets = 0; servers = 0; systems = 0; power = 0;
+                    portEl.textContent = '0';
+                    packetEl.textContent = '0';
+                    serverEl.textContent = '0';
+                    systemEl.textContent = '0';
+                    powerEl.textContent = '0%';
+                    progressBar.style.width = '0%';
+                    progressBar.textContent = '0%';
+                    progressBar.style.background = 'linear-gradient(90deg, #00ff41, #ff00ff, #00ff41)';
+                    progressBar.style.backgroundSize = '300% 100%';
+                    statusMsg.innerHTML = '[جاهز] في انتظار أمر عبود...';
+                    statusMsg.style.color = '#00ff41';
+                    document.querySelector('.main-content').style.borderColor = '#00ff41';
+                }, 5000);
             } else if (progress > 75) {
-                statusMsg.textContent = '[حالة] اختراق متقدم... تجاوز الدفاعات الأخيرة. عبود قادم.';
+                statusMsg.textContent = '[هجوم] اختراق متقدم... تجاوز الدفاعات الأخيرة. عبود قادم.';
                 statusMsg.style.color = '#ffaa00';
             } else if (progress > 45) {
-                statusMsg.textContent = '[حالة] اختراق الطبقات الداخلية... عبود في الداخل.';
+                statusMsg.textContent = '[هجوم] اختراق الطبقات الداخلية... عبود في الداخل.';
                 statusMsg.style.color = '#ffcc00';
             } else {
-                statusMsg.textContent = '[حالة] جاري اختراق الطبقات الدفاعية...';
-                statusMsg.style.color = '#00ff41';
-            }
-
-            if (Math.random() > 0.65) {
                 const randomStatus = statusPhrases[Math.floor(Math.random() * statusPhrases.length)];
-                if (progress < 100) {
-                    statusMsg.textContent = randomStatus;
-                }
+                statusMsg.textContent = randomStatus;
+                statusMsg.style.color = '#00ff41';
             }
         }, 200);
 
         // =========================================================
-        // 4. Titles
+        // 3. EXPLOIT BUTTON
         // =========================================================
-        const titles = ['!ACCESS', '!BREACH', '!ROOT', '!HACKED', '!ZERO_DAY', '!OVERRIDE', '!SYSTEM_DOWN', '!ABOOD_RULES'];
+        document.getElementById('exploitBtn').addEventListener('click', function() {
+            const target = document.getElementById('targetInput').value || 'غير محدد';
+            const exploit = document.getElementById('exploitInput').value || 'افتراضي';
+            document.getElementById('labOutput').textContent = `[EXPLOIT] استهداف: ${target} | الأمر: ${exploit} | الحالة: جاري التنفيذ...`;
+            setTimeout(() => {
+                document.getElementById('labOutput').textContent = `[EXPLOIT] ✅ استغلال ناجح! تم اختراق ${target} بواسطة عبود.`;
+                document.getElementById('labOutput').style.color = '#00ff41';
+                // تفعيل الهجوم التلقائي
+                if (!hackActive) {
+                    hackActive = true;
+                    statusMsg.textContent = '[هجوم] بدء الهجوم بأمر عبود...';
+                    statusMsg.style.color = '#ff3333';
+                }
+            }, 1500);
+        });
+
+        // =========================================================
+        // 4. COPY CODE
+        // =========================================================
+        function copyCode(btn) {
+            const code = btn.parentElement.querySelector('code');
+            navigator.clipboard.writeText(code.textContent).then(() => {
+                btn.textContent = '✓ تم النسخ';
+                setTimeout(() => btn.textContent = 'نسخ', 2000);
+            });
+        }
+
+        // =========================================================
+        // 5. SUPPORT MODAL (HIDDEN BUTTON)
+        // =========================================================
+        const supportModal = document.getElementById('supportModal');
+        const supportTrigger = document.getElementById('supportTrigger');
+        const closeSupport = document.getElementById('closeSupport');
+
+        // تفعيل الزر المخفي عبر الضغط (النص مخفي بلون خلفية)
+        supportTrigger.addEventListener('click', function(e) {
+            e.preventDefault();
+            supportModal.classList.add('show');
+            // تسجيل الحدث
+            console.log('[SUPPORT] تم تفعيل زر الدعم المخفي بواسطة عبود.');
+        });
+
+        // اختصار لوحة المفاتيح Ctrl+Shift+S
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.shiftKey && (e.key === 'S' || e.key === 's')) {
+                e.preventDefault();
+                supportModal.classList.add('show');
+                console.log('[SUPPORT] تم تفعيل الدعم عبر اختصار لوحة المفاتيح.');
+            }
+        });
+
+        closeSupport.addEventListener('click', function() {
+            supportModal.classList.remove('show');
+        });
+
+        supportModal.addEventListener('click', function(e) {
+            if (e.target === supportModal) {
+                supportModal.classList.remove('show');
+            }
+        });
+
+        // =========================================================
+        // 6. TITLE FLASH
+        // =========================================================
+        const titles = ['ABOOD_SECURE', '!BREACH', '!ROOT', '!HACKED', '!ZERO_DAY', '!OVERRIDE', '!SYSTEM_DOWN', '!ABOOD_RULES'];
         setInterval(() => {
             if (hackActive) {
-                const newTitle = titles[Math.floor(Math.random() * titles.length)] + ' | ' + String(Math.floor(Math.random() * 9999)).padStart(4, '0');
-                document.title = newTitle;
+                document.title = titles[Math.floor(Math.random() * titles.length)] + ' | ' + String(Math.floor(Math.random() * 9999)).padStart(4, '0');
                 setTimeout(() => {
-                    document.title = 'نظام الاختراق المتقدم - عبود';
+                    document.title = 'ABOOD_SECURE_ACADEMY';
                 }, 800);
             }
         }, 2000);
 
         // =========================================================
-        // 5. Flash effects
+        // 7. CONSOLE
         // =========================================================
-        setInterval(() => {
-            if (hackActive && Math.random() > 0.8) {
-                const flash = document.createElement('div');
-                flash.style.cssText = `
-                    position: fixed;
-                    top: 0; left: 0;
-                    width: 100%; height: 100%;
-                    background: #00ff41;
-                    opacity: 0.12;
-                    z-index: 999;
-                    pointer-events: none;
-                    transition: opacity 0.05s;
-                `;
-                document.body.appendChild(flash);
-                setTimeout(() => {
-                    flash.style.opacity = '0';
-                    setTimeout(() => {
-                        flash.remove();
-                    }, 100);
-                }, 50);
-            }
-        }, 1200);
-
-        // =========================================================
-        // 6. Console message
-        // =========================================================
-        console.log('%c◼ SYSTEM BREACHED ◼', 'color: #00ff41; font-size: 22px; font-weight: bold;');
+        console.log('%c◼ ABOOD_SECURE_ACADEMY ◼', 'color: #00ff41; font-size: 22px; font-weight: bold;');
         console.log('%cعبود هو المسيطر.', 'color: #ff00ff; font-size: 20px; font-weight: bold;');
         console.log('%cالظل المبرمج في خدمة عبود.', 'color: #00ff41; font-size: 16px;');
         console.log('%cجميع الأنظمة تحت سيطرة عبود.', 'color: #888; font-size: 14px;');
@@ -808,168 +882,39 @@ HTML_TEMPLATE = """
         console.log('====================================');
 
         // =========================================================
-        // 7. Typewriter effect
-        // =========================================================
-        (function typeWriterEffect() {
-            const terminalBox = document.getElementById('terminal');
-            const systemLines = [
-                '[SYSTEM] تهيئة البيئة لعبود...',
-                '[SYSTEM] تحميل وحدات الهجوم...',
-                '[SYSTEM] جاهزية كاملة.',
-                '[SYSTEM] في انتظار أمر عبود.'
-            ];
-            systemLines.forEach((line, index) => {
-                setTimeout(() => {
-                    const newLine = document.createElement('div');
-                    newLine.className = 'terminal-line highlight';
-                    newLine.style.borderRight = 'none';
-                    newLine.style.animation = 'none';
-                    newLine.textContent = line;
-                    terminalBox.prepend(newLine);
-                }, index * 600);
-            });
-        })();
-
-        // =========================================================
-        // 8. Hack button
-        // =========================================================
-        hackBtn.addEventListener('click', function() {
-            if (!hackActive) {
-                hackActive = true;
-                this.textContent = '⏳ جاري الهجوم... عبود يهاجم';
-                this.style.borderColor = '#ff3333';
-                this.style.color = '#ff3333';
-                this.style.boxShadow = '0 0 60px rgba(255, 51, 51, 0.3)';
-                statusMsg.textContent = '[حالة] بدء الهجوم الشامل بأمر عبود...';
-                statusMsg.style.color = '#ff3333';
-                port = 0; packets = 0; servers = 0; systems = 0; power = 0; progress = 0;
-                portEl.textContent = '0';
-                packetEl.textContent = '0';
-                serverEl.textContent = '0';
-                systemEl.textContent = '0';
-                powerEl.textContent = '0%';
-                progressBar.style.width = '0%';
-                progressBar.textContent = '0%';
-                overlay.classList.remove('vibrate');
-                document.body.style.animation = '';
-                
-                // Play sound
-                try {
-                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                    const oscillator = audioCtx.createOscillator();
-                    const gainNode = audioCtx.createGain();
-                    oscillator.connect(gainNode);
-                    gainNode.connect(audioCtx.destination);
-                    oscillator.type = 'sawtooth';
-                    oscillator.frequency.setValueAtTime(150, audioCtx.currentTime);
-                    oscillator.frequency.exponentialRampToValueAtTime(900, audioCtx.currentTime + 0.4);
-                    gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
-                    oscillator.start(audioCtx.currentTime);
-                    oscillator.stop(audioCtx.currentTime + 0.4);
-                } catch(e) {}
-            }
-        });
-
-        // =========================================================
-        // 9. Reset hack
-        // =========================================================
-        function resetHack() {
-            hackActive = false;
-            hackBtn.textContent = '▶ تنفيذ الهجوم';
-            hackBtn.style.borderColor = '#00ff41';
-            hackBtn.style.color = '#00ff41';
-            hackBtn.style.boxShadow = '0 0 30px rgba(0, 255, 65, 0.1)';
-            statusMsg.textContent = '[حالة] جاهز لتنفيذ هجوم جديد بأمر عبود.';
-            statusMsg.style.color = '#00ff41';
-            overlay.classList.remove('vibrate');
-            document.body.style.animation = '';
-            setTimeout(() => {
-                port = 0; packets = 0; servers = 0; systems = 0; power = 0; progress = 0;
-                portEl.textContent = '0';
-                packetEl.textContent = '0';
-                serverEl.textContent = '0';
-                systemEl.textContent = '0';
-                powerEl.textContent = '0%';
-                progressBar.style.width = '0%';
-                progressBar.textContent = '0%';
-                progressBar.style.background = 'linear-gradient(90deg, #00ff41, #00ff88, #ff00ff, #00ff41)';
-            }, 1000);
-        }
-
-        // =========================================================
-        // 10. Floating texts
+        // 8. FLOATING EFFECTS
         // =========================================================
         setInterval(() => {
             if (hackActive && Math.random() > 0.88) {
-                const floatText = document.createElement('div');
-                const texts = ['!ACCESS', '!BREACH', '!ROOT', '!HACKED', '!SYSTEM', '!OVERRIDE', '!ABOOD', '!RULES'];
-                floatText.textContent = texts[Math.floor(Math.random() * texts.length)];
-                floatText.style.cssText = `
+                const el = document.createElement('div');
+                const txt = ['!ACCESS', '!BREACH', '!ROOT', '!HACKED', '!SYSTEM', '!OVERRIDE', '!ABOOD', '!RULES'];
+                el.textContent = txt[Math.floor(Math.random() * txt.length)];
+                el.style.cssText = `
                     position: fixed;
                     color: #ff00ff;
                     font-size: ${Math.random() * 2.5 + 1.5}rem;
                     font-weight: bold;
-                    opacity: ${Math.random() * 0.3 + 0.1};
+                    opacity: ${Math.random() * 0.3 + 0.05};
                     z-index: 5;
                     pointer-events: none;
                     left: ${Math.random() * 90}%;
                     top: ${Math.random() * 90}%;
                     transform: rotate(${Math.random() * 60 - 30}deg);
                     text-shadow: 0 0 30px #ff00ff;
-                    animation: fadeOut 2.5s forwards;
+                    animation: floatFade ${Math.random() * 2 + 2}s forwards;
                 `;
-                document.body.appendChild(floatText);
+                document.body.appendChild(el);
                 const style = document.createElement('style');
                 style.textContent = `
-                    @keyframes fadeOut {
-                        0% { opacity: ${Math.random() * 0.3 + 0.1}; transform: scale(1) rotate(${Math.random() * 60 - 30}deg); }
-                        100% { opacity: 0; transform: scale(3) rotate(${Math.random() * 60 - 30 + 30}deg); }
+                    @keyframes floatFade {
+                        0% { opacity: ${Math.random() * 0.3 + 0.05}; transform: scale(1) rotate(${Math.random() * 60 - 30}deg); }
+                        100% { opacity: 0; transform: scale(4) rotate(${Math.random() * 60 - 30 + 40}deg); }
                     }
                 `;
                 document.head.appendChild(style);
-                setTimeout(() => {
-                    floatText.remove();
-                    style.remove();
-                }, 3000);
+                setTimeout(() => { el.remove(); style.remove(); }, 4000);
             }
         }, 2500);
-
-        // =========================================================
-        // 11. تأثير إضافي: نصوص متحركة في الخلفية
-        // =========================================================
-        setInterval(() => {
-            if (hackActive && Math.random() > 0.7) {
-                const scrollText = document.createElement('div');
-                scrollText.textContent = '🔴 عبود يخترق... 🔴';
-                scrollText.style.cssText = `
-                    position: fixed;
-                    color: #ff3333;
-                    font-size: 1.2rem;
-                    font-weight: bold;
-                    opacity: 0.15;
-                    z-index: 3;
-                    pointer-events: none;
-                    left: ${Math.random() * 80}%;
-                    top: ${Math.random() * 80}%;
-                    animation: scrollText 3s linear forwards;
-                    text-shadow: 0 0 20px #ff3333;
-                `;
-                document.body.appendChild(scrollText);
-                const style = document.createElement('style');
-                style.textContent = `
-                    @keyframes scrollText {
-                        0% { opacity: 0.15; transform: translateX(0) rotate(0deg); }
-                        100% { opacity: 0; transform: translateX(-200px) rotate(180deg); }
-                    }
-                `;
-                document.head.appendChild(style);
-                setTimeout(() => {
-                    scrollText.remove();
-                    style.remove();
-                }, 3000);
-            }
-        }, 3000);
     </script>
 </body>
 </html>
