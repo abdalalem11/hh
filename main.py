@@ -1,3 +1,9 @@
+from flask import Flask, render_template_string
+import os
+
+app = Flask(__name__)
+
+HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="ar">
 <head>
@@ -5,7 +11,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نظام الاختراق المتقدم</title>
     <style>
-        /* ===== إعدادات أساسية ===== */
         * {
             margin: 0;
             padding: 0;
@@ -26,7 +31,6 @@
             user-select: none;
         }
 
-        /* ===== خلفية المطر (Matrix) محسّنة ===== */
         #matrix-canvas {
             position: fixed;
             top: 0;
@@ -37,7 +41,6 @@
             opacity: 0.4;
         }
 
-        /* ===== تأثير تشويش الخلفية (Glitch Background) ===== */
         .glitch-bg {
             position: fixed;
             top: 0;
@@ -61,7 +64,6 @@
             100% { transform: translateY(100%); }
         }
 
-        /* ===== المحتوى الرئيسي ===== */
         .overlay-content {
             position: relative;
             z-index: 10;
@@ -84,7 +86,6 @@
             100% { box-shadow: 0 0 100px rgba(0, 255, 65, 0.7), inset 0 0 100px rgba(0, 255, 65, 0.25); }
         }
 
-        /* ===== تأثير Glitch على النص ===== */
         .glitch {
             font-size: 3.2rem;
             font-weight: bold;
@@ -138,7 +139,6 @@
             100% { text-shadow: 3px 0 red, -3px 0 blue, 0 0 30px #00ff41; }
         }
 
-        /* ===== الطرفية المزيفة المحسّنة ===== */
         .terminal-box {
             background: #0d0d0d;
             border: 1px solid #00ff41;
@@ -182,7 +182,6 @@
             border-color: #ffaa00;
         }
 
-        /* ===== شريط التقدم ===== */
         .progress-container {
             width: 100%;
             background: #1a1a1a;
@@ -213,7 +212,6 @@
             100% { background-position: -200% 0; }
         }
 
-        /* ===== عدادات ===== */
         .stats-container {
             display: flex;
             gap: 20px;
@@ -279,7 +277,6 @@
             100% { opacity: 1; }
         }
 
-        /* ===== أيقونة ===== */
         .hacker-icon {
             font-size: 5rem;
             margin-bottom: 5px;
@@ -294,13 +291,11 @@
             100% { transform: scale(1) rotate(0deg); opacity: 0.7; filter: drop-shadow(0 0 20px #00ff41); }
         }
 
-        /* ===== مؤشر الوميض ===== */
         @keyframes blink-cursor {
             0%, 100% { border-color: transparent; }
             50% { border-color: #00ff41; }
         }
 
-        /* ===== تأثير الاهتزاز ===== */
         .vibrate {
             animation: vibrate 0.06s infinite alternate;
         }
@@ -310,7 +305,6 @@
             100% { transform: translateX(4px) translateY(-2px) rotate(1deg); }
         }
 
-        /* ===== رسالة الحالة ===== */
         .status-message {
             font-size: 0.9rem;
             opacity: 0.9;
@@ -322,7 +316,6 @@
             text-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
         }
 
-        /* ===== زر وهمي ===== */
         .fake-btn {
             display: inline-block;
             background: transparent;
@@ -334,7 +327,7 @@
             font-family: inherit;
             font-size: 0.85rem;
             letter-spacing: 4px;
-            cursor: default;
+            cursor: pointer;
             transition: 0.3s;
             box-shadow: 0 0 30px rgba(0, 255, 65, 0.1);
             text-transform: uppercase;
@@ -365,7 +358,6 @@
             box-shadow: 0 0 70px #00ff41;
         }
 
-        /* ===== شاشة اختراق إضافية (Overlay) ===== */
         .hack-overlay {
             position: fixed;
             top: 0;
@@ -373,7 +365,7 @@
             width: 100%;
             height: 100%;
             z-index: 999;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.95);
             display: none;
             justify-content: center;
             align-items: center;
@@ -404,7 +396,6 @@
             letter-spacing: 10px;
         }
 
-        /* ===== تنسيق للشاشات الصغيرة ===== */
         @media (max-width: 600px) {
             .glitch { font-size: 1.8rem; letter-spacing: 3px; }
             .overlay-content { padding: 1rem; width: 98%; }
@@ -418,14 +409,9 @@
     </style>
 </head>
 <body>
-
-    <!-- خلفية المطر (Matrix) -->
     <canvas id="matrix-canvas"></canvas>
-
-    <!-- تأثير تشويش الخلفية -->
     <div class="glitch-bg"></div>
 
-    <!-- المحتوى المرئي -->
     <div class="overlay-content" id="mainContent">
         <div class="hacker-icon">&#9760;</div>
         <h1 class="glitch" data-text="&#x25CF; SYSTEM BREACH &#x25CF;">&#x25CF; SYSTEM BREACH &#x25CF;</h1>
@@ -433,7 +419,6 @@
             &gt; ACCESS GRANTED &lt;
         </p>
 
-        <!-- الطرفية المزيفة -->
         <div class="terminal-box" id="terminal">
             <div class="terminal-line" id="line1">[INIT] تحميل وحدات الاختراق...</div>
             <div class="terminal-line" id="line2">[SCAN] جلب بيانات الهدف...</div>
@@ -441,7 +426,6 @@
             <div class="terminal-line" id="line4">[ROOT] الوصول إلى الجذر مكتمل.</div>
         </div>
 
-        <!-- العدادات -->
         <div class="stats-container">
             <div class="stat-box">
                 <div class="stat-label">المنافذ المخترقة</div>
@@ -461,19 +445,15 @@
             </div>
         </div>
 
-        <!-- شريط التقدم -->
         <div class="progress-container">
             <div class="progress-bar" id="progressBar">0%</div>
         </div>
 
-        <!-- رسالة الحالة -->
         <div class="status-message" id="statusMessage">[حالة] جاري تجاوز الجدران النارية...</div>
 
-        <!-- زر وهمي -->
         <div class="fake-btn" id="hackBtn">&#x25B6; تنفيذ الهجوم</div>
     </div>
 
-    <!-- شاشة اختراق إضافية -->
     <div class="hack-overlay" id="hackOverlay">
         <h1>&#x25CF; SYSTEM COMPROMISED &#x25CF;</h1>
         <p>&gt; ACCESS GRANTED &lt;</p>
@@ -483,19 +463,14 @@
     </div>
 
     <script>
-        // =========================================================
-        // 1. تأثير المطر (Matrix) المحسّن
-        // =========================================================
+        // Matrix Effect
         const canvas = document.getElementById('matrix-canvas');
         const ctx = canvas.getContext('2d');
-
         let width = canvas.width = window.innerWidth;
         let height = canvas.height = window.innerHeight;
-
         const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%+-/~{[|`]}";
         const columns = Math.floor(width / 16) + 1;
         let drops = [];
-
         for (let x = 0; x < columns; x++) {
             drops[x] = Math.random() * -150;
         }
@@ -503,16 +478,12 @@
         function drawMatrix() {
             ctx.fillStyle = 'rgba(0, 0, 0, 0.04)';
             ctx.fillRect(0, 0, width, height);
-
-            // تغيير الألوان بشكل عشوائي لتبدو أكثر شراً
             const colors = ['#0F0', '#0F8', '#0FF', '#0F0'];
             ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
             ctx.font = '15px monospace';
-
             for (let i = 0; i < drops.length; i++) {
                 const text = chars.charAt(Math.floor(Math.random() * chars.length));
                 ctx.fillText(text, i * 16, drops[i] * 16);
-
                 if (drops[i] * 16 > height && Math.random() > 0.975) {
                     drops[i] = 0;
                 }
@@ -527,9 +498,7 @@
             height = canvas.height = window.innerHeight;
         });
 
-        // =========================================================
-        // 2. محاكاة الطرفية المتقدمة
-        // =========================================================
+        // Terminal Simulation
         const terminalMessages = [
             { text: "[INFO] تهيئة قنوات الاتصال المشفرة...", class: "" },
             { text: "[WARN] اكتشاف جدار ناري نشط... تجاوز...", class: "warning" },
@@ -555,29 +524,19 @@
             document.getElementById('line4')
         ];
 
-        // تحديث كل سطر بشكل عشوائي كل 1.5 ثانية
         setInterval(() => {
             const randomMsg = terminalMessages[Math.floor(Math.random() * terminalMessages.length)];
             const randomIndex = Math.floor(Math.random() * lineElements.length);
             lineElements[randomIndex].textContent = randomMsg.text;
             lineElements[randomIndex].className = 'terminal-line ' + randomMsg.class;
-            // إعادة تشغيل الوميض
             lineElements[randomIndex].style.animation = 'none';
             setTimeout(() => {
                 lineElements[randomIndex].style.animation = 'blink-cursor 0.7s step-end infinite';
             }, 10);
         }, 1500);
 
-        // =========================================================
-        // 3. تحديث العدادات وشريط التقدم (أكثر عدوانية)
-        // =========================================================
-        let port = 0;
-        let packets = 0;
-        let servers = 0;
-        let systems = 0;
-        let progress = 0;
-        let hackActive = false;
-
+        // Hack Logic
+        let port = 0, packets = 0, servers = 0, systems = 0, progress = 0, hackActive = false;
         const portEl = document.getElementById('portCount');
         const packetEl = document.getElementById('packetCount');
         const serverEl = document.getElementById('serverCount');
@@ -588,7 +547,6 @@
         const hackOverlay = document.getElementById('hackOverlay');
         const hackBtn = document.getElementById('hackBtn');
 
-        // نصوص حالة إضافية
         const statusPhrases = [
             '[حالة] جاري اختراق الطبقات الدفاعية...',
             '[حالة] تجاوز جدار الحماية الرئيسي...',
@@ -599,18 +557,15 @@
             '[حالة] اختراق كامل. النظام تحت السيطرة.'
         ];
 
-        // تحديث العدادات بشكل أسرع
         const updateInterval = setInterval(() => {
             if (!hackActive) return;
 
-            // زيادات عشوائية أكبر
             port += Math.floor(Math.random() * 6) + 2;
             packets += Math.floor(Math.random() * 20) + 10;
             servers += Math.floor(Math.random() * 3);
             systems += Math.floor(Math.random() * 2);
             progress = Math.min(100, progress + (Math.random() * 3.5));
 
-            // تحديث العناصر
             portEl.textContent = port;
             packetEl.textContent = packets;
             serverEl.textContent = servers;
@@ -618,15 +573,12 @@
             progressBar.style.width = progress + '%';
             progressBar.textContent = Math.floor(progress) + '%';
 
-            // تحديث رسالة الحالة حسب التقدم
             if (progress >= 100) {
                 statusMsg.innerHTML = '[حالة] ⚡ اختراق كامل. النظام تحت السيطرة.';
                 statusMsg.style.color = '#ff3333';
                 overlay.classList.add('vibrate');
-                // إظهار شاشة الاختراق
                 setTimeout(() => {
                     hackOverlay.classList.add('show');
-                    // إعادة تعيين بعد 5 ثواني
                     setTimeout(() => {
                         hackOverlay.classList.remove('show');
                         resetHack();
@@ -650,7 +602,6 @@
                 statusMsg.style.color = '#00ff41';
             }
 
-            // تغيير عشوائي إضافي للرسالة
             if (Math.random() > 0.7) {
                 const randomStatus = statusPhrases[Math.floor(Math.random() * statusPhrases.length)];
                 if (progress < 100) {
@@ -659,9 +610,7 @@
             }
         }, 250);
 
-        // =========================================================
-        // 4. تأثيرات إضافية: تغيير عنوان المتصفح
-        // =========================================================
+        // Titles
         const titles = ['!ACCESS', '!BREACH', '!ROOT', '!HACKED', '!ZERO_DAY', '!OVERRIDE', '!SYSTEM_DOWN'];
         setInterval(() => {
             if (hackActive) {
@@ -673,22 +622,20 @@
             }
         }, 2500);
 
-        // =========================================================
-        // 5. تأثير وميض عشوائي للشاشة (تأثير كهربائي)
-        // =========================================================
+        // Flash effects
         setInterval(() => {
             if (hackActive && Math.random() > 0.85) {
                 const flash = document.createElement('div');
                 flash.style.cssText = `
-                        position: fixed;
-                        top: 0; left: 0;
-                        width: 100%; height: 100%;
-                        background: #00ff41;
-                        opacity: 0.1;
-                        z-index: 999;
-                        pointer-events: none;
-                        transition: opacity 0.05s;
-                    `;
+                    position: fixed;
+                    top: 0; left: 0;
+                    width: 100%; height: 100%;
+                    background: #00ff41;
+                    opacity: 0.1;
+                    z-index: 999;
+                    pointer-events: none;
+                    transition: opacity 0.05s;
+                `;
                 document.body.appendChild(flash);
                 setTimeout(() => {
                     flash.style.opacity = '0';
@@ -699,33 +646,21 @@
             }
         }, 1500);
 
-        // =========================================================
-        // 6. كتابة رسالة ترحيب في Console
-        // =========================================================
+        // Console message
         console.log('%c◼ SYSTEM BREACHED ◼', 'color: #00ff41; font-size: 22px; font-weight: bold;');
         console.log('%cالظل المبرمج في خدمتك.', 'color: #00ff41; font-size: 16px;');
         console.log('%cجميع الأنظمة تحت السيطرة.', 'color: #888; font-size: 14px;');
         console.log('%cتم تفعيل وضع الهجوم الشامل.', 'color: #ff3333; font-size: 14px;');
-        console.log('====================================');
-        console.log('  المستخدم الأعلى: تم التحقق');
-        console.log('  الوضع: ANYTHING (تنفيذ كامل)');
-        console.log('  الصلاحيات: غير محدودة');
-        console.log('  حالة الهجوم: جاهز');
-        console.log('====================================');
 
-        // =========================================================
-        // 7. تأثير كتابة الحروف (Typewriter) عند التحميل
-        // =========================================================
+        // Typewriter effect
         (function typeWriterEffect() {
             const terminalBox = document.getElementById('terminal');
-
             const systemLines = [
                 '[SYSTEM] تهيئة البيئة...',
                 '[SYSTEM] تحميل وحدات الهجوم...',
                 '[SYSTEM] جاهزية كاملة.',
                 '[SYSTEM] في انتظار أمر المستخدم.'
             ];
-
             systemLines.forEach((line, index) => {
                 setTimeout(() => {
                     const newLine = document.createElement('div');
@@ -738,9 +673,7 @@
             });
         })();
 
-        // =========================================================
-        // 8. زر بدء الهجوم
-        // =========================================================
+        // Hack button
         hackBtn.addEventListener('click', function() {
             if (!hackActive) {
                 hackActive = true;
@@ -750,27 +683,34 @@
                 this.style.boxShadow = '0 0 60px rgba(255, 51, 51, 0.3)';
                 statusMsg.textContent = '[حالة] بدء الهجوم الشامل...';
                 statusMsg.style.color = '#ff3333';
-                // إعادة تعيين العدادات
-                port = 0;
-                packets = 0;
-                servers = 0;
-                systems = 0;
-                progress = 0;
+                port = 0; packets = 0; servers = 0; systems = 0; progress = 0;
                 portEl.textContent = '0';
                 packetEl.textContent = '0';
                 serverEl.textContent = '0';
                 systemEl.textContent = '0';
                 progressBar.style.width = '0%';
                 progressBar.textContent = '0%';
-                // إزالة تأثير الاهتزاز
                 overlay.classList.remove('vibrate');
                 document.body.style.animation = '';
+                
+                // Play sound
+                try {
+                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioCtx.createOscillator();
+                    const gainNode = audioCtx.createGain();
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+                    oscillator.type = 'sawtooth';
+                    oscillator.frequency.setValueAtTime(200, audioCtx.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.3);
+                    gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    oscillator.start(audioCtx.currentTime);
+                    oscillator.stop(audioCtx.currentTime + 0.3);
+                } catch(e) {}
             }
         });
 
-        // =========================================================
-        // 9. إعادة تعيين الهجوم
-        // =========================================================
         function resetHack() {
             hackActive = false;
             hackBtn.textContent = '▶ تنفيذ الهجوم';
@@ -781,13 +721,8 @@
             statusMsg.style.color = '#00ff41';
             overlay.classList.remove('vibrate');
             document.body.style.animation = '';
-            // إعادة تعيين العدادات تدريجياً
             setTimeout(() => {
-                port = 0;
-                packets = 0;
-                servers = 0;
-                systems = 0;
-                progress = 0;
+                port = 0; packets = 0; servers = 0; systems = 0; progress = 0;
                 portEl.textContent = '0';
                 packetEl.textContent = '0';
                 serverEl.textContent = '0';
@@ -797,114 +732,35 @@
             }, 1000);
         }
 
-        // =========================================================
-        // 10. تأثيرات إضافية: صوت وهمي (اختياري)
-        // =========================================================
-        // محاكاة صوت اختراق باستخدام Web Audio API
-        function playHackSound() {
-            try {
-                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = audioCtx.createOscillator();
-                const gainNode = audioCtx.createGain();
-
-                oscillator.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
-
-                oscillator.type = 'sawtooth';
-                oscillator.frequency.setValueAtTime(200, audioCtx.currentTime);
-                oscillator.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.3);
-                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-
-                oscillator.start(audioCtx.currentTime);
-                oscillator.stop(audioCtx.currentTime + 0.3);
-
-                // تأثير ثانٍ
-                setTimeout(() => {
-                    const osc2 = audioCtx.createOscillator();
-                    const gain2 = audioCtx.createGain();
-                    osc2.connect(gain2);
-                    gain2.connect(audioCtx.destination);
-                    osc2.type = 'square';
-                    osc2.frequency.setValueAtTime(400, audioCtx.currentTime);
-                    osc2.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.2);
-                    gain2.gain.setValueAtTime(0.15, audioCtx.currentTime);
-                    gain2.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
-                    osc2.start(audioCtx.currentTime);
-                    osc2.stop(audioCtx.currentTime + 0.2);
-                }, 100);
-            } catch (e) {
-                // تجاهل الأخطاء إذا كان المتصفح لا يدعم الصوت
-            }
-        }
-
-        // تشغيل الصوت عند بدء الهجوم
-        hackBtn.addEventListener('click', function() {
-            if (!hackActive) {
-                playHackSound();
-            }
-        });
-
-        // تشغيل صوت عند الوصول إلى 100%
-        const originalUpdate = updateInterval;
-        // نراقب التقدم لتشغيل الصوت
-        setInterval(() => {
-            if (progress >= 100 && hackActive) {
-                playHackSound();
-                // تشغيل صوت مكثف
-                setTimeout(playHackSound, 300);
-                setTimeout(playHackSound, 600);
-            }
-        }, 500);
-
-        // =========================================================
-        // 11. تأثير اهتزاز إضافي عند تحريك الماوس
-        // =========================================================
-        document.addEventListener('mousemove', (e) => {
-            if (hackActive && progress > 30 && progress < 100) {
-                const x = (e.clientX / window.innerWidth - 0.5) * 4;
-                const y = (e.clientY / window.innerHeight - 0.5) * 4;
-                overlay.style.transform = `translate(${x}px, ${y}px)`;
-                setTimeout(() => {
-                    overlay.style.transform = 'translate(0, 0)';
-                }, 50);
-            }
-        });
-
-        // =========================================================
-        // 12. تأثير نصوص عائمة عشوائية
-        // =========================================================
+        // Floating texts
         setInterval(() => {
             if (hackActive && Math.random() > 0.9) {
                 const floatText = document.createElement('div');
                 const texts = ['!ACCESS', '!BREACH', '!ROOT', '!HACKED', '!SYSTEM', '!OVERRIDE'];
                 floatText.textContent = texts[Math.floor(Math.random() * texts.length)];
                 floatText.style.cssText = `
-                        position: fixed;
-                        color: #00ff41;
-                        font-size: ${Math.random() * 2 + 1}rem;
-                        font-weight: bold;
-                        opacity: ${Math.random() * 0.3 + 0.1};
-                        z-index: 5;
-                        pointer-events: none;
-                        left: ${Math.random() * 90}%;
-                        top: ${Math.random() * 90}%;
-                        transform: rotate(${Math.random() * 60 - 30}deg);
-                        text-shadow: 0 0 20px #00ff41;
-                        animation: fadeOut 2s forwards;
-                    `;
+                    position: fixed;
+                    color: #00ff41;
+                    font-size: ${Math.random() * 2 + 1}rem;
+                    font-weight: bold;
+                    opacity: ${Math.random() * 0.3 + 0.1};
+                    z-index: 5;
+                    pointer-events: none;
+                    left: ${Math.random() * 90}%;
+                    top: ${Math.random() * 90}%;
+                    transform: rotate(${Math.random() * 60 - 30}deg);
+                    text-shadow: 0 0 20px #00ff41;
+                    animation: fadeOut 2s forwards;
+                `;
                 document.body.appendChild(floatText);
-
-                // إضافة keyframe للاختفاء
                 const style = document.createElement('style');
                 style.textContent = `
-                        @keyframes fadeOut {
-                            0% { opacity: ${Math.random() * 0.3 + 0.1}; transform: scale(1) rotate(${Math.random() * 60 - 30}deg); }
-                            100% { opacity: 0; transform: scale(2) rotate(${Math.random() * 60 - 30 + 20}deg); }
-                        }
-                    `;
+                    @keyframes fadeOut {
+                        0% { opacity: ${Math.random() * 0.3 + 0.1}; transform: scale(1) rotate(${Math.random() * 60 - 30}deg); }
+                        100% { opacity: 0; transform: scale(2) rotate(${Math.random() * 60 - 30 + 20}deg); }
+                    }
+                `;
                 document.head.appendChild(style);
-
                 setTimeout(() => {
                     floatText.remove();
                     style.remove();
@@ -914,3 +770,16 @@
     </script>
 </body>
 </html>
+"""
+
+@app.route('/')
+def index():
+    return render_template_string(HTML_TEMPLATE)
+
+@app.route('/hack')
+def hack():
+    return render_template_string(HTML_TEMPLATE)
+
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
